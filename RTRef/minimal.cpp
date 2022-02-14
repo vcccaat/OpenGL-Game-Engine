@@ -1,11 +1,13 @@
 // Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <embree3/rtcore.h>
 #include <stdio.h>
 #include <math.h>
 #include <limits>
-#include <stdio.h>
+#include <iostream>
 #include <stb_image_write.h>
 
 #if defined(_WIN32)
@@ -188,7 +190,7 @@ unsigned char castRay(RTCScene scene,
    */
   rtcIntersect1(scene, &context, &rayhit);
 
-  printf("%f, %f, %f: ", ox, oy, oz);
+  //printf("%f, %f, %f: ", ox, oy, oz);
   if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID)
   {
       /* Note how geomID and primID identify the geometry we just hit.
@@ -274,18 +276,20 @@ int main2() {
     float* topRightBound = new float[] { 1.5, 1.5 };
 
     // Cast rays with origin in bounding box
-    for (int ox = bottomLeftBound[0]; ox < topRightBound[0]; ox += (topRightBound[0] - bottomLeftBound[0]) / n) {
-        for (int oy = bottomLeftBound[1]; oy < topRightBound[1]; oy += (topRightBound[1] - bottomLeftBound[1]) / n) {
-            out = castRay(scene, ox, oy, 0, 0, 0, -1);
-            img[ox * n + oy + 0] = out;
-            img[ox * n + oy + 1] = out;
-            img[ox * n + oy + 2] = out;
-            printf("%f", out);
-        }
+    float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
+    float ystep = (topRightBound[1] - bottomLeftBound[1]) / n;
+    float ox;
+    float oy;
+    for (int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
+        ox = i * xstep + bottomLeftBound[0];
+        oy = j * ystep + bottomLeftBound[1];
+        out = castRay(scene, ox, oy, 1, 0, 0, -1);
+        img[(3 * i * n) + (3 * j) + 0] = out;
+        img[(3 * i * n) + (3 * j) + 1] = out;
+        img[(3 * i * n) + (3 * j) + 2] = out;
     }
 
     // Write the image
     //stbi_write_png("triangle.png", n, n, 3, img, n * 3);
-    std::cout << "done" << std::endl;
     return 0;
 }
