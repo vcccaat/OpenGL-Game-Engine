@@ -2,8 +2,11 @@
 #include "DemoApp.hpp"
 #include "TetraApp.hpp"
 #include "SkyApp.hpp"
+#include "../RTRef/minimal.cpp"
 
 int main(int argc, char const *argv[]) {
+    main2();
+    return 0;
   nanogui::init();
 
   if (argc > 1 && std::string(argv[1]) == "Tetra") {

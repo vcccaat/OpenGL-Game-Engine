@@ -4,3 +4,21 @@ xcodebuild/
 *.blend1
 debug_build/
 .vscode
+.vs/Starter22/v17/ipch/AutoPCH/c98f5edb7e6e7514/MAIN.ipch
+.vs/Starter22/v17/ipch/AutoPCH/6d4b36e98f8ce908/MINIMAL.ipch
+.vs/Starter22/v17/ipch/AutoPCH/58d2323f4b4a5552/MAIN.ipch
+.vs/Starter22/v17/ipch/AutoPCH/3dfe61daf4128978/TRIANGLE_GEOMETRY.ipch
+.vs/Starter22/v17/ipch/AutoPCH/24449a6a2e41352d/TRIANGLE_GEOMETRY_DEVICE.ipch
+.vs/Starter22/v17/Browse.VC.opendb
+.vs/CMake Overview
+.vs/cmake.db
+.vs/ProjectSettings.json
+.vs/slnx.sqlite
+.vs/Starter22/v17/.suo
+.vs/Starter22/v17/Browse.VC.db
+.vs/Starter22/v17/Browse.VC.db-shm
+.vs/Starter22/v17/Browse.VC.db-wal
+.vs/Starter22/v17/ipch/AutoPCH/201e037f001c1ada/MAIN.ipch
+.vs/Starter22/v17/ipch/AutoPCH/329b17ea7f3a00a9/RTCORE.ipch
+.vs/Starter22/v17/ipch/AutoPCH/5d9bd6ae4b7974b0/MINIMAL.ipch
+.vs/Starter22/v17/ipch/AutoPCH/93739205d617f90c/MINIMAL.ipch
