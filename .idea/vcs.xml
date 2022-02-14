@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/assimp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/cpplocate" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/embree" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/glm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/nanogui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/nanogui/ext/glfw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/nanogui/ext/nanovg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/nanogui/ext/nanovg_metal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/nanogui/ext/pybind11" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext/stb" vcs="Git" />
+  </component>
+</project>
