@@ -272,8 +272,8 @@ int main2() {
     int n = 256;
     unsigned char out;
     unsigned char* img = new unsigned char[n * n * 3];
-    float* bottomLeftBound = new float[] { -.5, -.5 };
-    float* topRightBound = new float[] { 1.5, 1.5 };
+    float bottomLeftBound [2] = { -.5, -.5 };
+    float topRightBound [2] = { 1.5, 1.5 };
 
     // Cast rays with origin in bounding box
     float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;

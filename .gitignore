@@ -27,3 +27,5 @@ CMakeLists.txt
 CMakeLists.txt
 *.txt
 CMakeLists.txt
+cmake-build-debug/
+.idea/.name
