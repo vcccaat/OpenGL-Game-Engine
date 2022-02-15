@@ -2,13 +2,13 @@
 #include "DemoApp.hpp"
 #include "TetraApp.hpp"
 #include "SkyApp.hpp"
-#include "../RTRef/minimal.cpp"
+#include "../RTRef/minimal.cpp" /////added
 
 int main(int argc, char const *argv[]) {
-    main2();
-    return 0;
+    main1(); /////added
+    return 0; /////added
+    /////added
   nanogui::init();
-
   if (argc > 1 && std::string(argv[1]) == "Tetra") {
     nanogui::ref<TetraApp> app = new TetraApp();
     nanogui::mainloop(16);

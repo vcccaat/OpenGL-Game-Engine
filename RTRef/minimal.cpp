@@ -242,7 +242,7 @@ void waitForKeyPressedUnderWindows()
 
 /* -------------------------------------------------------------------------- */
 
-int main1()
+int main2()
 {
   /* Initialization. All of this may fail, but we will be notified by
    * our errorFunction. */
@@ -266,7 +266,7 @@ int main1()
   return 0;
 }
 
-int main2() {
+int main1() {
     // Instantiate devices
     RTCDevice device = initializeDevice();
     RTCScene scene = initializeScene(device);
