@@ -1,13 +1,16 @@
 // Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#define STB_IMAGE_IMPLEMENTATION
-
 #include <embree3/rtcore.h>
 #include <stdio.h>
 #include <math.h>
 #include <limits>
 #include <iostream>
+
+
+//#define STBI_MSC_SECURE_CRT
+//#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
 #if defined(_WIN32)
@@ -239,7 +242,7 @@ void waitForKeyPressedUnderWindows()
 
 /* -------------------------------------------------------------------------- */
 
-int main1()
+int main2()
 {
   /* Initialization. All of this may fail, but we will be notified by
    * our errorFunction. */
@@ -263,7 +266,7 @@ int main1()
   return 0;
 }
 
-int main2() {
+int main1() {
     // Instantiate devices
     RTCDevice device = initializeDevice();
     RTCScene scene = initializeScene(device);
@@ -290,6 +293,6 @@ int main2() {
     }
 
     // Write the image
-    //stbi_write_png("triangle.png", n, n, 3, img, n * 3);
+    stbi_write_png("triangle.png", n, n, 3, img, n * 3);
     return 0;
 }

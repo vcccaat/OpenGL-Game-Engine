@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\cmake-build-debug\\ext",
+    "\\cmake-build-debug\\ext\\assimp",
+    "\\cmake-build-debug\\ext\\assimp\\include",
+    "\\cmake-build-debug\\ext\\assimp\\include\\assimp",
+    "\\Demo",
+    "\\ext\\embree",
+    "\\ext\\embree\\kernels\\common",
+    "\\ext\\embree\\tutorials",
+    "\\ext\\embree\\tutorials\\triangle_geometry"
+  ],
+  "SelectedNode": "\\Demo\\Main.cpp",
+  "PreviewInSolutionExplorer": false
+}

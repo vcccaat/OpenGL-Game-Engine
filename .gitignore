@@ -22,9 +22,6 @@ debug_build/
 .vs/Starter22/v17/ipch/AutoPCH/329b17ea7f3a00a9/RTCORE.ipch
 .vs/Starter22/v17/ipch/AutoPCH/5d9bd6ae4b7974b0/MINIMAL.ipch
 .vs/Starter22/v17/ipch/AutoPCH/93739205d617f90c/MINIMAL.ipch
-CMakeLists.txt
-CMakeLists.txt
-CMakeLists.txt
 *.txt
 CMakeLists.txt
 cmake-build-debug/
