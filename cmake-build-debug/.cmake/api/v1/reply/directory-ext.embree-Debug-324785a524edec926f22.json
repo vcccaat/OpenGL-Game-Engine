@@ -1,0 +1,218 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"INSTALL",
+			"include"
+		],
+		"files" : 
+		[
+			"ext/embree/common/cmake/package.cmake",
+			"ext/embree/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 460,
+				"parent" : 0
+			},
+			{
+				"file" : 0,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 38,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 40,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 55,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 56,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 57,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 58,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 59,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 60,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 93,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 131,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 132,
+				"parent" : 2
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 3,
+			"component" : "devel",
+			"destination" : "include",
+			"paths" : 
+			[
+				"ext/embree/include/embree3"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "devel",
+			"destination" : "share/man",
+			"paths" : 
+			[
+				"ext/embree/man/man3"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 5,
+			"component" : "lib",
+			"destination" : "share/doc/embree3",
+			"paths" : 
+			[
+				"ext/embree/LICENSE.txt"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 6,
+			"component" : "lib",
+			"destination" : "share/doc/embree3",
+			"paths" : 
+			[
+				"ext/embree/CHANGELOG.md"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 7,
+			"component" : "lib",
+			"destination" : "share/doc/embree3",
+			"paths" : 
+			[
+				"ext/embree/README.md"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 8,
+			"component" : "lib",
+			"destination" : "share/doc/embree3",
+			"paths" : 
+			[
+				"ext/embree/readme.pdf"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 9,
+			"component" : "lib",
+			"destination" : "share/doc/embree3",
+			"paths" : 
+			[
+				"ext/embree/third-party-programs.txt"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 10,
+			"component" : "lib",
+			"destination" : "share/doc/embree3",
+			"paths" : 
+			[
+				"ext/embree/third-party-programs-TBB.txt"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 11,
+			"component" : "lib",
+			"destination" : "bin/..",
+			"paths" : 
+			[
+				"cmake-build-debug/ext/embree/uninstall.command"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 12,
+			"component" : "devel",
+			"destination" : "lib/cmake/embree-3.13.2",
+			"paths" : 
+			[
+				{
+					"from" : "cmake-build-debug/ext/embree/embree-config-install.cmake",
+					"to" : "embree-config.cmake"
+				}
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 13,
+			"component" : "devel",
+			"destination" : "lib/cmake/embree-3.13.2",
+			"paths" : 
+			[
+				"cmake-build-debug/ext/embree/embree-config-version.cmake"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "ext/embree",
+		"source" : "ext/embree"
+	}
+}

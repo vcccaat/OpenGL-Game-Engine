@@ -1,0 +1,3720 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "ext/assimp/bin/libassimpd.dylib"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"ADD_LIBRARY",
+			"INSTALL",
+			"TARGET_LINK_LIBRARIES",
+			"TARGET_COMPILE_OPTIONS",
+			"ADD_DEFINITIONS",
+			"add_definitions",
+			"ADD_ASSIMP_EXPORTER",
+			"ADD_ASSIMP_IMPORTER",
+			"INCLUDE_DIRECTORIES",
+			"TARGET_INCLUDE_DIRECTORIES",
+			"TARGET_COMPILE_FEATURES"
+		],
+		"files" : 
+		[
+			"ext/assimp/code/CMakeLists.txt",
+			"ext/assimp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1171,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 1316,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 1213,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 1180,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 1096,
+				"parent" : 0
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 622,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 6
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 311,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 8
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 797,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 10
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 672,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 12
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 848,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 14
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 318,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 16
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 302,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 18
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 323,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 20
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 626,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 22
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 330,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 24
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 680,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 26
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 632,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 28
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 335,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 30
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 530,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 32
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 340,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 34
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 581,
+				"parent" : 36
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 524,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 38
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 642,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 40
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 360,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 42
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 354,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 44
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 646,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 46
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 666,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 48
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 365,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 50
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 550,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 52
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 379,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 54
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 372,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 56
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 385,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 58
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 392,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 60
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 402,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 62
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 45,
+				"parent" : 36
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 44,
+				"parent" : 36
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 416,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 66
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 423,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 68
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 429,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 70
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 436,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 72
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 443,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 74
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 859,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 76
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 519,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 78
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 472,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 80
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 467,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 82
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 610,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 84
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 477,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 86
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 493,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 88
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 614,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 90
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 506,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 92
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 494,
+				"parent" : 36
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 676,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 95
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 618,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 97
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 512,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 99
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 764,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 101
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 759,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 103
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 772,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 105
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 777,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 107
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 782,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 109
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 687,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 111
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 654,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 113
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 787,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 115
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 792,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 117
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 662,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 119
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 810,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 121
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 574,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 123
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 658,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 288,
+				"parent" : 125
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 802,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 256,
+				"parent" : 127
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 1152,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 1069,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 1072,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 1,
+				"line" : 229,
+				"parent" : 36
+			},
+			{
+				"command" : 8,
+				"file" : 0,
+				"line" : 904,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 0,
+				"line" : 1068,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 0,
+				"line" : 1084,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 0,
+				"line" : 1108,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 0,
+				"line" : 1155,
+				"parent" : 0
+			},
+			{
+				"command" : 9,
+				"file" : 0,
+				"line" : 1186,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 0,
+				"line" : 1306,
+				"parent" : 0
+			},
+			{
+				"command" : 10,
+				"file" : 0,
+				"line" : 1184,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-fvisibility=hidden -fno-strict-aliasing -Wall -Wno-long-long  -g -arch x86_64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.0.sdk -fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-Werror"
+				},
+				{
+					"fragment" : "-std=gnu++11"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "ASSIMP_BUILD_DLL_EXPORT"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "ASSIMP_BUILD_NO_3DS_EXPORTER"
+				},
+				{
+					"backtrace" : 9,
+					"define" : "ASSIMP_BUILD_NO_3DS_IMPORTER"
+				},
+				{
+					"backtrace" : 11,
+					"define" : "ASSIMP_BUILD_NO_3D_IMPORTER"
+				},
+				{
+					"backtrace" : 13,
+					"define" : "ASSIMP_BUILD_NO_3MF_EXPORTER"
+				},
+				{
+					"backtrace" : 15,
+					"define" : "ASSIMP_BUILD_NO_3MF_IMPORTER"
+				},
+				{
+					"backtrace" : 17,
+					"define" : "ASSIMP_BUILD_NO_AC_IMPORTER"
+				},
+				{
+					"backtrace" : 19,
+					"define" : "ASSIMP_BUILD_NO_AMF_IMPORTER"
+				},
+				{
+					"backtrace" : 21,
+					"define" : "ASSIMP_BUILD_NO_ASE_IMPORTER"
+				},
+				{
+					"backtrace" : 23,
+					"define" : "ASSIMP_BUILD_NO_ASSBIN_EXPORTER"
+				},
+				{
+					"backtrace" : 25,
+					"define" : "ASSIMP_BUILD_NO_ASSBIN_IMPORTER"
+				},
+				{
+					"backtrace" : 27,
+					"define" : "ASSIMP_BUILD_NO_ASSJSON_EXPORTER"
+				},
+				{
+					"backtrace" : 29,
+					"define" : "ASSIMP_BUILD_NO_ASSXML_EXPORTER"
+				},
+				{
+					"backtrace" : 31,
+					"define" : "ASSIMP_BUILD_NO_B3D_IMPORTER"
+				},
+				{
+					"backtrace" : 33,
+					"define" : "ASSIMP_BUILD_NO_BLEND_IMPORTER"
+				},
+				{
+					"backtrace" : 35,
+					"define" : "ASSIMP_BUILD_NO_BVH_IMPORTER"
+				},
+				{
+					"backtrace" : 37,
+					"define" : "ASSIMP_BUILD_NO_C4D_IMPORTER"
+				},
+				{
+					"backtrace" : 39,
+					"define" : "ASSIMP_BUILD_NO_COB_IMPORTER"
+				},
+				{
+					"backtrace" : 41,
+					"define" : "ASSIMP_BUILD_NO_COLLADA_EXPORTER"
+				},
+				{
+					"backtrace" : 43,
+					"define" : "ASSIMP_BUILD_NO_CSM_IMPORTER"
+				},
+				{
+					"backtrace" : 45,
+					"define" : "ASSIMP_BUILD_NO_DXF_IMPORTER"
+				},
+				{
+					"backtrace" : 47,
+					"define" : "ASSIMP_BUILD_NO_FBX_EXPORTER"
+				},
+				{
+					"backtrace" : 49,
+					"define" : "ASSIMP_BUILD_NO_GLTF_EXPORTER"
+				},
+				{
+					"backtrace" : 51,
+					"define" : "ASSIMP_BUILD_NO_HMP_IMPORTER"
+				},
+				{
+					"backtrace" : 53,
+					"define" : "ASSIMP_BUILD_NO_IFC_IMPORTER"
+				},
+				{
+					"backtrace" : 55,
+					"define" : "ASSIMP_BUILD_NO_IQM_IMPORTER"
+				},
+				{
+					"backtrace" : 57,
+					"define" : "ASSIMP_BUILD_NO_IRRMESH_IMPORTER"
+				},
+				{
+					"backtrace" : 59,
+					"define" : "ASSIMP_BUILD_NO_IRR_IMPORTER"
+				},
+				{
+					"backtrace" : 61,
+					"define" : "ASSIMP_BUILD_NO_LWO_IMPORTER"
+				},
+				{
+					"backtrace" : 63,
+					"define" : "ASSIMP_BUILD_NO_LWS_IMPORTER"
+				},
+				{
+					"backtrace" : 64,
+					"define" : "ASSIMP_BUILD_NO_M3D_EXPORTER"
+				},
+				{
+					"backtrace" : 65,
+					"define" : "ASSIMP_BUILD_NO_M3D_IMPORTER"
+				},
+				{
+					"backtrace" : 67,
+					"define" : "ASSIMP_BUILD_NO_MD2_IMPORTER"
+				},
+				{
+					"backtrace" : 69,
+					"define" : "ASSIMP_BUILD_NO_MD3_IMPORTER"
+				},
+				{
+					"backtrace" : 71,
+					"define" : "ASSIMP_BUILD_NO_MD5_IMPORTER"
+				},
+				{
+					"backtrace" : 73,
+					"define" : "ASSIMP_BUILD_NO_MDC_IMPORTER"
+				},
+				{
+					"backtrace" : 75,
+					"define" : "ASSIMP_BUILD_NO_MDL_IMPORTER"
+				},
+				{
+					"backtrace" : 77,
+					"define" : "ASSIMP_BUILD_NO_MMD_IMPORTER"
+				},
+				{
+					"backtrace" : 79,
+					"define" : "ASSIMP_BUILD_NO_MS3D_IMPORTER"
+				},
+				{
+					"backtrace" : 81,
+					"define" : "ASSIMP_BUILD_NO_NDO_IMPORTER"
+				},
+				{
+					"backtrace" : 83,
+					"define" : "ASSIMP_BUILD_NO_NFF_IMPORTER"
+				},
+				{
+					"backtrace" : 85,
+					"define" : "ASSIMP_BUILD_NO_OBJ_EXPORTER"
+				},
+				{
+					"backtrace" : 87,
+					"define" : "ASSIMP_BUILD_NO_OFF_IMPORTER"
+				},
+				{
+					"backtrace" : 89,
+					"define" : "ASSIMP_BUILD_NO_OGRE_IMPORTER"
+				},
+				{
+					"backtrace" : 91,
+					"define" : "ASSIMP_BUILD_NO_OPENGEX_EXPORTER"
+				},
+				{
+					"backtrace" : 93,
+					"define" : "ASSIMP_BUILD_NO_OPENGEX_IMPORTER"
+				},
+				{
+					"backtrace" : 94,
+					"define" : "ASSIMP_BUILD_NO_OWN_ZLIB"
+				},
+				{
+					"backtrace" : 96,
+					"define" : "ASSIMP_BUILD_NO_PBRT_EXPORTER"
+				},
+				{
+					"backtrace" : 98,
+					"define" : "ASSIMP_BUILD_NO_PLY_EXPORTER"
+				},
+				{
+					"backtrace" : 100,
+					"define" : "ASSIMP_BUILD_NO_PLY_IMPORTER"
+				},
+				{
+					"backtrace" : 102,
+					"define" : "ASSIMP_BUILD_NO_Q3BSP_IMPORTER"
+				},
+				{
+					"backtrace" : 104,
+					"define" : "ASSIMP_BUILD_NO_Q3D_IMPORTER"
+				},
+				{
+					"backtrace" : 106,
+					"define" : "ASSIMP_BUILD_NO_RAW_IMPORTER"
+				},
+				{
+					"backtrace" : 108,
+					"define" : "ASSIMP_BUILD_NO_SIB_IMPORTER"
+				},
+				{
+					"backtrace" : 110,
+					"define" : "ASSIMP_BUILD_NO_SMD_IMPORTER"
+				},
+				{
+					"backtrace" : 112,
+					"define" : "ASSIMP_BUILD_NO_STEP_EXPORTER"
+				},
+				{
+					"backtrace" : 114,
+					"define" : "ASSIMP_BUILD_NO_STL_EXPORTER"
+				},
+				{
+					"backtrace" : 116,
+					"define" : "ASSIMP_BUILD_NO_STL_IMPORTER"
+				},
+				{
+					"backtrace" : 118,
+					"define" : "ASSIMP_BUILD_NO_TERRAGEN_IMPORTER"
+				},
+				{
+					"backtrace" : 120,
+					"define" : "ASSIMP_BUILD_NO_X3D_EXPORTER"
+				},
+				{
+					"backtrace" : 122,
+					"define" : "ASSIMP_BUILD_NO_X3D_IMPORTER"
+				},
+				{
+					"backtrace" : 124,
+					"define" : "ASSIMP_BUILD_NO_XGL_IMPORTER"
+				},
+				{
+					"backtrace" : 126,
+					"define" : "ASSIMP_BUILD_NO_X_EXPORTER"
+				},
+				{
+					"backtrace" : 128,
+					"define" : "ASSIMP_BUILD_NO_X_IMPORTER"
+				},
+				{
+					"backtrace" : 129,
+					"define" : "OPENDDLPARSER_BUILD"
+				},
+				{
+					"backtrace" : 130,
+					"define" : "RAPIDJSON_HAS_STDSTRING=1"
+				},
+				{
+					"backtrace" : 131,
+					"define" : "RAPIDJSON_NOMEMBERITERATORCLASS"
+				},
+				{
+					"define" : "assimp_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/cmake-build-debug/ext/assimp/include"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/cmake-build-debug/ext/assimp"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/include"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/."
+				},
+				{
+					"backtrace" : 133,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/pugixml/src"
+				},
+				{
+					"backtrace" : 134,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/rapidjson/include"
+				},
+				{
+					"backtrace" : 135,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib"
+				},
+				{
+					"backtrace" : 136,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/unzip"
+				},
+				{
+					"backtrace" : 137,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/openddlparser/include"
+				},
+				{
+					"backtrace" : 138,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../include"
+				},
+				{
+					"backtrace" : 138,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/cmake-build-debug/ext/assimp/code/../include"
+				},
+				{
+					"backtrace" : 139,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/.."
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "11"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				3,
+				4,
+				8,
+				9,
+				11,
+				12,
+				13,
+				14,
+				16,
+				18,
+				19,
+				21,
+				22,
+				23,
+				25,
+				26,
+				27,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				36,
+				37,
+				38,
+				39,
+				40,
+				46,
+				49,
+				50,
+				52,
+				54,
+				56,
+				58,
+				60,
+				62,
+				64,
+				66,
+				68,
+				70,
+				72,
+				74,
+				76,
+				78,
+				80,
+				82,
+				84,
+				86,
+				88,
+				90,
+				92,
+				94,
+				96,
+				98,
+				100,
+				103,
+				104,
+				106,
+				108,
+				110,
+				112,
+				114,
+				117,
+				118,
+				120,
+				122,
+				124,
+				127,
+				129,
+				131,
+				134,
+				137,
+				139,
+				143,
+				145,
+				147,
+				149,
+				151,
+				152,
+				153,
+				154,
+				155,
+				156,
+				157,
+				158,
+				161,
+				166,
+				172,
+				180,
+				184,
+				185,
+				187,
+				189,
+				192,
+				193,
+				194,
+				195,
+				196,
+				197,
+				198
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-fno-strict-aliasing  -g -arch x86_64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.0.sdk -fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-Werror"
+				},
+				{
+					"fragment" : "-std=gnu99"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "ASSIMP_BUILD_DLL_EXPORT"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "ASSIMP_BUILD_NO_3DS_EXPORTER"
+				},
+				{
+					"backtrace" : 9,
+					"define" : "ASSIMP_BUILD_NO_3DS_IMPORTER"
+				},
+				{
+					"backtrace" : 11,
+					"define" : "ASSIMP_BUILD_NO_3D_IMPORTER"
+				},
+				{
+					"backtrace" : 13,
+					"define" : "ASSIMP_BUILD_NO_3MF_EXPORTER"
+				},
+				{
+					"backtrace" : 15,
+					"define" : "ASSIMP_BUILD_NO_3MF_IMPORTER"
+				},
+				{
+					"backtrace" : 17,
+					"define" : "ASSIMP_BUILD_NO_AC_IMPORTER"
+				},
+				{
+					"backtrace" : 19,
+					"define" : "ASSIMP_BUILD_NO_AMF_IMPORTER"
+				},
+				{
+					"backtrace" : 21,
+					"define" : "ASSIMP_BUILD_NO_ASE_IMPORTER"
+				},
+				{
+					"backtrace" : 23,
+					"define" : "ASSIMP_BUILD_NO_ASSBIN_EXPORTER"
+				},
+				{
+					"backtrace" : 25,
+					"define" : "ASSIMP_BUILD_NO_ASSBIN_IMPORTER"
+				},
+				{
+					"backtrace" : 27,
+					"define" : "ASSIMP_BUILD_NO_ASSJSON_EXPORTER"
+				},
+				{
+					"backtrace" : 29,
+					"define" : "ASSIMP_BUILD_NO_ASSXML_EXPORTER"
+				},
+				{
+					"backtrace" : 31,
+					"define" : "ASSIMP_BUILD_NO_B3D_IMPORTER"
+				},
+				{
+					"backtrace" : 33,
+					"define" : "ASSIMP_BUILD_NO_BLEND_IMPORTER"
+				},
+				{
+					"backtrace" : 35,
+					"define" : "ASSIMP_BUILD_NO_BVH_IMPORTER"
+				},
+				{
+					"backtrace" : 37,
+					"define" : "ASSIMP_BUILD_NO_C4D_IMPORTER"
+				},
+				{
+					"backtrace" : 39,
+					"define" : "ASSIMP_BUILD_NO_COB_IMPORTER"
+				},
+				{
+					"backtrace" : 41,
+					"define" : "ASSIMP_BUILD_NO_COLLADA_EXPORTER"
+				},
+				{
+					"backtrace" : 43,
+					"define" : "ASSIMP_BUILD_NO_CSM_IMPORTER"
+				},
+				{
+					"backtrace" : 45,
+					"define" : "ASSIMP_BUILD_NO_DXF_IMPORTER"
+				},
+				{
+					"backtrace" : 47,
+					"define" : "ASSIMP_BUILD_NO_FBX_EXPORTER"
+				},
+				{
+					"backtrace" : 49,
+					"define" : "ASSIMP_BUILD_NO_GLTF_EXPORTER"
+				},
+				{
+					"backtrace" : 51,
+					"define" : "ASSIMP_BUILD_NO_HMP_IMPORTER"
+				},
+				{
+					"backtrace" : 53,
+					"define" : "ASSIMP_BUILD_NO_IFC_IMPORTER"
+				},
+				{
+					"backtrace" : 55,
+					"define" : "ASSIMP_BUILD_NO_IQM_IMPORTER"
+				},
+				{
+					"backtrace" : 57,
+					"define" : "ASSIMP_BUILD_NO_IRRMESH_IMPORTER"
+				},
+				{
+					"backtrace" : 59,
+					"define" : "ASSIMP_BUILD_NO_IRR_IMPORTER"
+				},
+				{
+					"backtrace" : 61,
+					"define" : "ASSIMP_BUILD_NO_LWO_IMPORTER"
+				},
+				{
+					"backtrace" : 63,
+					"define" : "ASSIMP_BUILD_NO_LWS_IMPORTER"
+				},
+				{
+					"backtrace" : 64,
+					"define" : "ASSIMP_BUILD_NO_M3D_EXPORTER"
+				},
+				{
+					"backtrace" : 65,
+					"define" : "ASSIMP_BUILD_NO_M3D_IMPORTER"
+				},
+				{
+					"backtrace" : 67,
+					"define" : "ASSIMP_BUILD_NO_MD2_IMPORTER"
+				},
+				{
+					"backtrace" : 69,
+					"define" : "ASSIMP_BUILD_NO_MD3_IMPORTER"
+				},
+				{
+					"backtrace" : 71,
+					"define" : "ASSIMP_BUILD_NO_MD5_IMPORTER"
+				},
+				{
+					"backtrace" : 73,
+					"define" : "ASSIMP_BUILD_NO_MDC_IMPORTER"
+				},
+				{
+					"backtrace" : 75,
+					"define" : "ASSIMP_BUILD_NO_MDL_IMPORTER"
+				},
+				{
+					"backtrace" : 77,
+					"define" : "ASSIMP_BUILD_NO_MMD_IMPORTER"
+				},
+				{
+					"backtrace" : 79,
+					"define" : "ASSIMP_BUILD_NO_MS3D_IMPORTER"
+				},
+				{
+					"backtrace" : 81,
+					"define" : "ASSIMP_BUILD_NO_NDO_IMPORTER"
+				},
+				{
+					"backtrace" : 83,
+					"define" : "ASSIMP_BUILD_NO_NFF_IMPORTER"
+				},
+				{
+					"backtrace" : 85,
+					"define" : "ASSIMP_BUILD_NO_OBJ_EXPORTER"
+				},
+				{
+					"backtrace" : 87,
+					"define" : "ASSIMP_BUILD_NO_OFF_IMPORTER"
+				},
+				{
+					"backtrace" : 89,
+					"define" : "ASSIMP_BUILD_NO_OGRE_IMPORTER"
+				},
+				{
+					"backtrace" : 91,
+					"define" : "ASSIMP_BUILD_NO_OPENGEX_EXPORTER"
+				},
+				{
+					"backtrace" : 93,
+					"define" : "ASSIMP_BUILD_NO_OPENGEX_IMPORTER"
+				},
+				{
+					"backtrace" : 94,
+					"define" : "ASSIMP_BUILD_NO_OWN_ZLIB"
+				},
+				{
+					"backtrace" : 96,
+					"define" : "ASSIMP_BUILD_NO_PBRT_EXPORTER"
+				},
+				{
+					"backtrace" : 98,
+					"define" : "ASSIMP_BUILD_NO_PLY_EXPORTER"
+				},
+				{
+					"backtrace" : 100,
+					"define" : "ASSIMP_BUILD_NO_PLY_IMPORTER"
+				},
+				{
+					"backtrace" : 102,
+					"define" : "ASSIMP_BUILD_NO_Q3BSP_IMPORTER"
+				},
+				{
+					"backtrace" : 104,
+					"define" : "ASSIMP_BUILD_NO_Q3D_IMPORTER"
+				},
+				{
+					"backtrace" : 106,
+					"define" : "ASSIMP_BUILD_NO_RAW_IMPORTER"
+				},
+				{
+					"backtrace" : 108,
+					"define" : "ASSIMP_BUILD_NO_SIB_IMPORTER"
+				},
+				{
+					"backtrace" : 110,
+					"define" : "ASSIMP_BUILD_NO_SMD_IMPORTER"
+				},
+				{
+					"backtrace" : 112,
+					"define" : "ASSIMP_BUILD_NO_STEP_EXPORTER"
+				},
+				{
+					"backtrace" : 114,
+					"define" : "ASSIMP_BUILD_NO_STL_EXPORTER"
+				},
+				{
+					"backtrace" : 116,
+					"define" : "ASSIMP_BUILD_NO_STL_IMPORTER"
+				},
+				{
+					"backtrace" : 118,
+					"define" : "ASSIMP_BUILD_NO_TERRAGEN_IMPORTER"
+				},
+				{
+					"backtrace" : 120,
+					"define" : "ASSIMP_BUILD_NO_X3D_EXPORTER"
+				},
+				{
+					"backtrace" : 122,
+					"define" : "ASSIMP_BUILD_NO_X3D_IMPORTER"
+				},
+				{
+					"backtrace" : 124,
+					"define" : "ASSIMP_BUILD_NO_XGL_IMPORTER"
+				},
+				{
+					"backtrace" : 126,
+					"define" : "ASSIMP_BUILD_NO_X_EXPORTER"
+				},
+				{
+					"backtrace" : 128,
+					"define" : "ASSIMP_BUILD_NO_X_IMPORTER"
+				},
+				{
+					"backtrace" : 129,
+					"define" : "OPENDDLPARSER_BUILD"
+				},
+				{
+					"backtrace" : 130,
+					"define" : "RAPIDJSON_HAS_STDSTRING=1"
+				},
+				{
+					"backtrace" : 131,
+					"define" : "RAPIDJSON_NOMEMBERITERATORCLASS"
+				},
+				{
+					"define" : "assimp_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/cmake-build-debug/ext/assimp/include"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/cmake-build-debug/ext/assimp"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/include"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code"
+				},
+				{
+					"backtrace" : 132,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/."
+				},
+				{
+					"backtrace" : 133,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/pugixml/src"
+				},
+				{
+					"backtrace" : 134,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/rapidjson/include"
+				},
+				{
+					"backtrace" : 135,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib"
+				},
+				{
+					"backtrace" : 136,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/unzip"
+				},
+				{
+					"backtrace" : 137,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../contrib/openddlparser/include"
+				},
+				{
+					"backtrace" : 138,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/../include"
+				},
+				{
+					"backtrace" : 138,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/cmake-build-debug/ext/assimp/code/../include"
+				},
+				{
+					"backtrace" : 139,
+					"path" : "/Users/sze/Desktop/CS5625/Starter22/ext/assimp/code/.."
+				}
+			],
+			"language" : "C",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					140
+				],
+				"standard" : "99"
+			},
+			"sourceIndexes" : 
+			[
+				174,
+				176,
+				178
+			]
+		}
+	],
+	"folder" : 
+	{
+		"name" : "dependencies"
+	},
+	"id" : "assimp::@f00565dfd11dd3fb0a83",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 2,
+				"path" : "lib"
+			},
+			{
+				"backtrace" : 2,
+				"path" : "lib"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "/usr/local"
+		}
+	},
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "/Library/Developer/CommandLineTools/SDKs/MacOSX12.0.sdk/usr/lib/libz.tbd",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "assimp",
+	"nameOnDisk" : "libassimpd.dylib",
+	"paths" : 
+	{
+		"build" : "ext/assimp/code",
+		"source" : "ext/assimp/code"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CApi",
+			"sourceIndexes" : 
+			[
+				1,
+				2
+			]
+		},
+		{
+			"name" : "Common",
+			"sourceIndexes" : 
+			[
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40
+			]
+		},
+		{
+			"name" : "include\\assimp",
+			"sourceIndexes" : 
+			[
+				41,
+				42,
+				43,
+				44,
+				51,
+				209,
+				210,
+				211,
+				212,
+				213,
+				214,
+				215,
+				216,
+				217,
+				218,
+				219,
+				220,
+				221,
+				222,
+				223,
+				224,
+				225,
+				226,
+				227,
+				228,
+				229,
+				230,
+				231,
+				232,
+				233,
+				234,
+				235,
+				236,
+				237,
+				238,
+				239,
+				240,
+				241,
+				242,
+				243,
+				244,
+				245,
+				246,
+				247,
+				248,
+				249,
+				250,
+				251,
+				252,
+				253,
+				254,
+				255,
+				256,
+				257,
+				258,
+				259,
+				260,
+				261,
+				262,
+				263,
+				264,
+				265,
+				266,
+				267,
+				268,
+				269,
+				270,
+				271,
+				272,
+				273,
+				274,
+				275,
+				276,
+				277,
+				278,
+				279,
+				280,
+				281,
+				282,
+				283,
+				284,
+				285,
+				286,
+				287
+			]
+		},
+		{
+			"name" : "Logging",
+			"sourceIndexes" : 
+			[
+				45,
+				46,
+				47,
+				48
+			]
+		},
+		{
+			"name" : "Exporter",
+			"sourceIndexes" : 
+			[
+				49,
+				50
+			]
+		},
+		{
+			"name" : "PostProcessing",
+			"sourceIndexes" : 
+			[
+				52,
+				53,
+				54,
+				55,
+				56,
+				57,
+				58,
+				59,
+				60,
+				61,
+				62,
+				63,
+				64,
+				65,
+				66,
+				67,
+				68,
+				69,
+				70,
+				71,
+				72,
+				73,
+				74,
+				75,
+				76,
+				77,
+				78,
+				79,
+				80,
+				81,
+				82,
+				83,
+				84,
+				85,
+				86,
+				87,
+				88,
+				89,
+				90,
+				91,
+				92,
+				93,
+				94,
+				95,
+				96,
+				97,
+				98,
+				99,
+				100,
+				101,
+				102,
+				103,
+				104,
+				105,
+				106,
+				107,
+				108,
+				109,
+				110,
+				111,
+				112,
+				113
+			]
+		},
+		{
+			"name" : "MaterialSystem",
+			"sourceIndexes" : 
+			[
+				114,
+				115
+			]
+		},
+		{
+			"name" : "STEPParser",
+			"sourceIndexes" : 
+			[
+				116,
+				117,
+				118,
+				119
+			]
+		},
+		{
+			"name" : "AssetLib\\COLLADA",
+			"sourceIndexes" : 
+			[
+				120,
+				121,
+				122,
+				123,
+				124,
+				125
+			]
+		},
+		{
+			"name" : "AssetLib\\OBJ",
+			"sourceIndexes" : 
+			[
+				126,
+				127,
+				128,
+				129,
+				130,
+				131,
+				132,
+				133
+			]
+		},
+		{
+			"name" : "AssetLib\\FBX",
+			"sourceIndexes" : 
+			[
+				134,
+				135,
+				136,
+				137,
+				138,
+				139,
+				140,
+				141,
+				142,
+				143,
+				144,
+				145,
+				146,
+				147,
+				148,
+				149,
+				150,
+				151,
+				152,
+				153,
+				154,
+				155,
+				156,
+				157,
+				158,
+				159
+			]
+		},
+		{
+			"name" : "AssetLib\\GLTF",
+			"sourceIndexes" : 
+			[
+				160,
+				161,
+				162,
+				163,
+				164,
+				165,
+				166,
+				167,
+				168,
+				169,
+				170,
+				171,
+				172,
+				173
+			]
+		},
+		{
+			"name" : "Contrib\\unzip",
+			"sourceIndexes" : 
+			[
+				174,
+				175,
+				176,
+				177,
+				178,
+				179
+			]
+		},
+		{
+			"name" : "Contrib\\Poly2Tri",
+			"sourceIndexes" : 
+			[
+				180,
+				181,
+				182,
+				183,
+				184,
+				185,
+				186,
+				187,
+				188,
+				189,
+				190
+			]
+		},
+		{
+			"name" : "Contrib\\Clipper",
+			"sourceIndexes" : 
+			[
+				191,
+				192
+			]
+		},
+		{
+			"name" : "Contrib\\openddl_parser",
+			"sourceIndexes" : 
+			[
+				193,
+				194,
+				195,
+				196,
+				197,
+				198,
+				199,
+				200,
+				201,
+				202,
+				203,
+				204,
+				205
+			]
+		},
+		{
+			"name" : "Contrib\\Pugixml",
+			"sourceIndexes" : 
+			[
+				206,
+				207
+			]
+		},
+		{
+			"name" : "Contrib\\stb",
+			"sourceIndexes" : 
+			[
+				208
+			]
+		},
+		{
+			"name" : "Compiler",
+			"sourceIndexes" : 
+			[
+				288,
+				289,
+				290
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Assimp.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/CApi/CInterfaceIOWrapper.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/CApi/CInterfaceIOWrapper.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/BaseImporter.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/BaseProcess.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/BaseProcess.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/Importer.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/ScenePrivate.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/PostStepRegistry.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/ImporterRegistry.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/DefaultProgressHandler.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/DefaultIOStream.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/IOSystem.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/DefaultIOSystem.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/ZipArchiveIOSystem.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/PolyTools.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Importer.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/IFF.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/SGSpatialSort.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/VertexTriangleAdjacency.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/VertexTriangleAdjacency.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/SpatialSort.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/SceneCombiner.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/ScenePreprocessor.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/ScenePreprocessor.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/SkeletonMeshBuilder.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/StandardShapes.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/TargetAnimation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/TargetAnimation.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/RemoveComments.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Subdivision.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/scene.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Bitmap.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Version.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/CreateAnimMesh.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/simd.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/simd.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/material.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/AssertHandler.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Exceptional.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Base64.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/DefaultLogger.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/LogStream.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Logger.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/NullLogger.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/Win32DebugLogStream.h",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/DefaultLogger.cpp",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/FileLogStream.h",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Common/StdOStreamLogStream.h",
+			"sourceGroupIndex" : 4
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Common/Exporter.cpp",
+			"sourceGroupIndex" : 5
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/CApi/AssimpCExport.cpp",
+			"sourceGroupIndex" : 5
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/BlobIOSystem.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/CalcTangentsProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/CalcTangentsProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/ComputeUVMappingProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/ComputeUVMappingProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/ConvertToLHProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/ConvertToLHProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/EmbedTexturesProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/EmbedTexturesProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/FindDegenerates.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/FindDegenerates.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/FindInstancesProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/FindInstancesProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/FindInvalidDataProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/FindInvalidDataProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/FixNormalsStep.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/FixNormalsStep.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/DropFaceNormalsProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/DropFaceNormalsProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/GenFaceNormalsProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/GenFaceNormalsProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/GenVertexNormalsProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/GenVertexNormalsProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/PretransformVertices.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/PretransformVertices.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/ImproveCacheLocality.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/ImproveCacheLocality.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/JoinVerticesProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/JoinVerticesProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/LimitBoneWeightsProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/LimitBoneWeightsProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/RemoveRedundantMaterials.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/RemoveRedundantMaterials.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/RemoveVCProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/RemoveVCProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/SortByPTypeProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/SortByPTypeProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/SplitLargeMeshes.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/SplitLargeMeshes.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/TextureTransform.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/TextureTransform.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/TriangulateProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/TriangulateProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/ValidateDataStructure.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/ValidateDataStructure.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/OptimizeGraph.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/OptimizeGraph.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/OptimizeMeshes.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/OptimizeMeshes.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/DeboneProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/DeboneProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/ProcessHelper.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/ProcessHelper.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/MakeVerboseFormat.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/MakeVerboseFormat.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/ScaleProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/ScaleProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/ArmaturePopulate.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/ArmaturePopulate.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/GenBoundingBoxesProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/GenBoundingBoxesProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/PostProcessing/SplitByBoneCountProcess.cpp",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/PostProcessing/SplitByBoneCountProcess.h",
+			"sourceGroupIndex" : 6
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/Material/MaterialSystem.cpp",
+			"sourceGroupIndex" : 7
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/Material/MaterialSystem.h",
+			"sourceGroupIndex" : 7
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/STEPParser/STEPFileReader.h",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/STEPParser/STEPFileReader.cpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/STEPParser/STEPFileEncoding.cpp",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/STEPParser/STEPFileEncoding.h",
+			"sourceGroupIndex" : 8
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/Collada/ColladaHelper.cpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Collada/ColladaHelper.h",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/Collada/ColladaLoader.cpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Collada/ColladaLoader.h",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/Collada/ColladaParser.cpp",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Collada/ColladaParser.h",
+			"sourceGroupIndex" : 9
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjFileData.h",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjFileImporter.cpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjFileImporter.h",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjFileMtlImporter.cpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjFileMtlImporter.h",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjFileParser.cpp",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjFileParser.h",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/Obj/ObjTools.h",
+			"sourceGroupIndex" : 10
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXImporter.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXCompileConfig.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXImporter.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXParser.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXParser.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXTokenizer.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXTokenizer.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXImportSettings.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXConverter.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXConverter.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXUtil.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXUtil.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXDocument.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXDocument.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXProperties.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXProperties.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXMeshGeometry.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXMeshGeometry.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXMaterial.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXModel.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXAnimation.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXNodeAttribute.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXDeformer.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXBinaryTokenizer.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXDocumentUtil.cpp",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/FBX/FBXCommon.h",
+			"sourceGroupIndex" : 11
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFCommon.h",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFCommon.cpp",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFAsset.h",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFAsset.inl",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFAssetWriter.h",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFAssetWriter.inl",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFImporter.cpp",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF/glTFImporter.h",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF2/glTF2Asset.h",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF2/glTF2Asset.inl",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF2/glTF2AssetWriter.h",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF2/glTF2AssetWriter.inl",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/code/AssetLib/glTF2/glTF2Importer.cpp",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/code/AssetLib/glTF2/glTF2Importer.h",
+			"sourceGroupIndex" : 12
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "ext/assimp/contrib/unzip/crypt.c",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/unzip/crypt.h",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "ext/assimp/contrib/unzip/ioapi.c",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/unzip/ioapi.h",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "ext/assimp/contrib/unzip/unzip.c",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/unzip/unzip.h",
+			"sourceGroupIndex" : 13
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/common/shapes.cc",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/common/shapes.h",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/common/utils.h",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/advancing_front.h",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/advancing_front.cc",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/cdt.cc",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/cdt.h",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/sweep.cc",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/sweep.h",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/sweep_context.cc",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/poly2tri/poly2tri/sweep/sweep_context.h",
+			"sourceGroupIndex" : 14
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/clipper/clipper.hpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/clipper/clipper.cpp",
+			"sourceGroupIndex" : 15
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/openddlparser/code/OpenDDLParser.cpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/openddlparser/code/DDLNode.cpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/openddlparser/code/OpenDDLCommon.cpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/openddlparser/code/OpenDDLExport.cpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/openddlparser/code/Value.cpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ext/assimp/contrib/openddlparser/code/OpenDDLStream.cpp",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/openddlparser/include/openddlparser/OpenDDLParser.h",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/openddlparser/include/openddlparser/OpenDDLParserUtils.h",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/openddlparser/include/openddlparser/OpenDDLCommon.h",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/openddlparser/include/openddlparser/OpenDDLExport.h",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/openddlparser/include/openddlparser/OpenDDLStream.h",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/openddlparser/include/openddlparser/DDLNode.h",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/openddlparser/include/openddlparser/Value.h",
+			"sourceGroupIndex" : 16
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/pugixml/src/pugiconfig.hpp",
+			"sourceGroupIndex" : 17
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/pugixml/src/pugixml.hpp",
+			"sourceGroupIndex" : 17
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/contrib/stb/stb_image.h",
+			"sourceGroupIndex" : 18
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/anim.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/aabb.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/ai_assert.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/camera.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/color4.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/color4.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug/ext/assimp/include/assimp/config.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/ColladaMetaData.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/commonMetaData.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/defs.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/cfileio.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/light.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/material.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/material.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/matrix3x3.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/matrix3x3.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/matrix4x4.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/matrix4x4.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/mesh.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/pbrmaterial.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/GltfMaterial.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/postprocess.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/quaternion.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/quaternion.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/scene.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/metadata.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/texture.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/types.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/vector2.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/vector2.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/vector3.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/vector3.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/version.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/cimport.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/importerdesc.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Importer.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/ProgressHandler.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/IOStream.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/IOSystem.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/cexport.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Exporter.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/DefaultIOStream.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/DefaultIOSystem.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/ZipArchiveIOSystem.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/SceneCombiner.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/fast_atof.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/qnan.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/BaseImporter.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Hash.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/MemoryIOWrapper.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/ParsingUtils.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/StreamReader.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/StreamWriter.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/StringComparison.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/StringUtils.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/SGSpatialSort.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/GenericProperty.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/SpatialSort.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/SkeletonMeshBuilder.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/SmallVector.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/SmoothingGroups.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/SmoothingGroups.inl",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/StandardShapes.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/RemoveComments.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Subdivision.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Vertex.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/LineSplitter.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/TinyFormatter.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Profiler.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/LogAux.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Bitmap.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/XMLTools.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/IOStreamBuffer.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/CreateAnimMesh.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/XmlParser.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/MathFunctions.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Exceptional.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/ByteSwapper.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Base64.hpp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Compiler/pushpack1.h",
+			"sourceGroupIndex" : 19
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Compiler/poppack1.h",
+			"sourceGroupIndex" : 19
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ext/assimp/include/assimp/Compiler/pstdint.h",
+			"sourceGroupIndex" : 19
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

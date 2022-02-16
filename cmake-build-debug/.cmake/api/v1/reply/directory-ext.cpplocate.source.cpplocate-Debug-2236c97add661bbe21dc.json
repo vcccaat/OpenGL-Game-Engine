@@ -1,0 +1,116 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"ext/cpplocate/source/cpplocate/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 190,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 198,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 204,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 210,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "runtime_cpp",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"libcpplocated.2.3.0.dylib",
+				"libcpplocated.2.dylib"
+			],
+			"targetId" : "cpplocate::@eecdba3ac93eafbff593",
+			"targetIndex" : 9,
+			"targetInstallNamelink" : "skip",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "runtime_cpp",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"libcpplocated.dylib"
+			],
+			"targetId" : "cpplocate::@eecdba3ac93eafbff593",
+			"targetIndex" : 9,
+			"targetInstallNamelink" : "only",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "dev_cpp",
+			"destination" : "include",
+			"paths" : 
+			[
+				"ext/cpplocate/source/cpplocate/include/cpplocate"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "dev_cpp",
+			"destination" : "include",
+			"paths" : 
+			[
+				"cmake-build-debug/ext/cpplocate/source/cpplocate/include/cpplocate"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "dev_cpp",
+			"destination" : "share/cpplocate/cmake/cpplocate",
+			"exportName" : "cpplocate-export",
+			"exportTargets" : 
+			[
+				{
+					"id" : "cpplocate::@eecdba3ac93eafbff593",
+					"index" : 9
+				}
+			],
+			"paths" : 
+			[
+				"ext/cpplocate/source/cpplocate/CMakeFiles/Export/share/cpplocate/cmake/cpplocate/cpplocate-export.cmake"
+			],
+			"type" : "export"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "ext/cpplocate/source/cpplocate",
+		"source" : "ext/cpplocate/source/cpplocate"
+	}
+}

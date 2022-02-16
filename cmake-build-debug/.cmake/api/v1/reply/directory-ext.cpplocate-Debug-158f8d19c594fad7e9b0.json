@@ -1,0 +1,123 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"ext/cpplocate/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 185,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 188,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 189,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 192,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 193,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 194,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "meta",
+			"destination" : "share/cpplocate",
+			"paths" : 
+			[
+				"cmake-build-debug/ext/cpplocate/VERSION"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "dev_cpp",
+			"destination" : "share/cpplocate",
+			"paths" : 
+			[
+				"ext/cpplocate/cpplocate-config.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "dev_c",
+			"destination" : "share/cpplocate",
+			"paths" : 
+			[
+				"ext/cpplocate/liblocate-config.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "meta",
+			"destination" : "share/cpplocate",
+			"paths" : 
+			[
+				"ext/cpplocate/AUTHORS"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 5,
+			"component" : "meta",
+			"destination" : "share/cpplocate",
+			"paths" : 
+			[
+				"ext/cpplocate/LICENSE"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 6,
+			"component" : "meta",
+			"destination" : "share/cpplocate",
+			"paths" : 
+			[
+				"ext/cpplocate/README.md"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "ext/cpplocate",
+		"source" : "ext/cpplocate"
+	}
+}

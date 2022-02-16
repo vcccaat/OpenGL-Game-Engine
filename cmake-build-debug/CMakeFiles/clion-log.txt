@@ -1,0 +1,56 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja /Users/sze/Desktop/CS5625/Starter22
+-- The CXX compiler identification is AppleClang 13.0.0.13000029
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Library/Developer/CommandLineTools/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- GLM: Version 0.9.9.9
+-- NanoGUI v0.1.4 
+-- The C compiler identification is AppleClang 13.0.0.13000029
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Library/Developer/CommandLineTools/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- NanoGUI: using OpenGL backend.
+-- NanoGUI: building shared library.
+-- NanoGUI: using libc++.
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Using Cocoa for window creation
+-- NanoGUI: not building the Python plugin.
+-- Could NOT find cppcheck (missing: cppcheck_EXECUTABLE) 
+-- Check cppcheck skipped: cppcheck not found
+-- Could NOT find clang_tidy (missing: clang_tidy_EXECUTABLE) 
+-- Check clang-tidy skipped: clang-tidy not found
+-- Lib cpplocate
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- Lib liblocate
+-- Found Git: /usr/local/bin/git (found version "2.15.0") 
+-- Found TBB: 2021.5.0 at /opt/homebrew/lib/cmake/TBB via TBBConfig.cmake
+-- Shared libraries enabled
+-- Looking for ZLIB...
+-- Found PkgConfig: /usr/local/bin/pkg-config (found version "0.29.2") 
+-- Checking for module 'zzip-zlib-config'
+--   No package 'zzip-zlib-config' found
+-- Found ZLIB: optimized;/Library/Developer/CommandLineTools/SDKs/MacOSX12.0.sdk/usr/lib/libz.tbd;debug;/Library/Developer/CommandLineTools/SDKs/MacOSX12.0.sdk/usr/lib/libz.tbd
+-- Checking for module 'minizip'
+--   No package 'minizip' found
+INFO Hunter enabled or RT-extension not found. glTF import/export will be built without Open3DGC-compression.
+-- Enabled importer formats: COLLADA OBJ FBX GLTF
+-- Disabled importer formats: AMF 3DS AC ASE ASSBIN B3D BVH DXF CSM HMP IRRMESH IQM IRR LWO LWS M3D MD2 MD3 MD5 MDC MDL NFF NDO OFF OGRE OPENGEX PLY MS3D COB BLEND IFC XGL Q3D Q3BSP RAW SIB SMD STL TERRAGEN 3D X X3D 3MF MMD
+-- Enabled exporter formats:
+-- Disabled exporter formats: OBJ OPENGEX PLY 3DS ASSBIN ASSXML M3D COLLADA FBX STL X X3D GLTF 3MF PBRT ASSJSON STEP
+-- Found OpenGL: /Library/Developer/CommandLineTools/SDKs/MacOSX12.0.sdk/System/Library/Frameworks/OpenGL.framework  found components: OpenGL 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/sze/Desktop/CS5625/Starter22/cmake-build-debug

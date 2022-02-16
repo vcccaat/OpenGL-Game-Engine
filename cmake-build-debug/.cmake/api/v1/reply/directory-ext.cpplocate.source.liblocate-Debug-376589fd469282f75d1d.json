@@ -1,0 +1,116 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"ext/cpplocate/source/liblocate/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 187,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 195,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 201,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 207,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "runtime_c",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"ext/cpplocate/liblocated.2.3.0.dylib",
+				"ext/cpplocate/liblocated.2.dylib"
+			],
+			"targetId" : "liblocate::@16746b5a9fa541b5837a",
+			"targetIndex" : 17,
+			"targetInstallNamelink" : "skip",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "runtime_c",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"ext/cpplocate/liblocated.dylib"
+			],
+			"targetId" : "liblocate::@16746b5a9fa541b5837a",
+			"targetIndex" : 17,
+			"targetInstallNamelink" : "only",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "dev_c",
+			"destination" : "include",
+			"paths" : 
+			[
+				"ext/cpplocate/source/liblocate/include/liblocate"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "dev_c",
+			"destination" : "include",
+			"paths" : 
+			[
+				"cmake-build-debug/ext/cpplocate/source/liblocate/include/liblocate"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "dev_c",
+			"destination" : "share/cpplocate/cmake/liblocate",
+			"exportName" : "liblocate-export",
+			"exportTargets" : 
+			[
+				{
+					"id" : "liblocate::@16746b5a9fa541b5837a",
+					"index" : 17
+				}
+			],
+			"paths" : 
+			[
+				"ext/cpplocate/source/liblocate/CMakeFiles/Export/share/cpplocate/cmake/liblocate/liblocate-export.cmake"
+			],
+			"type" : "export"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "ext/cpplocate/source/liblocate",
+		"source" : "ext/cpplocate/source/liblocate"
+	}
+}

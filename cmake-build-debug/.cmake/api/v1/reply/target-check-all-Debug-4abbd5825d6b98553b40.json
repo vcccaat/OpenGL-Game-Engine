@@ -1,0 +1,81 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"perform_health_checks",
+			"add_dependencies"
+		],
+		"files" : 
+		[
+			"ext/cpplocate/cmake/HealthCheck.cmake",
+			"ext/cpplocate/source/cpplocate/CMakeLists.txt",
+			"ext/cpplocate/source/liblocate/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 178,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 11,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 38,
+				"parent" : 1
+			},
+			{
+				"file" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 2,
+				"line" : 175,
+				"parent" : 4
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 38,
+				"parent" : 5
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "check-cpplocate::@eecdba3ac93eafbff593"
+		},
+		{
+			"backtrace" : 6,
+			"id" : "check-liblocate::@16746b5a9fa541b5837a"
+		}
+	],
+	"folder" : 
+	{
+		"name" : "Maintenance"
+	},
+	"id" : "check-all::@eecdba3ac93eafbff593",
+	"name" : "check-all",
+	"paths" : 
+	{
+		"build" : "ext/cpplocate/source/cpplocate",
+		"source" : "ext/cpplocate/source/cpplocate"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

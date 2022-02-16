@@ -1,0 +1,708 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						3,
+						6,
+						12,
+						20
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.2"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				},
+				{
+					"build" : "ext/glm",
+					"childIndexes" : 
+					[
+						2
+					],
+					"jsonFile" : "directory-ext.glm-Debug-701ed8d54251f29d3c48.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.2"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "ext/glm",
+					"targetIndexes" : 
+					[
+						25
+					]
+				},
+				{
+					"build" : "ext/glm/glm",
+					"jsonFile" : "directory-ext.glm.glm-Debug-0c423eb54a06804588da.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "ext/glm/glm"
+				},
+				{
+					"build" : "ext/nanogui",
+					"childIndexes" : 
+					[
+						4
+					],
+					"jsonFile" : "directory-ext.nanogui-Debug-c54bf91d236c1e72d592.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13..3.18"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "ext/nanogui",
+					"targetIndexes" : 
+					[
+						19
+					]
+				},
+				{
+					"build" : "ext/nanogui/ext/glfw",
+					"childIndexes" : 
+					[
+						5
+					],
+					"jsonFile" : "directory-ext.nanogui.ext.glfw-Debug-8e66c978657c80d1a995.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 3,
+					"source" : "ext/nanogui/ext/glfw"
+				},
+				{
+					"build" : "ext/nanogui/ext/glfw/src",
+					"jsonFile" : "directory-ext.nanogui.ext.glfw.src-Debug-058a710a645533641b2f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 3,
+					"source" : "ext/nanogui/ext/glfw/src",
+					"targetIndexes" : 
+					[
+						14,
+						15
+					]
+				},
+				{
+					"build" : "ext/cpplocate",
+					"childIndexes" : 
+					[
+						7,
+						10,
+						11
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.cpplocate-Debug-158f8d19c594fad7e9b0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 4,
+					"source" : "ext/cpplocate",
+					"targetIndexes" : 
+					[
+						7
+					]
+				},
+				{
+					"build" : "ext/cpplocate/source",
+					"childIndexes" : 
+					[
+						8,
+						9
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.cpplocate.source-Debug-aa7c8019529497608b73.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 4,
+					"source" : "ext/cpplocate/source"
+				},
+				{
+					"build" : "ext/cpplocate/source/cpplocate",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.cpplocate.source.cpplocate-Debug-2236c97add661bbe21dc.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 7,
+					"projectIndex" : 4,
+					"source" : "ext/cpplocate/source/cpplocate",
+					"targetIndexes" : 
+					[
+						4,
+						5,
+						9
+					]
+				},
+				{
+					"build" : "ext/cpplocate/source/liblocate",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.cpplocate.source.liblocate-Debug-376589fd469282f75d1d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 7,
+					"projectIndex" : 4,
+					"source" : "ext/cpplocate/source/liblocate",
+					"targetIndexes" : 
+					[
+						6,
+						17
+					]
+				},
+				{
+					"build" : "ext/cpplocate/docs",
+					"jsonFile" : "directory-ext.cpplocate.docs-Debug-2a34160b0e5ff75215f8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 4,
+					"source" : "ext/cpplocate/docs"
+				},
+				{
+					"build" : "ext/cpplocate/deploy",
+					"jsonFile" : "directory-ext.cpplocate.deploy-Debug-111250f5dbfcd6cfc40c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 4,
+					"source" : "ext/cpplocate/deploy",
+					"targetIndexes" : 
+					[
+						8,
+						20,
+						21
+					]
+				},
+				{
+					"build" : "ext/embree",
+					"childIndexes" : 
+					[
+						13,
+						19
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.embree-Debug-324785a524edec926f22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 5,
+					"source" : "ext/embree"
+				},
+				{
+					"build" : "ext/embree/common",
+					"childIndexes" : 
+					[
+						14,
+						15,
+						16,
+						17,
+						18
+					],
+					"jsonFile" : "directory-ext.embree.common-Debug-26422b5beb34872996c6.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 12,
+					"projectIndex" : 5,
+					"source" : "ext/embree/common"
+				},
+				{
+					"build" : "ext/embree/common/sys",
+					"jsonFile" : "directory-ext.embree.common.sys-Debug-df0d41ebfb6cf9f4ee80.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 13,
+					"projectIndex" : 5,
+					"source" : "ext/embree/common/sys",
+					"targetIndexes" : 
+					[
+						23
+					]
+				},
+				{
+					"build" : "ext/embree/common/math",
+					"jsonFile" : "directory-ext.embree.common.math-Debug-30c71daf1ff9b4c26f89.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 13,
+					"projectIndex" : 5,
+					"source" : "ext/embree/common/math",
+					"targetIndexes" : 
+					[
+						18
+					]
+				},
+				{
+					"build" : "ext/embree/common/simd",
+					"jsonFile" : "directory-ext.embree.common.simd-Debug-47cd82ea4849845b82c3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 13,
+					"projectIndex" : 5,
+					"source" : "ext/embree/common/simd",
+					"targetIndexes" : 
+					[
+						22
+					]
+				},
+				{
+					"build" : "ext/embree/common/lexers",
+					"jsonFile" : "directory-ext.embree.common.lexers-Debug-ad6bb37c60b8443b722f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 13,
+					"projectIndex" : 5,
+					"source" : "ext/embree/common/lexers",
+					"targetIndexes" : 
+					[
+						16
+					]
+				},
+				{
+					"build" : "ext/embree/common/tasking",
+					"jsonFile" : "directory-ext.embree.common.tasking-Debug-2099635ad1480f9b19eb.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 13,
+					"projectIndex" : 5,
+					"source" : "ext/embree/common/tasking",
+					"targetIndexes" : 
+					[
+						24
+					]
+				},
+				{
+					"build" : "ext/embree/kernels",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.embree.kernels-Debug-786ad50e440cb3100e6b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 12,
+					"projectIndex" : 5,
+					"source" : "ext/embree/kernels",
+					"targetIndexes" : 
+					[
+						10,
+						11,
+						12,
+						13
+					]
+				},
+				{
+					"build" : "ext/assimp",
+					"childIndexes" : 
+					[
+						21
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.assimp-Debug-41adc55350fd5f80d7ea.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 6,
+					"source" : "ext/assimp"
+				},
+				{
+					"build" : "ext/assimp/code",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-ext.assimp.code-Debug-414ec45580cd8d662efe.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 20,
+					"projectIndex" : 6,
+					"source" : "ext/assimp/code",
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2,
+						4,
+						5,
+						6
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "cs5625",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2
+					],
+					"name" : "glm",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						25
+					]
+				},
+				{
+					"childIndexes" : 
+					[
+						3
+					],
+					"directoryIndexes" : 
+					[
+						3
+					],
+					"name" : "nanogui",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						19
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						4,
+						5
+					],
+					"name" : "GLFW",
+					"parentIndex" : 2,
+					"targetIndexes" : 
+					[
+						14,
+						15
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"name" : "cpplocate",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						17,
+						20,
+						21
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19
+					],
+					"name" : "embree3",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						10,
+						11,
+						12,
+						13,
+						16,
+						18,
+						22,
+						23,
+						24
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						20,
+						21
+					],
+					"name" : "Assimp",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Demo::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Demo-Debug-85054054be62d23dec2d.json",
+					"name" : "Demo",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "GLWrap::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GLWrap-Debug-28f27fd2abcdec364d1d.json",
+					"name" : "GLWrap",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RTUtil::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RTUtil-Debug-d30bbc1b4c125d4f61f3.json",
+					"name" : "RTUtil",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 21,
+					"id" : "assimp::@f00565dfd11dd3fb0a83",
+					"jsonFile" : "target-assimp-Debug-ac77a9f737f4773e0589.json",
+					"name" : "assimp",
+					"projectIndex" : 6
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "check-all::@eecdba3ac93eafbff593",
+					"jsonFile" : "target-check-all-Debug-4abbd5825d6b98553b40.json",
+					"name" : "check-all",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "check-cpplocate::@eecdba3ac93eafbff593",
+					"jsonFile" : "target-check-cpplocate-Debug-836ecd86056fd05c3191.json",
+					"name" : "check-cpplocate",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "check-liblocate::@16746b5a9fa541b5837a",
+					"jsonFile" : "target-check-liblocate-Debug-7284107c32c209dd4423.json",
+					"name" : "check-liblocate",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "check-template::@5e8bfff27af097b81b3e",
+					"jsonFile" : "target-check-template-Debug-2458b280ffeafcd68d7b.json",
+					"name" : "check-template",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "component_install::@477d5e9dd84fd8be6c0a",
+					"jsonFile" : "target-component_install-Debug-d1481520557b41a844d0.json",
+					"name" : "component_install",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "cpplocate::@eecdba3ac93eafbff593",
+					"jsonFile" : "target-cpplocate-Debug-63368f41d4ce605feb1a.json",
+					"name" : "cpplocate",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 19,
+					"id" : "embree::@2cb1f9781e56fdf70b7c",
+					"jsonFile" : "target-embree-Debug-09be0829161bfad901ed.json",
+					"name" : "embree",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 19,
+					"id" : "embree_avx::@2cb1f9781e56fdf70b7c",
+					"jsonFile" : "target-embree_avx-Debug-ccf456917fdfc2b3750e.json",
+					"name" : "embree_avx",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 19,
+					"id" : "embree_avx2::@2cb1f9781e56fdf70b7c",
+					"jsonFile" : "target-embree_avx2-Debug-409f9337eb7ebfce1dd7.json",
+					"name" : "embree_avx2",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 19,
+					"id" : "embree_sse42::@2cb1f9781e56fdf70b7c",
+					"jsonFile" : "target-embree_sse42-Debug-5ea19ceadb4f5d91615c.json",
+					"name" : "embree_sse42",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "glfw::@1be24dc577ac5b71845c",
+					"jsonFile" : "target-glfw-Debug-b15abd7b4e75bd9d1b17.json",
+					"name" : "glfw",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "glfw_objects::@1be24dc577ac5b71845c",
+					"jsonFile" : "target-glfw_objects-Debug-25e359ffde6d7b5bece8.json",
+					"name" : "glfw_objects",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 17,
+					"id" : "lexers::@977d70221a29360af9cb",
+					"jsonFile" : "target-lexers-Debug-f476238a2c47e303df48.json",
+					"name" : "lexers",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "liblocate::@16746b5a9fa541b5837a",
+					"jsonFile" : "target-liblocate-Debug-6f581d857560c8087251.json",
+					"name" : "liblocate",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 15,
+					"id" : "math::@4daf5a19d193e7508d07",
+					"jsonFile" : "target-math-Debug-44d9dd8a553120716ae5.json",
+					"name" : "math",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "nanogui::@f32fc89d7586c0a8572c",
+					"jsonFile" : "target-nanogui-Debug-c01ff4694b7227a838ec.json",
+					"name" : "nanogui",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "pack::@477d5e9dd84fd8be6c0a",
+					"jsonFile" : "target-pack-Debug-8227aef4d94a14044b43.json",
+					"name" : "pack",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "pack-cpplocate::@477d5e9dd84fd8be6c0a",
+					"jsonFile" : "target-pack-cpplocate-Debug-20c681927bd2cac398eb.json",
+					"name" : "pack-cpplocate",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 16,
+					"id" : "simd::@c589fa56afaa8da08086",
+					"jsonFile" : "target-simd-Debug-393c8761c6f61dd419ee.json",
+					"name" : "simd",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 14,
+					"id" : "sys::@99b126e922565c2303d5",
+					"jsonFile" : "target-sys-Debug-0cee4b1abff2d0d6e244.json",
+					"name" : "sys",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 18,
+					"id" : "tasking::@4c427a0f85423ee8c3e5",
+					"jsonFile" : "target-tasking-Debug-aad195f11b42e237df58.json",
+					"name" : "tasking",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "uninstall::@4e4d9b34f8f0d8d86c78",
+					"jsonFile" : "target-uninstall-Debug-c3abe400daaf052bbcd6.json",
+					"name" : "uninstall",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/sze/Desktop/CS5625/Starter22/cmake-build-debug",
+		"source" : "/Users/sze/Desktop/CS5625/Starter22"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

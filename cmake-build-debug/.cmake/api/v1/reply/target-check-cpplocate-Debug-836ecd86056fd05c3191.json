@@ -1,0 +1,47 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"perform_health_checks"
+		],
+		"files" : 
+		[
+			"ext/cpplocate/cmake/HealthCheck.cmake",
+			"ext/cpplocate/source/cpplocate/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 178,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 20,
+				"parent" : 1
+			}
+		]
+	},
+	"folder" : 
+	{
+		"name" : "Maintenance"
+	},
+	"id" : "check-cpplocate::@eecdba3ac93eafbff593",
+	"name" : "check-cpplocate",
+	"paths" : 
+	{
+		"build" : "ext/cpplocate/source/cpplocate",
+		"source" : "ext/cpplocate/source/cpplocate"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

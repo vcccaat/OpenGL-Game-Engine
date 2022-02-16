@@ -6,7 +6,9 @@
 #include <math.h>
 #include <limits>
 #include <iostream>
-
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>           // Output data structure
+#include <assimp/postprocess.h>     // Post processing flags
 
 //#define STBI_MSC_SECURE_CRT
 //#define STB_IMAGE_IMPLEMENTATION
@@ -266,7 +268,57 @@ int main1()
   return 0;
 }
 
-int main() {
+void drawbunny(const aiScene* aiscene) {
+    RTCDevice device = initializeDevice();
+    RTCScene scene = initializeScene(device);
+    // Constants
+    int n = 256;
+    unsigned char out;
+    unsigned char* img = new unsigned char[n * n * 3];
+    float bottomLeftBound [2] = { -.5, -.5 };
+    float topRightBound [2] = { 1.5, 1.5 };
+
+    // Cast rays with origin in bounding box
+    float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
+    float ystep = (topRightBound[1] - bottomLeftBound[1]) / n;
+    float ox;
+    float oy;
+    for (int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
+        ox = i * xstep + bottomLeftBound[0];
+        oy = j * ystep + bottomLeftBound[1];
+        out = castRay(scene, ox, oy, 1, 0, 0, -1);
+        img[(3 * i * n) + (3 * j) + 0] = out;
+        img[(3 * i * n) + (3 * j) + 1] = out;
+        img[(3 * i * n) + (3 * j) + 2] = out;
+    }
+
+    // Write the image
+    stbi_write_png("bunny.png", n, n, 3, img, n * 3);
+  
+}
+
+int main(){
+   // Create an instance of the Importer class
+  Assimp::Importer importer;
+
+  // And have it read the given file with some example postprocessing
+  // Usually - if speed is not the most important aspect for you - you'll
+  // probably to request more postprocessing than we do in this example.
+  const aiScene* scene = importer.ReadFile("resources/meshes/bunny.obj",
+    aiProcess_CalcTangentSpace       |
+    aiProcess_Triangulate            |
+    aiProcess_JoinIdenticalVertices  |
+    aiProcess_SortByPType);
+
+  // Now we can access the file's contents.
+  
+  bool hasmesh = scene->HasMeshes();
+  printf("%d", hasmesh);
+  return 0;
+}
+
+int main3() {
+  
     // Instantiate devices
     RTCDevice device = initializeDevice();
     RTCScene scene = initializeScene(device);
@@ -295,4 +347,5 @@ int main() {
     // Write the image
     stbi_write_png("triangle.png", n, n, 3, img, n * 3);
     return 0;
+
 }

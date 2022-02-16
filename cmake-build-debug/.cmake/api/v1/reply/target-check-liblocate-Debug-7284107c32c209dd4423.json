@@ -1,0 +1,47 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"perform_health_checks"
+		],
+		"files" : 
+		[
+			"ext/cpplocate/cmake/HealthCheck.cmake",
+			"ext/cpplocate/source/liblocate/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 175,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 20,
+				"parent" : 1
+			}
+		]
+	},
+	"folder" : 
+	{
+		"name" : "Maintenance"
+	},
+	"id" : "check-liblocate::@16746b5a9fa541b5837a",
+	"name" : "check-liblocate",
+	"paths" : 
+	{
+		"build" : "ext/cpplocate/source/liblocate",
+		"source" : "ext/cpplocate/source/liblocate"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}
