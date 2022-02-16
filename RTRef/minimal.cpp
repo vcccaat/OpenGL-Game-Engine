@@ -286,7 +286,7 @@ int main1()
 }
 */
 
-void main(const aiScene* aiscene) {
+int main(const aiScene* aiscene) {
 
     // Create an instance of the Importer class
     Assimp::Importer importer;
@@ -306,8 +306,8 @@ void main(const aiScene* aiscene) {
     int n = 256;
     unsigned char out;
     unsigned char* img = new unsigned char[n * n * 3];
-    float bottomLeftBound [2] = { -1, -1 };
-    float topRightBound [2] = { 1, 1 };
+    float bottomLeftBound [2] = { -1.25, -1.25 };
+    float topRightBound [2] = { 1.25, 1.25 };
 
     // Cast rays with origin in bounding box
     float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
@@ -325,10 +325,10 @@ void main(const aiScene* aiscene) {
 
     // Write the image
     stbi_write_png("bunny.png", n, n, 3, img, n * 3);
-  
+    return 0;
 }
 
-
+/*
 int main6(){
    // Create an instance of the Importer class
   Assimp::Importer importer;
@@ -353,6 +353,7 @@ int main6(){
   std::cout << "hi";
   return 0;
 }
+*/
 
 /*
 int main3() {
