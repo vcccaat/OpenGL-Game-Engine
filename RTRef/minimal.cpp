@@ -124,13 +124,6 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene)
   // Draw the triangle
   if (vertices && indices)
   {
-      /*
-    vertices[0] = 0.f; vertices[1] = 0.f; vertices[2] = 0.f;
-    vertices[3] = 1.f; vertices[4] = 0.f; vertices[5] = 0.f;
-    vertices[6] = 0.f; vertices[7] = 1.f; vertices[8] = 0.f;
-
-    indices[0] = 0; indices[1] = 1; indices[2] = 2;
-    */
       for (int i = 0; i < mesh->mNumVertices; ++i) {
           vertices[3*i] = mesh->mVertices[i][0];
           vertices[3*i+1] = mesh->mVertices[i][1];
@@ -257,71 +250,6 @@ void waitForKeyPressedUnderWindows()
 #endif
 }
 
-RTCScene initializeScene2(RTCDevice device)
-{
-  RTCScene scene = rtcNewScene(device);
-
-  /* 
-   * Create a triangle mesh geometry, and initialize a single triangle.
-   * You can look up geometry types in the API documentation to
-   * find out which type expects which buffers.
-   *
-   * We create buffers directly on the device, but you can also use
-   * shared buffers. For shared buffers, special care must be taken
-   * to ensure proper alignment and padding. This is described in
-   * more detail in the API documentation.
-   */
-  RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-  float* vertices = (float*) rtcSetNewGeometryBuffer(geom,
-                                                     RTC_BUFFER_TYPE_VERTEX,
-                                                     0,
-                                                     RTC_FORMAT_FLOAT3,
-                                                     3*sizeof(float),
-                                                     3);
-
-  unsigned* indices = (unsigned*) rtcSetNewGeometryBuffer(geom,
-                                                          RTC_BUFFER_TYPE_INDEX,
-                                                          0,
-                                                          RTC_FORMAT_UINT3,
-                                                          3*sizeof(unsigned),
-                                                          1);
-
-  if (vertices && indices)
-  {
-    vertices[0] = 0.f; vertices[1] = 0.f; vertices[2] = 0.f;
-    vertices[3] = 1.f; vertices[4] = 0.f; vertices[5] = 0.f;
-    vertices[6] = 0.f; vertices[7] = 1.f; vertices[8] = 0.f;
-
-    indices[0] = 0; indices[1] = 1; indices[2] = 2;
-  }
-
-  /*
-   * You must commit geometry objects when you are done setting them up,
-   * or you will not get any intersections.
-   */
-  rtcCommitGeometry(geom);
-
-  /*
-   * In rtcAttachGeometry(...), the scene takes ownership of the geom
-   * by increasing its reference count. This means that we don't have
-   * to hold on to the geom handle, and may release it. The geom object
-   * will be released automatically when the scene is destroyed.
-   *
-   * rtcAttachGeometry() returns a geometry ID. We could use this to
-   * identify intersected objects later on.
-   */
-  rtcAttachGeometry(scene, geom);
-  rtcReleaseGeometry(geom);
-
-  /*
-   * Like geometry objects, scenes must be committed. This lets
-   * Embree know that it may start building an acceleration structure.
-   */
-  rtcCommitScene(scene);
-
-  return scene;
-}
-
 
 int main() {
 
@@ -345,8 +273,8 @@ int main() {
     int n = 256;
     unsigned char out;
     unsigned char* img = new unsigned char[n * n * 3];
-    float bottomLeftBound [2] = { -1.25, -1.25 };
-    float topRightBound [2] = { 1.25, 1.25 };
+    float bottomLeftBound [2] = { -1, -1 };
+    float topRightBound [2] = { 1, 1 };
 
     // Cast rays with origin in bounding box
     float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
@@ -357,12 +285,13 @@ int main() {
         ox = i * xstep + bottomLeftBound[0];
         oy = j * ystep + bottomLeftBound[1];
         out = castRay(scene, ox, oy, 1, 0, 0, -1);
-        img[(3 * i * n) + (3 * j) + 0] = out;
-        img[(3 * i * n) + (3 * j) + 1] = out;
-        img[(3 * i * n) + (3 * j) + 2] = out;
+        img[(3 * j * n) + (3 * i) + 0] = out;
+        img[(3 * j * n) + (3 * i) + 1] = out;
+        img[(3 * j * n) + (3 * i) + 2] = out;
     }
 
     // Write the image
+    stbi_flip_vertically_on_write(1);
     stbi_write_png("bunny.png", n, n, 3, img, n * 3);
     return 0;
 }
