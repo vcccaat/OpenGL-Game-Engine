@@ -90,6 +90,9 @@ set_property(TARGET embree PROPERTY FOLDER "dependencies")
 list(APPEND INCS "${EMBREE_BASE_DIR}/include")
 list(APPEND LIBS embree)
 
+list(APPEND INCS ${TBB_INCLUDE_DIR})
+list(APPEND LIBS ${TBB_LIBRARY})
+
 # ----------------------------------------------------------------
 # Include assimp as a subproject
 
@@ -118,6 +121,9 @@ set_property(TARGET assimp PROPERTY FOLDER "dependencies")
 
 # Use RPath on OS X and iOS (see CMP0042)
 set_property(TARGET assimp PROPERTY MACOSX_RPATH TRUE)
+
+# Override library and runtime directories
+set_target_properties(assimp PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 list(APPEND INCS "${ASSIMP_BASE_DIR}/include")
 list(APPEND LIBS assimp)
