@@ -304,16 +304,17 @@ int main(){
   // And have it read the given file with some example postprocessing
   // Usually - if speed is not the most important aspect for you - you'll
   // probably to request more postprocessing than we do in this example.
-  const aiScene* scene = importer.ReadFile("resources/meshes/bunny.obj",
+  const aiScene* scene = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
     aiProcess_CalcTangentSpace       |
     aiProcess_Triangulate            |
     aiProcess_JoinIdenticalVertices  |
     aiProcess_SortByPType);
 
   // Now we can access the file's contents.
-  
-  bool hasmesh = scene->HasMeshes();
-  printf("%d", hasmesh);
+  aiMesh mesh = scene->mMeshes[0][0];
+  for (int i = 0; i < mesh.mNumVertices; ++i) {
+      printf("%f, %f, %f\n", mesh.mVertices[i][0], mesh.mVertices[i][1], mesh.mVertices[i][2]);
+  }
   return 0;
 }
 
