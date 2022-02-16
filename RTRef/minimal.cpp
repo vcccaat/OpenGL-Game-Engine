@@ -89,8 +89,11 @@ RTCDevice initializeDevice()
  *
  * Scenes, like devices, are reference-counted.
  */
-RTCScene initializeScene(RTCDevice device)
+RTCScene initializeScene(RTCDevice device, const aiScene* aiscene)
 {
+
+  aiMesh mesh = aiscene->mMeshes[0][0];
+
   RTCScene scene = rtcNewScene(device);
 
   /* 
@@ -109,22 +112,35 @@ RTCScene initializeScene(RTCDevice device)
                                                      0,
                                                      RTC_FORMAT_FLOAT3,
                                                      3*sizeof(float),
-                                                     3);
+                                                     3*mesh.mNumVertices);
 
   unsigned* indices = (unsigned*) rtcSetNewGeometryBuffer(geom,
                                                           RTC_BUFFER_TYPE_INDEX,
                                                           0,
                                                           RTC_FORMAT_UINT3,
                                                           3*sizeof(unsigned),
-                                                          1);
+                                                          3*mesh.mNumFaces);
 
+  // Draw the triangle
   if (vertices && indices)
   {
+      /*
     vertices[0] = 0.f; vertices[1] = 0.f; vertices[2] = 0.f;
     vertices[3] = 1.f; vertices[4] = 0.f; vertices[5] = 0.f;
     vertices[6] = 0.f; vertices[7] = 1.f; vertices[8] = 0.f;
 
     indices[0] = 0; indices[1] = 1; indices[2] = 2;
+    */
+      for (int i = 0; i < mesh.mNumVertices; ++i) {
+          vertices[3*i] = mesh.mVertices[i][0];
+          vertices[3*i+1] = mesh.mVertices[i][1];
+          vertices[3*i+2] = mesh.mVertices[i][2];
+      }
+      for (int i = 0; i < mesh.mNumFaces; ++i) {
+          indices[3 * i] = mesh.mFaces[i].mIndices[0];
+          indices[3 * i + 1] = mesh.mFaces[i].mIndices[1];
+          indices[3 * i + 2] = mesh.mFaces[i].mIndices[2];
+      }
   }
 
   /*
@@ -244,39 +260,54 @@ void waitForKeyPressedUnderWindows()
 
 /* -------------------------------------------------------------------------- */
 
+/*
 int main1()
 {
   /* Initialization. All of this may fail, but we will be notified by
-   * our errorFunction. */
+   * our errorFunction. 
   RTCDevice device = initializeDevice();
   RTCScene scene = initializeScene(device);
 
-  /* This will hit the triangle at t=1. */
+  /* This will hit the triangle at t=1. 
   castRay(scene, 0, 0, -1, 0, 0, 1);
 
-  /* This will not hit anything. */
+  /* This will not hit anything. 
   castRay(scene, 1, 1, -1, 0, 0, 1);
 
   /* Though not strictly necessary in this example, you should
-   * always make sure to release resources allocated through Embree. */
+   * always make sure to release resources allocated through Embree. 
   rtcReleaseScene(scene);
   rtcReleaseDevice(device);
   
-  /* wait for user input under Windows when opened in separate window */
+  /* wait for user input under Windows when opened in separate window 
   waitForKeyPressedUnderWindows();
   
   return 0;
 }
+*/
 
-void drawbunny(const aiScene* aiscene) {
+void main(const aiScene* aiscene) {
+
+    // Create an instance of the Importer class
+    Assimp::Importer importer;
+
+    // And have it read the given file with some example postprocessing
+    // Usually - if speed is not the most important aspect for you - you'lld
+    // probably to request more postprocessing than we do in this example.
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
+        aiProcess_CalcTangentSpace |
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_SortByPType);
+
     RTCDevice device = initializeDevice();
-    RTCScene scene = initializeScene(device);
+    RTCScene scene = initializeScene(device, obj);
     // Constants
     int n = 256;
     unsigned char out;
     unsigned char* img = new unsigned char[n * n * 3];
-    float bottomLeftBound [2] = { -.5, -.5 };
-    float topRightBound [2] = { 1.5, 1.5 };
+    float bottomLeftBound [2] = { -1, -1 };
+    float topRightBound [2] = { 1, 1 };
 
     // Cast rays with origin in bounding box
     float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
@@ -297,12 +328,13 @@ void drawbunny(const aiScene* aiscene) {
   
 }
 
-int main(){
+
+int main6(){
    // Create an instance of the Importer class
   Assimp::Importer importer;
 
   // And have it read the given file with some example postprocessing
-  // Usually - if speed is not the most important aspect for you - you'll
+  // Usually - if speed is not the most important aspect for you - you'lld
   // probably to request more postprocessing than we do in this example.
   const aiScene* scene = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
     aiProcess_CalcTangentSpace       |
@@ -312,12 +344,17 @@ int main(){
 
   // Now we can access the file's contents.
   aiMesh mesh = scene->mMeshes[0][0];
-  for (int i = 0; i < mesh.mNumVertices; ++i) {
+  int h = mesh.mNumVertices;
+  std::cout << h << "\n\n\n";
+  for (int i = 0; i < h; ++i) {
+      printf("%i: ", i);
       printf("%f, %f, %f\n", mesh.mVertices[i][0], mesh.mVertices[i][1], mesh.mVertices[i][2]);
   }
+  std::cout << "hi";
   return 0;
 }
 
+/*
 int main3() {
   
     // Instantiate devices
@@ -350,3 +387,4 @@ int main3() {
     return 0;
 
 }
+*/
