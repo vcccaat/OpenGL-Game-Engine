@@ -5,3 +5,5 @@ xcodebuild/
 debug_build/
 .vscode
 .vs
+cmake-build-debug/
+.idea/.name
