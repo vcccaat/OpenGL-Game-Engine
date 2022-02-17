@@ -250,7 +250,6 @@ void waitForKeyPressedUnderWindows()
 #endif
 }
 
-
 int main() {
 
     // Create an instance of the Importer class
@@ -259,7 +258,11 @@ int main() {
     // And have it read the given file with some example postprocessing
     // Usually - if speed is not the most important aspect for you - you'lld
     // probably to request more postprocessing than we do in this example.
-    const aiScene* obj = importer.ReadFile("../resources/meshes/bunny.obj",
+
+    // Two paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
+    //            ../resources/meshes/bunny.obj
+
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
@@ -273,8 +276,8 @@ int main() {
     int n = 256;
     unsigned char out;
     unsigned char* img = new unsigned char[n * n * 3];
-    float bottomLeftBound [2] = { -1, -1 };
-    float topRightBound [2] = { 1, 1 };
+    float bottomLeftBound [2] = { -1.25, -1.25 };
+    float topRightBound [2] = { 1.25, 1.25 };
 
     // Cast rays with origin in bounding box
     float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
