@@ -296,5 +296,6 @@ int main() {
     // Write the image
     stbi_flip_vertically_on_write(1);
     stbi_write_png("bunny.png", n, n, 3, img, n * 3);
+    delete [] img;
     return 0;
 }
