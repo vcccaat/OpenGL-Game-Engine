@@ -55,7 +55,21 @@ namespace RTUtil {
             );
     }
 
+    /*
+     * Parse the name of an area light source that encodes its size in our 
+     * CS5625-specific format.  Provide the name of the light, and if it matches
+     * the format the width and height parameters are filled in, and the function
+     * returns true; otherwise it returns false and the output parameters are
+     * unchanged.
+     */
     bool parseAreaLight(const std::string &name, float &width, float &height);
+
+    /*
+     * Parse the name of an ambient light source that encodes its range in our
+     * CS5625-specific format.  Provide the name of the light, and if it matches 
+     * the format the range parameter is filled in, and the function returns 
+     * true; otherwise it returns false and the output parameters are unchanged.
+     */
     bool parseAmbientLight(const std::string &name, float &range);
 
 }

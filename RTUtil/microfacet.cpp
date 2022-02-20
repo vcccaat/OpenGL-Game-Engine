@@ -11,6 +11,7 @@
 #include "microfacet.hpp"
 #include "frame.hpp"
 #include "geomtools.hpp"
+#include "output.hpp"
 
 namespace nori {
 
@@ -179,5 +180,15 @@ namespace nori {
 	glm::vec3 Microfacet::diffuseReflectance() const {
 		return m_R;
 	}
+
+	// Write to a stream for debugging
+    std::ostream &Microfacet::debug_write(std::ostream &ost) const {
+    	ost << "Microfacet { alpha " << m_alpha
+    		<< "; intIOR " << m_intIOR
+    		<< "; extIOR " << m_extIOR
+    		<< "; R " << m_R << "}";
+    	return ost;
+    }
+
 
 }

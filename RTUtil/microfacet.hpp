@@ -57,6 +57,8 @@ struct RTUTIL_EXPORT BSDFQueryRecord {
  */
 class RTUTIL_EXPORT BSDF {
 public:
+    virtual ~BSDF() {}
+
     /**
      * \brief Sample the BSDF and return the importance weight (i.e. the
      * value of the BSDF * cos(theta_o) divided by the probability density 
@@ -111,7 +113,15 @@ public:
      *     The reflectance as an RGB color.
      */
     virtual glm::vec3 diffuseReflectance() const = 0;
+
+    // Write to a stream in a format suitable for debugging output
+    virtual std::ostream &debug_write(std::ostream &) const = 0;
 };
+
+
+inline std::ostream &operator <<(std::ostream &ost, const BSDF &b) {
+    return b.debug_write(ost);
+}
 
 
 
@@ -120,6 +130,8 @@ public:
     Microfacet(float alpha, float intIOR, float extIOR, const glm::vec3 R)
     : m_alpha(alpha), m_intIOR(intIOR), m_extIOR(extIOR), m_R(R) {
     }
+
+    virtual ~Microfacet() {}
 
     /// Evaluate the BRDF for the given pair of directions
     glm::vec3 eval(const BSDFQueryRecord &bRec) const override;
@@ -132,6 +144,8 @@ public:
 
     /// Return the diffuse reflectance
     glm::vec3 diffuseReflectance() const override;
+
+    std::ostream &debug_write(std::ostream &) const override;
 
     float alpha() const { return m_alpha; }
     float eta() const { return m_intIOR / m_extIOR; }
