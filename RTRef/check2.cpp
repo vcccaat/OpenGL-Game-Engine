@@ -218,18 +218,9 @@ unsigned char castRay(RTCScene scene,
        * get geomID=0 / primID=0 for all hits.
        * There is also instID, used for instancing. See
        * the instancing tutorials for more information */
-       /*
-         printf("Found intersection on geometry %d, primitive %d at tfar=%f\n",
-              rayhit.hit.geomID,
-              rayhit.hit.primID,
-              rayhit.ray.tfar);
-       */
       return 255;
   }
   else
-      /*
-    printf("Did not find any intersection.\n");
-    */
       return 0;
 }
 
@@ -256,28 +247,18 @@ void waitForKeyPressedUnderWindows()
 
 
 int main() {
-
-
-    // Create an instance of the Importer class
+    /* Initialization */
     Assimp::Importer importer;
-
-    // And have it read the given file with some example postprocessing
-    // Usually - if speed is not the most important aspect for you - you'lld
-    // probably to request more postprocessing than we do in this example.
-
     // Two paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj
-
     const aiScene* obj = importer.ReadFile("../resources/meshes/bunny.obj",
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
-
     RTCDevice device = initializeDevice();
     RTCScene scene = initializeScene(device, obj);
 
-    // RTCScene scene = initializeScene2(device);
     // Constants
     int n = 256;
     unsigned char out;
