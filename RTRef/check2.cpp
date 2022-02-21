@@ -82,8 +82,15 @@ public:
         this->aspect = cam->mAspect;
     }
 
+    Camera() {
+        this->pos = glm::vec3(0, 0, 1.f);
+        this->target = glm::vec3(0.f, 0.f, -1.f);
+        this->up = glm::vec3(0.f, 1.f, 0.f);
+        this->hfov = 0.785398f;
+        this->aspect = 16.f / 9.f;
+    }
+
     glm::vec3 Camera::generateRay(float xp, float yp) {
-        double degree_to_rad = .0174533;
         glm::vec3 w = glm::normalize(this->pos - this->target);
         glm::vec3 u = glm::normalize(glm::cross(this->up, w));
         glm::vec3 v = glm::normalize(glm::cross(w, u));
@@ -339,7 +346,7 @@ int main() {
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     RTCScene scene = initializeScene(device, obj);
-    aiCamera* rawcam = obj->mCameras[0];
+    //aiCamera* rawcam = obj->mCameras[0];
 
     // Constants
     int n = 256;
@@ -366,7 +373,8 @@ int main() {
     */
 
     // New tracing with camera
-    Camera cam(rawcam);
+    //Camera cam(rawcam);
+    Camera cam = Camera();
     glm::vec3 dir;
     for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
         dir = cam.generateRay(i + .5 / n, j + .5 / n);
