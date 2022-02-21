@@ -15,6 +15,10 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
+#include <cpplocate/cpplocate.h>
+#include <GLWrap/Program.hpp>
+
+
 #if defined(_WIN32)
 #  include <conio.h>
 #  include <windows.h>
@@ -250,7 +254,9 @@ void waitForKeyPressedUnderWindows()
 #endif
 }
 
+
 int main() {
+
 
     // Create an instance of the Importer class
     Assimp::Importer importer;
@@ -262,7 +268,7 @@ int main() {
     // Two paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj
 
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
+    const aiScene* obj = importer.ReadFile("../resources/meshes/bunny.obj",
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
