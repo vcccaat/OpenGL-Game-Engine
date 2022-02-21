@@ -9,6 +9,8 @@
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
+#include <glm/glm.hpp>
+#include <../RTUtil/output.hpp>
 
 //#define STBI_MSC_SECURE_CRT
 //#define STB_IMAGE_IMPLEMENTATION
@@ -23,6 +25,34 @@
 #  include <conio.h>
 #  include <windows.h>
 #endif
+
+struct Color {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+
+    Color(unsigned char r, unsigned char g, unsigned char b) {
+        this->r = r;
+        this->g = g;
+        this->b = b;
+    }
+
+    Color(float r, float g, float b) {
+        this->r = 255 * r;
+        this->g = 255 * g;
+        this->b = 255 * b;
+    }
+
+    Color() {
+        this->r = 0;
+        this->g = 0;
+        this->b = 0;
+    }
+
+    void Color::print() {
+        printf("%f, %f, %f\n", this->r, this->g, this->b);
+    }
+};
 
 /*
  * A minimal tutorial. 
@@ -171,7 +201,7 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene)
  * Cast a single ray with origin (ox, oy, oz) and direction
  * (dx, dy, dz).
  */
-unsigned char castRay(RTCScene scene, 
+Color castRay(RTCScene scene, 
              float ox, float oy, float oz,
              float dx, float dy, float dz)
 {
@@ -208,7 +238,7 @@ unsigned char castRay(RTCScene scene,
    */
   rtcIntersect1(scene, &context, &rayhit);
 
-  //printf("%f, %f, %f: ", ox, oy, oz);
+  //printf("%f, %f, %f: ", ox, oy, oz);`        
   if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID)
   {
       /* Note how geomID and primID identify the geometry we just hit.
@@ -218,10 +248,15 @@ unsigned char castRay(RTCScene scene,
        * get geomID=0 / primID=0 for all hits.
        * There is also instID, used for instancing. See
        * the instancing tutorials for more information */
-      return 255;
+
+      glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
+      float out = glm::dot(col, glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
+      out = out < 0 ? 0 : out;
+      //glm::acos(out);
+      return Color(out, out, out);
   }
   else
-      return 0;
+      return Color();
 }
 
 void waitForKeyPressedUnderWindows()
@@ -251,8 +286,7 @@ int main() {
     Assimp::Importer importer;
     // Two paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj
-    const aiScene* obj = importer.ReadFile("../resources/meshes/bunny.obj",
-        aiProcess_CalcTangentSpace |
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
@@ -274,10 +308,10 @@ int main() {
     for (int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
         ox = i * xstep + bottomLeftBound[0];
         oy = j * ystep + bottomLeftBound[1];
-        out = castRay(scene, ox, oy, 1, 0, 0, -1);
-        img[(3 * j * n) + (3 * i) + 0] = out;
-        img[(3 * j * n) + (3 * i) + 1] = out;
-        img[(3 * j * n) + (3 * i) + 2] = out;
+        Color col = castRay(scene, ox, oy, 1, 0, 0, -1);
+        img[(3 * j * n) + (3 * i) + 0] = col.r;
+        img[(3 * j * n) + (3 * i) + 1] = col.g;
+        img[(3 * j * n) + (3 * i) + 2] = col.b;
     }
 
     // Write the image
