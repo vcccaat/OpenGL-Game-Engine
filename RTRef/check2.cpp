@@ -83,11 +83,11 @@ public:
     }
 
     Camera() {
-        this->pos = glm::vec3(0, 0, 1.f);
-        this->target = glm::vec3(0.f, 0.f, -1.f);
+        this->pos = glm::vec3(3.f, -1.5, -5.f);
+        this->target = glm::vec3(1.5f, -2.f, 0.f);
         this->up = glm::vec3(0.f, 1.f, 0.f);
-        this->hfov = 0.785398f;
-        this->aspect = 16.f / 9.f;
+        this->hfov = 0.436332/200;
+        this->aspect = 1;
     }
 
     glm::vec3 Camera::generateRay(float xp, float yp) {
