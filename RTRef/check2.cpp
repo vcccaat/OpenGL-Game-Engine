@@ -43,6 +43,18 @@ struct Color {
         this->b = 255 * b;
     }
 
+    Color(unsigned char c) {
+        this->r = c;
+        this->g = c;
+        this->b = c;
+    }
+
+    Color(float c) {
+        this->r = 255 * c;
+        this->g = 255 * c;
+        this->b = 255 * c;
+    }
+
     Color() {
         this->r = 0;
         this->g = 0;
@@ -51,6 +63,42 @@ struct Color {
 
     void Color::print() {
         printf("%f, %f, %f\n", this->r, this->g, this->b);
+    }
+};
+
+class Camera {
+public:
+    glm::vec3 pos;
+    glm::vec3 target;
+    glm::vec3 up;
+    float hfov;
+    float aspect;
+
+    Camera(aiCamera* cam) {
+        this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
+        this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
+        this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
+        this->hfov = cam->mHorizontalFOV;
+        this->aspect = cam->mAspect;
+    }
+
+    glm::vec3 Camera::generateRay(float xp, float yp) {
+        double degree_to_rad = .0174533;
+        glm::vec3 w = glm::normalize(this->pos - this->target);
+        glm::vec3 u = glm::normalize(glm::cross(this->up, w));
+        glm::vec3 v = glm::normalize(glm::cross(w, u));
+
+        float vfov = this->hfov / this->aspect;
+        double h = 2 * tan(vfov / 2);
+        double wide = this->aspect * h;
+        double u_small = xp * wide;
+        double v_small = yp * h;
+        u_small -= wide / 2;
+        v_small -= h / 2;
+        float x = u.x * u_small + v.x * v_small - w.x;
+        float y = u.y * u_small + v.y * v_small - w.y;
+        float z = u.z * u_small + v.z * v_small - w.z;
+        return glm::vec3(x, y, z);
     }
 };
 
@@ -250,10 +298,9 @@ Color castRay(RTCScene scene,
        * the instancing tutorials for more information */
 
       glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-      float out = glm::dot(col, glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
+      float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
       out = out < 0 ? 0 : out;
-      //glm::acos(out);
-      return Color(out, out, out);
+      return Color(out);
   }
   else
       return Color();
@@ -292,11 +339,14 @@ int main() {
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     RTCScene scene = initializeScene(device, obj);
+    aiCamera* rawcam = obj->mCameras[0];
 
     // Constants
     int n = 256;
-    unsigned char out;
     unsigned char* img = new unsigned char[n * n * 3];
+
+    // Static tracing
+    /*
     float bottomLeftBound [2] = { -1.25, -1.25 };
     float topRightBound [2] = { 1.25, 1.25 };
 
@@ -313,6 +363,19 @@ int main() {
         img[(3 * j * n) + (3 * i) + 1] = col.g;
         img[(3 * j * n) + (3 * i) + 2] = col.b;
     }
+    */
+
+    // New tracing with camera
+    Camera cam(rawcam);
+    glm::vec3 dir;
+    for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
+        dir = cam.generateRay(i + .5 / n, j + .5 / n);
+        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+        img[(3 * j * n) + (3 * i) + 0] = col.r;
+        img[(3 * j * n) + (3 * i) + 1] = col.g;
+        img[(3 * j * n) + (3 * i) + 2] = col.b;
+    }
+
 
     // Write the image
     stbi_flip_vertically_on_write(1);
