@@ -182,6 +182,13 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene)
 {
 
   aiMesh* mesh = aiscene->mMeshes[0];
+  aiCamera* camera = aiScene->mCameras[0]; //get the first camera
+
+  aiNode* rootNode = aiscene->mRootNode;
+  aiNode* cameraNode = rootNode->FindNode(camera->mName);
+  aiMatrix4x4 cameraMatrix = cameraNode->mTransformation;
+  glm::mat4 cmt = glm::mat4(1.f);
+  std::cerr << cameraMatrix << std::endl;
 
   RTCScene scene = rtcNewScene(device);
 
@@ -340,7 +347,7 @@ int main() {
     Assimp::Importer importer;
     // Two paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
+    const aiScene* obj = importer.ReadFile("../resources/meshes/bunny.obj",
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
@@ -350,7 +357,7 @@ int main() {
 
     // Constants
     int n = 256;
-    unsigned char* img = new unsigned char[n * n * 3];
+    unsigned char img [n * n * 3];
 
     // Static tracing
     /*
@@ -388,6 +395,5 @@ int main() {
     // Write the image
     stbi_flip_vertically_on_write(1);
     stbi_write_png("bunny.png", n, n, 3, img, n * 3);
-    delete [] img;
     return 0;
 }
