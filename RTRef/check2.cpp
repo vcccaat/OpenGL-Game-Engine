@@ -340,13 +340,13 @@ int main() {
     Assimp::Importer importer;
     // Two paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj",
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     RTCScene scene = initializeScene(device, obj);
-    //aiCamera* rawcam = obj->mCameras[0];
+    aiCamera* rawcam = obj->mCameras[0];
 
     // Constants
     int n = 256;
@@ -374,7 +374,7 @@ int main() {
 
     // New tracing with camera
     //Camera cam(rawcam);
-    Camera cam = Camera();
+    Camera cam = Camera(rawcam);
     glm::vec3 dir;
     for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
         dir = cam.generateRay(i + .5 / n, j + .5 / n);
