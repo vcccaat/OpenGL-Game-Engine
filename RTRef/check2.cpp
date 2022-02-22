@@ -66,6 +66,15 @@ struct Color {
     }
 };
 
+glm::mat4 castToMat4(aiMatrix4x4 am) {
+    glm::mat4 out = glm::mat4(1.f);
+    out[0] = { am.a1, am.a2, am.a3, am.a4 };
+    out[1] = { am.b1, am.b2, am.b3, am.b4 };
+    out[2] = { am.c1, am.c2, am.c3, am.c4 };
+    out[3] = { am.d1, am.d2, am.d3, am.d4 };
+    return out;
+}
+
 class Camera {
 public:
     glm::vec3 pos;
@@ -182,7 +191,7 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene)
 {
 
   aiMesh* mesh = aiscene->mMeshes[0];
-  aiCamera* camera = aiScene->mCameras[0]; //get the first camera
+  aiCamera* camera = aiscene->mCameras[0]; //get the first camera
 
   aiNode* rootNode = aiscene->mRootNode;
   aiNode* cameraNode = rootNode->FindNode(camera->mName);
