@@ -61,8 +61,8 @@ struct Color {
         this->b = 0;
     }
 
-    void Color::print() {
-        printf("%f, %f, %f\n", this->r, this->g, this->b);
+    void print() {
+        printf("%c, %c, %c\n", this->r, this->g, this->b);
     }
 };
 
@@ -90,7 +90,7 @@ public:
         this->aspect = 1;
     }
 
-    glm::vec3 Camera::generateRay(float xp, float yp) {
+    glm::vec3 generateRay(float xp, float yp) {
         glm::vec3 w = glm::normalize(this->pos - this->target);
         glm::vec3 u = glm::normalize(glm::cross(this->up, w));
         glm::vec3 v = glm::normalize(glm::cross(w, u));
