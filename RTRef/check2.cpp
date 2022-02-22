@@ -11,6 +11,7 @@
 #include <assimp/postprocess.h>     // Post processing flags
 #include <glm/glm.hpp>
 #include <../RTUtil/output.hpp>
+#include <../RTUtil/conversions.hpp>
 
 //#define STBI_MSC_SECURE_CRT
 //#define STB_IMAGE_IMPLEMENTATION
@@ -66,15 +67,6 @@ struct Color {
     }
 };
 
-glm::mat4 castToMat4(aiMatrix4x4 am) {
-    glm::mat4 out = glm::mat4(1.f);
-    out[0] = { am.a1, am.a2, am.a3, am.a4 };
-    out[1] = { am.b1, am.b2, am.b3, am.b4 };
-    out[2] = { am.c1, am.c2, am.c3, am.c4 };
-    out[3] = { am.d1, am.d2, am.d3, am.d4 };
-    return out;
-}
-
 class Camera {
 public:
     glm::vec3 pos;
@@ -92,19 +84,19 @@ public:
     }
 
     Camera() {
-        this->pos = glm::vec3(3.f, -1.5, -5.f);
-        this->target = glm::vec3(1.5f, -2.f, 0.f);
+        this->pos = glm::vec3(-3.f, 0.f, 5.f);
+        this->target = glm::vec3(-1.5f, -1.5f, 0.f);
         this->up = glm::vec3(0.f, 1.f, 0.f);
-        this->hfov = 0.436332/200;
+        this->hfov = 0.5;
         this->aspect = 1;
     }
 
-    glm::vec3 generateRay(float xp, float yp) {
+    glm::vec3 generateRay(float xp, float yp, int n) {
         glm::vec3 w = glm::normalize(this->pos - this->target);
         glm::vec3 u = glm::normalize(glm::cross(this->up, w));
         glm::vec3 v = glm::normalize(glm::cross(w, u));
 
-        float vfov = this->hfov / this->aspect;
+        float vfov = this->hfov / (this->aspect * n);
         double h = 2 * tan(vfov / 2);
         double wide = this->aspect * h;
         double u_small = xp * wide;
@@ -187,18 +179,32 @@ RTCDevice initializeDevice()
  *
  * Scenes, like devices, are reference-counted.
  */
-RTCScene initializeScene(RTCDevice device, const aiScene* aiscene)
-{
+RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) {
+
+  // Dealing with camera transformation
+    
+  aiCamera* camera = aiscene->mCameras[0]; //get the first camera
+  aiNode* rootNode = aiscene->mRootNode;
+  aiNode* tempNode = rootNode->FindNode(camera->mName);
+  glm::mat4 cmt = glm::mat4(1.f);
+
+  while (tempNode != rootNode) {
+      glm::mat4 cur = RTUtil::a2g(tempNode->mTransformation); // cast does not flip axes, i hope
+      cmt = cmt * cur; // this is (i think) matrix multiplation, may be wrong
+      tempNode = tempNode->mParent;
+  }
+  // Final camera transformation matrix
+  //std::cerr << cmt << std::endl;
+
+  // Alter camera attributes
+  glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
+  cam.pos = glm::vec3(chg);
+  chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
+  cam.target = glm::vec3(chg);
+  chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 1) * cmt;
+  cam.up = glm::vec3(chg);
 
   aiMesh* mesh = aiscene->mMeshes[0];
-  aiCamera* camera = aiscene->mCameras[0]; //get the first camera
-
-  aiNode* rootNode = aiscene->mRootNode;
-  aiNode* cameraNode = rootNode->FindNode(camera->mName);
-  aiMatrix4x4 cameraMatrix = cameraNode->mTransformation;
-  glm::mat4 cmt = glm::mat4(1.f);
-  std::cerr << cameraMatrix << std::endl;
-
   RTCScene scene = rtcNewScene(device);
 
   /* 
@@ -321,7 +327,7 @@ Color castRay(RTCScene scene,
        * the instancing tutorials for more information */
 
       glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-      float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
+      float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, -1.f)));
       out = out < 0 ? 0 : out;
       return Color(out);
   }
@@ -354,18 +360,20 @@ void waitForKeyPressedUnderWindows()
 int main() {
     /* Initialization */
     Assimp::Importer importer;
-    // Two paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
+    // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj
+    //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
-    RTCScene scene = initializeScene(device, obj);
     aiCamera* rawcam = obj->mCameras[0];
+    Camera cam = Camera(rawcam);
+    RTCScene scene = initializeScene(device, obj, cam);
 
     // Constants
-    int n = 256;
+    const int n = 256;
     unsigned char img [n * n * 3];
 
     // Static tracing
@@ -389,12 +397,10 @@ int main() {
     */
 
     // New tracing with camera
-    //Camera cam(rawcam);
-    Camera cam = Camera(rawcam);
     glm::vec3 dir;
     for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
-        dir = cam.generateRay(i + .5 / n, j + .5 / n);
-        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+        dir = cam.generateRay(i + .5 / n, j + .5 / n, n);
+        Color col = castRay(scene, cam.pos.x, cam.pos.z, cam.pos.y, dir.x, dir.z, dir.y);
         img[(3 * j * n) + (3 * i) + 0] = col.r;
         img[(3 * j * n) + (3 * i) + 1] = col.g;
         img[(3 * j * n) + (3 * i) + 2] = col.b;
@@ -402,7 +408,6 @@ int main() {
 
 
     // Write the image
-    stbi_flip_vertically_on_write(1);
     stbi_write_png("bunny.png", n, n, 3, img, n * 3);
     return 0;
 }
