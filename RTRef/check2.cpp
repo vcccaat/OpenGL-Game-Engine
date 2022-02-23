@@ -153,6 +153,17 @@ void waitForKeyPressedUnderWindows() {
 
 /**************************************** SCENE AND RAY ****************************************/
 
+aiNode* findNodeWithMesh(aiNode* cur, int meshIndex) {
+    for(int i = 0; i < cur->mNumMeshes; ++i) {
+        if (cur->mMeshes[i] == meshIndex) return cur;
+    }
+    for (int i = 0; i < cur->mNumChildren; ++i) {
+        return findNodeWithMesh(cur->mChildren[i], meshIndex);
+    }
+    // Nothing was found
+    return nullptr;
+}
+
 
 /*
  * Create a scene, which is a collection of geometry objects. Scenes are 
@@ -168,26 +179,25 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
   aiCamera* camera = aiscene->mCameras[0]; //get the first camera
   aiNode* tempNode = rootNode->FindNode(camera->mName);
   glm::mat4 cmt = glm::mat4(1.f);
+  glm::mat4 cur;
 
   // Iterate through all nodes
-  while (tempNode != rootNode) {
-      glm::mat4 cur = RTUtil::a2g(tempNode->mTransformation); // cast does not flip axes, i hope
+  while (tempNode != NULL) {
+      cur = RTUtil::a2g(tempNode->mTransformation);
       std::cerr << cur << std::endl;
       cmt = cmt * cur; // this is (i think) matrix multiplation, may be wrong
       tempNode = tempNode->mParent;
   }
   // Now, alter camera attributes
-//   glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
-//   cam.pos = glm::vec3(chg);
-//   chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
-//   cam.target = glm::vec3(chg);
-//   chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 1) * cmt;
-//   cam.up = glm::vec3(chg);
-//   std::cerr << "updated cam" << cam.up << cam.pos << cam.target << std::endl;
+  glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
+  cam.pos = glm::vec3(chg);
+  chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
+  cam.target = glm::vec3(chg);
+  chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0) * cmt;
+  cam.up = glm::vec3(chg);
 
   // Look at mesh stuff
   aiMesh** mesh = aiscene->mMeshes;
-  std::cout << "number of mesh " << aiscene->mNumMeshes << std::endl;
   RTCScene scene = rtcNewScene(device);
 
   /* 
@@ -202,7 +212,8 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
    */
   
   // add multiple meshes, bunny + floor
-  for (int m = 0; m < aiscene->mNumMeshes; m++){
+    for (int m = 1; m < aiscene->mNumMeshes; m++){
+        printf("hi");
 
         RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
         float* vertices = (float*) rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3,
@@ -210,11 +221,25 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
         unsigned* indices = (unsigned*) rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3,
             3*sizeof(unsigned), 3*mesh[m]->mNumFaces);
 
+        glm::mat4 cmt = glm::mat4(1.f);
+        //aiNode* tempNode = rootNode->FindNode(mesh[m]->mName);
+        aiNode* tempNode = findNodeWithMesh(rootNode, m);
+        while (tempNode != rootNode) {
+            cur = RTUtil::a2g(tempNode->mTransformation); // cast does not flip axes, i hope
+            std::cerr << cur << std::endl;
+            cmt = cmt * cur; // this is (i think) matrix multiplation, may be wrong
+            tempNode = tempNode->mParent;
+        }
+
         // Inserting mesh data into vertices
         for (int i = 0; i < mesh[m]->mNumVertices; ++i) {
-            vertices[3 * i + 0] = mesh[m]->mVertices[i][0];
-            vertices[3 * i + 1] = mesh[m]->mVertices[i][1];
-            vertices[3 * i + 2] = mesh[m]->mVertices[i][2];
+            float x = mesh[m]->mVertices[i][0];
+            float y = mesh[m]->mVertices[i][1];
+            float z = mesh[m]->mVertices[i][2];
+            chg = glm::vec4(x, y, z, 1) * cmt;
+            vertices[3 * i + 0] = chg.x;
+            vertices[3 * i + 1] = chg.y;
+            vertices[3 * i + 2] = chg.z;
         }
         for (int i = 0; i < mesh[m]->mNumFaces; ++i) {
             indices[3 * i + 0] = mesh[m]->mFaces[i].mIndices[0];
@@ -241,12 +266,12 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
         rtcReleaseGeometry(geom);
     }
 
-  /*
-   * Like geometry objects, scenes must be committed. This lets
-   * Embree know that it may start building an acceleration structure.
-   */
-  rtcCommitScene(scene);
-  return scene;
+    /*
+    * Like geometry objects, scenes must be committed. This lets
+    * Embree know that it may start building an acceleration structure.
+    */
+    rtcCommitScene(scene);
+    return scene;
 }
 
 /*
