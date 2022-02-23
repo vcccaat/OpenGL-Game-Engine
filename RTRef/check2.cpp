@@ -81,6 +81,7 @@ public:
         this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
         this->hfov = cam->mHorizontalFOV;
         this->aspect = cam->mAspect;
+        std::cout << "init camera" << this->pos << this->target << this->up << this->hfov << this->aspect <<std::endl;
     }
 
     Camera() {
@@ -196,7 +197,6 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
   }
 
   // Alter camera attributes
-  
 //   glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
 //   cam.pos = glm::vec3(chg);
 //   chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
@@ -204,7 +204,8 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
 //   chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 1) * cmt;
 //   cam.up = glm::vec3(chg);
 //   std::cerr << "updated cam" << cam.up << cam.pos << cam.target << std::endl;
-  aiMesh* mesh = aiscene->mMeshes[0];
+  aiMesh** mesh = aiscene->mMeshes;
+  std::cout << "number of mesh " << aiscene->mNumMeshes << std::endl;
   RTCScene scene = rtcNewScene(device);
 
   /* 
@@ -217,35 +218,39 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
    * to ensure proper alignment and padding. This is described in
    * more detail in the API documentation.
    */
+  
+  // add multiple meshes, bunny + floor
+  for (int m = 0; m < aiscene->mNumMeshes; m++){
+
   RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
   float* vertices = (float*) rtcSetNewGeometryBuffer(geom,
                                                      RTC_BUFFER_TYPE_VERTEX,
                                                      0,
                                                      RTC_FORMAT_FLOAT3,
                                                      3*sizeof(float),
-                                                     3*mesh->mNumVertices);
+                                                     3*mesh[m]->mNumVertices);
 
   unsigned* indices = (unsigned*) rtcSetNewGeometryBuffer(geom,
                                                           RTC_BUFFER_TYPE_INDEX,
                                                           0,
                                                           RTC_FORMAT_UINT3,
                                                           3*sizeof(unsigned),
-                                                          3*mesh->mNumFaces);
+                                                          3*mesh[m]->mNumFaces);
 
   // Draw the triangle
-  if (vertices && indices)
-  {
-      for (int i = 0; i < mesh->mNumVertices; ++i) {
-          vertices[3*i] = mesh->mVertices[i][0];
-          vertices[3*i+1] = mesh->mVertices[i][1];
-          vertices[3*i+2] = mesh->mVertices[i][2];
-      }
-      for (int i = 0; i < mesh->mNumFaces; ++i) {
-          indices[3 * i] = mesh->mFaces[i].mIndices[0];
-          indices[3 * i + 1] = mesh->mFaces[i].mIndices[1];
-          indices[3 * i + 2] = mesh->mFaces[i].mIndices[2];
-      }
-  }
+
+    for (int i = 0; i < mesh[m]->mNumVertices; ++i) {
+        vertices[3*i] = mesh[m]->mVertices[i][0];
+        vertices[3*i+1] = mesh[m]->mVertices[i][1];
+        vertices[3*i+2] = mesh[m]->mVertices[i][2];
+    }
+    for (int i = 0; i < mesh[m]->mNumFaces; ++i) {
+        indices[3 * i] = mesh[m]->mFaces[i].mIndices[0];
+        indices[3 * i + 1] = mesh[m]->mFaces[i].mIndices[1];
+        indices[3 * i + 2] = mesh[m]->mFaces[i].mIndices[2];
+    }
+
+  
 
   /*
    * You must commit geometry objects when you are done setting them up,
@@ -262,8 +267,9 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
    * rtcAttachGeometry() returns a geometry ID. We could use this to
    * identify intersected objects later on.
    */
-  rtcAttachGeometry(scene, geom);
+  unsigned int geomID = rtcAttachGeometry(scene, geom);
   rtcReleaseGeometry(geom);
+}
 
   /*
    * Like geometry objects, scenes must be committed. This lets
