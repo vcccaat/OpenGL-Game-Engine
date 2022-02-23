@@ -84,7 +84,7 @@ public:
     }
 
     Camera() {
-        this->pos = glm::vec3(-3.f, 0.f, 5.f);
+        this->pos = glm::vec3(1.f, -1.f, 6.f);
         this->target = glm::vec3(-1.5f, -1.5f, 0.f);
         this->up = glm::vec3(0.f, 1.f, 0.f);
         this->hfov = 0.5;
@@ -190,20 +190,20 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
 
   while (tempNode != rootNode) {
       glm::mat4 cur = RTUtil::a2g(tempNode->mTransformation); // cast does not flip axes, i hope
+      std::cerr << cur << std::endl;
       cmt = cmt * cur; // this is (i think) matrix multiplation, may be wrong
       tempNode = tempNode->mParent;
   }
-  // Final camera transformation matrix
-  //std::cerr << cmt << std::endl;
 
   // Alter camera attributes
-  glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
-  cam.pos = glm::vec3(chg);
-  chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
-  cam.target = glm::vec3(chg);
-  chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 1) * cmt;
-  cam.up = glm::vec3(chg);
-
+  
+//   glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
+//   cam.pos = glm::vec3(chg);
+//   chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
+//   cam.target = glm::vec3(chg);
+//   chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 1) * cmt;
+//   cam.up = glm::vec3(chg);
+//   std::cerr << "updated cam" << cam.up << cam.pos << cam.target << std::endl;
   aiMesh* mesh = aiscene->mMeshes[0];
   RTCScene scene = rtcNewScene(device);
 
@@ -369,7 +369,7 @@ int main() {
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera(rawcam);
+    Camera cam = Camera();
     RTCScene scene = initializeScene(device, obj, cam);
 
     // Constants
