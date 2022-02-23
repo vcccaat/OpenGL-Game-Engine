@@ -151,7 +151,8 @@ void waitForKeyPressedUnderWindows() {
 }
 
 
-/**************************************** SCENE AND RAY ****************************************/
+/**************************************** OUR FUNCTIONS ****************************************/
+
 
 aiNode* findNodeWithMesh(aiNode* cur, int meshIndex) {
     for(int i = 0; i < cur->mNumMeshes; ++i) {
@@ -164,6 +165,25 @@ aiNode* findNodeWithMesh(aiNode* cur, int meshIndex) {
     return nullptr;
 }
 
+void printAll(aiNode* cur) {
+    if (cur == NULL) return;
+    if(cur->mNumChildren == 0) {
+        printf("\n\nCurrent node: %s. No children.", cur->mName.C_Str());
+        return;
+    }
+    printf("\n\nCurrent node: %s. Children: ", cur->mName.C_Str());
+    for (int i = 0; i < cur->mNumChildren; ++i) {
+        printf("\n%s ", cur->mChildren[i]->mName.C_Str());
+    }
+    for (int i = 0; i < cur->mNumChildren; ++i) {
+        printAll(cur->mChildren[i]);
+    }
+    return;
+}
+
+
+/**************************************** SCENE AND RAY ****************************************/
+
 
 /*
  * Create a scene, which is a collection of geometry objects. Scenes are 
@@ -174,44 +194,47 @@ aiNode* findNodeWithMesh(aiNode* cur, int meshIndex) {
  */
 RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) {
 
-  // Dealing with node transformations
-  aiNode* rootNode = aiscene->mRootNode;
-  aiCamera* camera = aiscene->mCameras[0]; //get the first camera
-  aiNode* tempNode = rootNode->FindNode(camera->mName);
-  glm::mat4 cmt = glm::mat4(1.f);
-  glm::mat4 cur;
+    // Print all nodes
+    printAll(aiscene->mRootNode);
+    printf("\n\n\n");
+    // Dealing with node transformations
+    aiNode* rootNode = aiscene->mRootNode;
+    aiCamera* camera = aiscene->mCameras[0]; //get the first camera
+    aiNode* tempNode = rootNode->FindNode(camera->mName);
+    glm::mat4 cmt = glm::mat4(1.f);
+    glm::mat4 cur;
 
-  // Iterate through all nodes
-  while (tempNode != NULL) {
-      cur = RTUtil::a2g(tempNode->mTransformation);
-      std::cerr << cur << std::endl;
-      cmt = cmt * cur; // this is (i think) matrix multiplation, may be wrong
-      tempNode = tempNode->mParent;
-  }
-  // Now, alter camera attributes
-  glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
-  cam.pos = glm::vec3(chg);
-  chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
-  cam.target = glm::vec3(chg);
-  chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0) * cmt;
-  cam.up = glm::vec3(chg);
+    // Iterate through all nodes
+    while (tempNode != NULL) {
+        cur = RTUtil::a2g(tempNode->mTransformation);
+        std::cerr << cur << std::endl;
+        cmt = cmt * cur; // this is (i think) matrix multiplation, may be wrong
+        tempNode = tempNode->mParent;
+    }
+    // Now, alter camera attributes
+    glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
+    cam.pos = glm::vec3(chg);
+    chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
+    cam.target = glm::vec3(chg);
+    chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0) * cmt;
+    cam.up = glm::vec3(chg);
 
-  // Look at mesh stuff
-  aiMesh** mesh = aiscene->mMeshes;
-  RTCScene scene = rtcNewScene(device);
+    // Look at mesh stuff
+    aiMesh** mesh = aiscene->mMeshes;
+    RTCScene scene = rtcNewScene(device);
 
-  /* 
-   * Create a triangle mesh geometry, and initialize a single triangle.
-   * You can look up geometry types in the API documentation to
-   * find out which type expects which buffers.
-   *
-   * We create buffers directly on the device, but you can also use
-   * shared buffers. For shared buffers, special care must be taken
-   * to ensure proper alignment and padding. This is described in
-   * more detail in the API documentation.
-   */
+    /* 
+    * Create a triangle mesh geometry, and initialize a single triangle.
+    * You can look up geometry types in the API documentation to
+    * find out which type expects which buffers.
+    *
+    * We create buffers directly on the device, but you can also use
+    * shared buffers. For shared buffers, special care must be taken
+    * to ensure proper alignment and padding. This is described in
+    * more detail in the API documentation.
+    */
   
-  // add multiple meshes, bunny + floor
+    // add multiple meshes, bunny + floor
     for (int m = 1; m < aiscene->mNumMeshes; m++){
         printf("hi");
 
@@ -348,7 +371,7 @@ int main() {
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera();
+    Camera cam = Camera(rawcam);
     RTCScene scene = initializeScene(device, obj, cam);
 
     // Constants

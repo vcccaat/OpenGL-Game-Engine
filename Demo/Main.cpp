@@ -7,6 +7,8 @@
 
 int main(int argc, char const *argv[]) {
   nanogui::init();
+  nanogui::ref<BunnyApp> app = new BunnyApp();
+  nanogui::mainloop(16);
   if (argc > 1 && std::string(argv[1]) == "Tetra") {
     nanogui::ref<TetraApp> app = new TetraApp();
     nanogui::mainloop(16);
