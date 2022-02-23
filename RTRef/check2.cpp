@@ -21,11 +21,12 @@
 #include <cpplocate/cpplocate.h>
 #include <GLWrap/Program.hpp>
 
-
 #if defined(_WIN32)
 #  include <conio.h>
 #  include <windows.h>
 #endif
+
+/**************************************** STRUCTURES ****************************************/
 
 struct Color {
     unsigned char r;
@@ -111,6 +112,8 @@ public:
     }
 };
 
+/**************************************** GIVEN FUNCTIONS ****************************************/
+
 /*
  * A minimal tutorial. 
  *
@@ -146,8 +149,7 @@ RTC_NAMESPACE_USE
  * This is extremely helpful for finding bugs in your code, prevents you
  * from having to add explicit error checking to each Embree API call.
  */
-void errorFunction(void* userPtr, enum RTCError error, const char* str)
-{
+void errorFunction(void* userPtr, enum RTCError error, const char* str) {
   printf("error %d: %s\n", error, str);
 }
 
@@ -162,16 +164,32 @@ void errorFunction(void* userPtr, enum RTCError error, const char* str)
  *
  * Note that RTCDevice is reference-counted.
  */
-RTCDevice initializeDevice()
-{
+RTCDevice initializeDevice() {
   RTCDevice device = rtcNewDevice(NULL);
-
-  if (!device)
-    printf("error %d: cannot create device\n", rtcGetDeviceError(NULL));
-
+  if (!device) printf("error %d: cannot create device\n", rtcGetDeviceError(NULL));
   rtcSetDeviceErrorFunction(device, errorFunction, NULL);
   return device;
 }
+
+
+void waitForKeyPressedUnderWindows() {
+#if defined(_WIN32)
+    HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (!GetConsoleScreenBufferInfo(hStdOutput, &csbi)) {
+        printf("GetConsoleScreenBufferInfo failed: %d\n", GetLastError());
+        return;
+    }
+    /* do not pause when running on a shell */
+    if (csbi.dwCursorPosition.X != 0 || csbi.dwCursorPosition.Y != 0)
+        return;
+    /* only pause if running in separate console window. */
+    printf("\n\tPress any key to exit...\n");
+    int ch = getch();
+#endif
+}
+
+/**************************************** SCENE AND RAY ****************************************/
 
 /*
  * Create a scene, which is a collection of geometry objects. Scenes are 
@@ -182,21 +200,20 @@ RTCDevice initializeDevice()
  */
 RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) {
 
-  // Dealing with camera transformation
-    
-  aiCamera* camera = aiscene->mCameras[0]; //get the first camera
+  // Dealing with node transformations
   aiNode* rootNode = aiscene->mRootNode;
+  aiCamera* camera = aiscene->mCameras[0]; //get the first camera
   aiNode* tempNode = rootNode->FindNode(camera->mName);
   glm::mat4 cmt = glm::mat4(1.f);
 
+  // Iterate through all nodes
   while (tempNode != rootNode) {
       glm::mat4 cur = RTUtil::a2g(tempNode->mTransformation); // cast does not flip axes, i hope
       std::cerr << cur << std::endl;
       cmt = cmt * cur; // this is (i think) matrix multiplation, may be wrong
       tempNode = tempNode->mParent;
   }
-
-  // Alter camera attributes
+  // Now, alter camera attributes
 //   glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
 //   cam.pos = glm::vec3(chg);
 //   chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
@@ -204,6 +221,8 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
 //   chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 1) * cmt;
 //   cam.up = glm::vec3(chg);
 //   std::cerr << "updated cam" << cam.up << cam.pos << cam.target << std::endl;
+
+  // Look at mesh stuff
   aiMesh** mesh = aiscene->mMeshes;
   std::cout << "number of mesh " << aiscene->mNumMeshes << std::endl;
   RTCScene scene = rtcNewScene(device);
@@ -222,61 +241,48 @@ RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera &cam) 
   // add multiple meshes, bunny + floor
   for (int m = 0; m < aiscene->mNumMeshes; m++){
 
-  RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-  float* vertices = (float*) rtcSetNewGeometryBuffer(geom,
-                                                     RTC_BUFFER_TYPE_VERTEX,
-                                                     0,
-                                                     RTC_FORMAT_FLOAT3,
-                                                     3*sizeof(float),
-                                                     3*mesh[m]->mNumVertices);
+        RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
+        float* vertices = (float*) rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3,
+            3*sizeof(float), 3*mesh[m]->mNumVertices);
+        unsigned* indices = (unsigned*) rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3,
+            3*sizeof(unsigned), 3*mesh[m]->mNumFaces);
 
-  unsigned* indices = (unsigned*) rtcSetNewGeometryBuffer(geom,
-                                                          RTC_BUFFER_TYPE_INDEX,
-                                                          0,
-                                                          RTC_FORMAT_UINT3,
-                                                          3*sizeof(unsigned),
-                                                          3*mesh[m]->mNumFaces);
+        // Inserting mesh data into vertices
+        for (int i = 0; i < mesh[m]->mNumVertices; ++i) {
+            vertices[3 * i + 0] = mesh[m]->mVertices[i][0];
+            vertices[3 * i + 1] = mesh[m]->mVertices[i][1];
+            vertices[3 * i + 2] = mesh[m]->mVertices[i][2];
+        }
+        for (int i = 0; i < mesh[m]->mNumFaces; ++i) {
+            indices[3 * i + 0] = mesh[m]->mFaces[i].mIndices[0];
+            indices[3 * i + 1] = mesh[m]->mFaces[i].mIndices[1];
+            indices[3 * i + 2] = mesh[m]->mFaces[i].mIndices[2];
+        }
 
-  // Draw the triangle
+        /*
+        * You must commit geometry objects when you are done setting them up,
+        * or you will not get any intersections.
+        */
+        rtcCommitGeometry(geom);
 
-    for (int i = 0; i < mesh[m]->mNumVertices; ++i) {
-        vertices[3*i] = mesh[m]->mVertices[i][0];
-        vertices[3*i+1] = mesh[m]->mVertices[i][1];
-        vertices[3*i+2] = mesh[m]->mVertices[i][2];
+        /*
+        * In rtcAttachGeometry(...), the scene takes ownership of the geom
+        * by increasing its reference count. This means that we don't have
+        * to hold on to the geom handle, and may release it. The geom object
+        * will be released automatically when the scene is destroyed.
+        *
+        * rtcAttachGeometry() returns a geometry ID. We could use this to
+        * identify intersected objects later on.
+        */
+        unsigned int geomID = rtcAttachGeometry(scene, geom);
+        rtcReleaseGeometry(geom);
     }
-    for (int i = 0; i < mesh[m]->mNumFaces; ++i) {
-        indices[3 * i] = mesh[m]->mFaces[i].mIndices[0];
-        indices[3 * i + 1] = mesh[m]->mFaces[i].mIndices[1];
-        indices[3 * i + 2] = mesh[m]->mFaces[i].mIndices[2];
-    }
-
-  
-
-  /*
-   * You must commit geometry objects when you are done setting them up,
-   * or you will not get any intersections.
-   */
-  rtcCommitGeometry(geom);
-
-  /*
-   * In rtcAttachGeometry(...), the scene takes ownership of the geom
-   * by increasing its reference count. This means that we don't have
-   * to hold on to the geom handle, and may release it. The geom object
-   * will be released automatically when the scene is destroyed.
-   *
-   * rtcAttachGeometry() returns a geometry ID. We could use this to
-   * identify intersected objects later on.
-   */
-  unsigned int geomID = rtcAttachGeometry(scene, geom);
-  rtcReleaseGeometry(geom);
-}
 
   /*
    * Like geometry objects, scenes must be committed. This lets
    * Embree know that it may start building an acceleration structure.
    */
   rtcCommitScene(scene);
-
   return scene;
 }
 
@@ -331,40 +337,17 @@ Color castRay(RTCScene scene,
        * get geomID=0 / primID=0 for all hits.
        * There is also instID, used for instancing. See
        * the instancing tutorials for more information */
-
       glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
       float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, -1.f)));
       out = out < 0 ? 0 : out;
       return Color(out);
   }
-  else
-      return Color();
+  return Color();
 }
 
-void waitForKeyPressedUnderWindows()
-{
-#if defined(_WIN32)
-  HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-  
-  CONSOLE_SCREEN_BUFFER_INFO csbi;
-  if (!GetConsoleScreenBufferInfo(hStdOutput, &csbi)) {
-    printf("GetConsoleScreenBufferInfo failed: %d\n", GetLastError());
-    return;
-  }
-  
-  /* do not pause when running on a shell */
-  if (csbi.dwCursorPosition.X != 0 || csbi.dwCursorPosition.Y != 0)
-    return;
-  
-  /* only pause if running in separate console window. */
-  printf("\n\tPress any key to exit...\n");
-  int ch = getch();
-#endif
-}
-
+/**************************************** MAIN ****************************************/
 
 int main() {
-    /* Initialization */
     Assimp::Importer importer;
     // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj
@@ -382,26 +365,6 @@ int main() {
     const int n = 256;
     unsigned char img [n * n * 3];
 
-    // Static tracing
-    /*
-    float bottomLeftBound [2] = { -1.25, -1.25 };
-    float topRightBound [2] = { 1.25, 1.25 };
-
-    // Cast rays with origin in bounding box
-    float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
-    float ystep = (topRightBound[1] - bottomLeftBound[1]) / n;
-    float ox;
-    float oy;
-    for (int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
-        ox = i * xstep + bottomLeftBound[0];
-        oy = j * ystep + bottomLeftBound[1];
-        Color col = castRay(scene, ox, oy, 1, 0, 0, -1);
-        img[(3 * j * n) + (3 * i) + 0] = col.r;
-        img[(3 * j * n) + (3 * i) + 1] = col.g;
-        img[(3 * j * n) + (3 * i) + 2] = col.b;
-    }
-    */
-
     // New tracing with camera
     glm::vec3 dir;
     for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
@@ -412,8 +375,27 @@ int main() {
         img[(3 * j * n) + (3 * i) + 2] = col.b;
     }
 
-
     // Write the image
     stbi_write_png("bunny.png", n, n, 3, img, n * 3);
     return 0;
 }
+
+// Static tracing (would go after "// Constants")
+/*
+float bottomLeftBound [2] = { -1.25, -1.25 };
+float topRightBound [2] = { 1.25, 1.25 };
+
+// Cast rays with origin in bounding box
+float xstep = (topRightBound[0] - bottomLeftBound[0]) / n;
+float ystep = (topRightBound[1] - bottomLeftBound[1]) / n;
+float ox;
+float oy;
+for (int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
+    ox = i * xstep + bottomLeftBound[0];
+    oy = j * ystep + bottomLeftBound[1];
+    Color col = castRay(scene, ox, oy, 1, 0, 0, -1);
+    img[(3 * j * n) + (3 * i) + 0] = col.r;
+    img[(3 * j * n) + (3 * i) + 1] = col.g;
+    img[(3 * j * n) + (3 * i) + 2] = col.b;
+}
+*/
