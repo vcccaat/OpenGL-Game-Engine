@@ -1,16 +1,19 @@
 #include "check2.h"
-
+#include <iostream>
 #include "../RTUtil/ImgGUI.hpp"
 
 class BunnyGUI : public RTUtil::ImgGUI {
 public:
 	BunnyGUI(): ImgGUI(800,600) {
-		windowWidth = 10;
+		std::cout << windowWidth << windowHeight << "\n";
+
+		// img_data = getImgData(windowWidth,windowHeight);
+		
 	}
 	void compute_image() {
-
-	}
-
+		// always updating 
+		img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(255,255,255));
+}
 };
 
 int main() {
@@ -18,8 +21,10 @@ int main() {
 	nanogui::init();
 	nanogui::ref<BunnyGUI> app = new BunnyGUI();
   nanogui::mainloop(16);
+	nanogui::shutdown();
 	// run();
 
-	nanogui::shutdown();
+
+	
 	return 0;
 }

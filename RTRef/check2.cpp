@@ -272,7 +272,6 @@ Color castRay(RTCScene scene,
 
 /**************************************** MAIN ****************************************/
 
-
 int run() {
     Assimp::Importer importer;
     // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
@@ -305,6 +304,35 @@ int run() {
   // Write the image
   stbi_write_png("bunny.png", n, n, 3, img, n * 3);
   return 0;
+}
+
+
+std::vector<glm::vec3> getImgData(int width, int height) {
+    Assimp::Importer importer;
+    // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
+    //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
+    //        ../resources/meshes/bunny.obj
+    //        ../resources/scenes/bunnyscene.glb
+    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_SortByPType);
+    RTCDevice device = initializeDevice();
+    aiCamera* rawcam = obj->mCameras[0];
+    Camera cam = Camera(rawcam); //rawcam
+    RTCScene scene = initializeScene(device, obj, cam);
+
+    std::vector<glm::vec3> img  = std::vector<glm::vec3>(width * height,glm::vec3(0.0f));
+
+    // New tracing with camera
+    glm::vec3 dir;
+    for(int i = 0; i < width; ++i) for (int j = 0; j < height; ++j) {
+        dir = cam.generateRay(i + .5 / width, j + .5 / height, width);  // wierd fov ratio!!
+        Color col = castRay(scene, cam.pos.x, cam.pos.z, cam.pos.y, dir.x, dir.z, dir.y);
+        img[j* height + i] = glm::vec3(col.r,col.g,col.b);
+    }
+
+  return img;
 }
 
 // Static tracing (would go after "// Constants")
