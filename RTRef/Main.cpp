@@ -4,15 +4,15 @@
 
 class BunnyGUI : public RTUtil::ImgGUI {
 public:
-	BunnyGUI(): ImgGUI(800,600) {
+	BunnyGUI(): ImgGUI(800,800) {
 		std::cout << windowWidth << windowHeight << "\n";
-
-		// img_data = getImgData(windowWidth,windowHeight);
+		
+		img_data = getImgData(windowWidth,windowHeight);
 		
 	}
 	void compute_image() {
 		// always updating 
-		img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(255,255,255));
+		// img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(255,255,255));
 }
 };
 
@@ -23,6 +23,7 @@ int main() {
   nanogui::mainloop(16);
 	nanogui::shutdown();
 	// run();
+	// getImgData(800,800);  //not work for rectangle screen, check!!
 
 
 	

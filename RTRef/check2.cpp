@@ -188,8 +188,7 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
     
     // when it reaches mesh, transform the vertices
     if (cur->mNumMeshes > 0 && *cur->mMeshes == 0) { /// temp: only has bunny   && *cur->mMeshes == 0
-        
-    
+      
       aiMesh **meshList = aiscene->mMeshes;
       aiMesh *mesh = meshList[*cur->mMeshes];
       printf("index of mesh %d \n",*cur->mMeshes);
@@ -278,7 +277,7 @@ int run() {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
@@ -329,7 +328,8 @@ std::vector<glm::vec3> getImgData(int width, int height) {
     for(int i = 0; i < width; ++i) for (int j = 0; j < height; ++j) {
         dir = cam.generateRay(i + .5 / width, j + .5 / height, width);  // wierd fov ratio!!
         Color col = castRay(scene, cam.pos.x, cam.pos.z, cam.pos.y, dir.x, dir.z, dir.y);
-        img[j* height + i] = glm::vec3(col.r,col.g,col.b);
+        img[i*width + j] = glm::vec3(col.r,col.g,col.b);
+        std::cerr <<  glm::vec3(col.r,col.g,col.b) << std::endl;
     }
 
   return img;
