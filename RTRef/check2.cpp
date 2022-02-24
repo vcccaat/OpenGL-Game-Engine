@@ -94,8 +94,8 @@ class Camera {
   }
 
   Camera() {
-    this->pos = glm::vec3(1.f, -1.f, 0.f);
-    this->target = glm::vec3(-1.5f, 1.5f, 0.f);
+    this->pos = glm::vec3(1.f, -1.f, 6.f);
+    this->target = glm::vec3(-1.5f, -1.5f, 0.f);
     this->up = glm::vec3(0.f, 1.f, 0.f);
     this->hfov = 0.5;
     this->aspect = 1;
@@ -187,14 +187,14 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
     transMatrix =  RTUtil::a2g(cur->mTransformation)*transMatrix;
     
     // when it reaches mesh, transform the vertices
-    if (cur->mNumMeshes > 0 ) { /// temp: only has bunny   && *cur->mMeshes == 0
+    if (cur->mNumMeshes > 0 && *cur->mMeshes == 0) { /// temp: only has bunny   && *cur->mMeshes == 0
         
     
       aiMesh **meshList = aiscene->mMeshes;
       aiMesh *mesh = meshList[*cur->mMeshes];
       printf("index of mesh %d \n",*cur->mMeshes);
       std::cerr << transMatrix << std::endl;
-      addMeshToScene(device, scene, mesh, transMatrix); //transMatrix  temp!!! glm::mat4(1.f)
+      addMeshToScene(device, scene, mesh, glm::mat4(1.f)); //transMatrix  temp!!! glm::mat4(1.f)
     //   transMatrix = glm::mat4(1.f); //!!!!!
       return;
     }
