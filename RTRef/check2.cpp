@@ -30,6 +30,8 @@
 RTC_NAMESPACE_USE
 #endif
 
+#include "check2.h"
+
 
 /**************************************** STRUCTURES ****************************************/
 
@@ -360,7 +362,7 @@ Color castRay(RTCScene scene,
 /**************************************** MAIN ****************************************/
 
 
-int main() {
+int run() {
     Assimp::Importer importer;
     // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj
     //            ../resources/meshes/bunny.obj

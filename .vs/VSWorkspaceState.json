@@ -1,10 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\resources",
-    "\\resources\\meshes",
-    "\\resources\\scenes"
+    "\\Demo",
+    "\\RTRef",
+    "\\RTUtil"
   ],
-  "SelectedNode": "\\out",
+  "SelectedNode": "\\Demo\\TetraApp.cpp",
   "PreviewInSolutionExplorer": false
 }
