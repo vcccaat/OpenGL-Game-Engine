@@ -111,6 +111,8 @@ void ImgGUI::draw_contents() {
 
   // Clear (hardly necessary but makes it easier to recognize viewport issues)
   glClearColor(0.0, 0.2, 1.0, 1.0);
+  // nanogui::Color backgroundColor(0.4f, 0.4f, 0.7f, 1.0f);
+  // glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
   glClear(GL_COLOR_BUFFER_BIT);
 
   // Call subclass to update the displayed image
