@@ -56,6 +56,10 @@ namespace RTUtil {
     /// @arg action The GLFW action value of the event (GLFW_PRESS, etc.).
     /// @arg modifiers GLFW modifier flags for any active modifiers (GLFW_MOD_SHIFT, etc.).
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers) override;
+    virtual bool mouse_button_event(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
+    virtual bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
+    virtual bool scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
+
 
     /// Draws the UI and all child windows with the given context.
     virtual void draw(NVGcontext *ctx) override {
@@ -97,6 +101,8 @@ namespace RTUtil {
 
     // Mesh for full screen quad
     std::unique_ptr<GLWrap::Mesh> fsqMesh;
+
+    // std::unique_ptr<RTUtil::DefaultCC> cc;
 
   };
 

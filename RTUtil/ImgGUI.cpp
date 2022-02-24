@@ -104,6 +104,20 @@ bool ImgGUI::keyboard_event(int key, int scancode, int action, int modifiers) {
 
   // Otherwise, the event is not handled here.
   return false;
+  //  return cc->keyboard_event(key, scancode, action, modifiers);
+
+}
+
+bool ImgGUI::mouse_button_event(const nanogui::Vector2i &p, int button, bool down, int modifiers) {
+    return Screen::mouse_button_event(p, button, down, modifiers) ;
+}
+
+bool ImgGUI::mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) {
+    return Screen::mouse_motion_event(p, rel, button, modifiers) ;
+}
+
+bool ImgGUI::scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
+    return Screen::scroll_event(p, rel) ;
 }
 
 

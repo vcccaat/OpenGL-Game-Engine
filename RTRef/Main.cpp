@@ -14,7 +14,10 @@ public:
 		// always updating 
 		// img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(255,255,255));
 }
+
 };
+
+
 
 int main() {
 	

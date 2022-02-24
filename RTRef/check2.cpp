@@ -219,12 +219,12 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
     tempNode = tempNode->mParent;
   }
   // Now, alter camera attributes
-//   glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
-//   cam.pos = glm::vec3(chg);
-//   chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
-//   cam.target = glm::vec3(chg);
-//   chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0) * cmt;
-//   cam.up = glm::vec3(chg);
+  glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
+  cam.pos = glm::vec3(chg);
+  chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
+  cam.target = glm::vec3(chg);
+  chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0) * cmt;
+  cam.up = glm::vec3(chg);
 
   // Look at mesh stuff
   RTCScene scene = rtcNewScene(device);
@@ -283,7 +283,7 @@ int run() {
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera(); //rawcam
+    Camera cam = Camera(rawcam); //rawcam
     RTCScene scene = initializeScene(device, obj, cam);
 
     // Constants
@@ -329,7 +329,7 @@ std::vector<glm::vec3> getImgData(int width, int height) {
         dir = cam.generateRay(i + .5 / width, j + .5 / height, width);  // wierd fov ratio!!
         Color col = castRay(scene, cam.pos.x, cam.pos.z, cam.pos.y, dir.x, dir.z, dir.y);
         img[i*width + j] = glm::vec3(col.r,col.g,col.b);
-        std::cerr <<  glm::vec3(col.r,col.g,col.b) << std::endl;
+        // std::cerr <<  glm::vec3(col.r,col.g,col.b) << std::endl;
     }
 
   return img;
