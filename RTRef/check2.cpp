@@ -72,7 +72,7 @@ struct Color {
   }
 
   void print() {
-    printf("%c, %c, %c\n", this->r, this->g, this->b);
+    printf("%d, %d, %d\n", this->r, this->g, this->b);
   }
 };
 
@@ -94,21 +94,20 @@ class Camera {
   }
 
   Camera() {
-    this->pos = glm::vec3(1.f, -1.f, 6.f);
-    this->target = glm::vec3(-1.5f, -1.5f, 0.f);
+    this->pos = glm::vec3(3.f, 4.f, 5.f);
+    this->target = glm::vec3(-3.f, -4.f, -5.f);
     this->up = glm::vec3(0.f, 1.f, 0.f);
     this->hfov = 0.5;
     this->aspect = 1;
   }
 
-  glm::vec3 generateRay(float xp, float yp, int n) {
-    glm::vec3 w = glm::normalize(this->pos - this->target);
+  glm::vec3 generateRay(float xp, float yp) {
+    glm::vec3 w = glm::normalize(-this->target);
     glm::vec3 u = glm::normalize(glm::cross(this->up, w));
     glm::vec3 v = glm::normalize(glm::cross(w, u));
 
-    float vfov = this->hfov / (this->aspect * n);
-    double h = 2 * tan(vfov / 2);
-    double wide = this->aspect * h;
+    double wide = 2 * tan(hfov / 2);
+    double h = wide / this->aspect;
     double u_small = xp * wide;
     double v_small = yp * h;
     u_small -= wide / 2;
@@ -165,7 +164,7 @@ void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 tr
     float x = mesh->mVertices[i][0];
     float y = mesh->mVertices[i][1];
     float z = mesh->mVertices[i][2];
-    glm::vec4 chg = glm::vec4(x, y, z, 1) * transMatrix;
+    glm::vec4 chg = transMatrix * glm::vec4(x, y, z, 1) ;
     vertices[3 * i + 0] = chg.x;
     vertices[3 * i + 1] = chg.y;
     vertices[3 * i + 2] = chg.z;
@@ -187,13 +186,13 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
     transMatrix =  RTUtil::a2g(cur->mTransformation)*transMatrix;
     
     // when it reaches mesh, transform the vertices
-    if (cur->mNumMeshes > 0 && *cur->mMeshes == 0) { /// temp: only has bunny   && *cur->mMeshes == 0
+    if (cur->mNumMeshes > 0) { /// temp: only has bunny   && *cur->mMeshes == 0
       
       aiMesh **meshList = aiscene->mMeshes;
       aiMesh *mesh = meshList[*cur->mMeshes];
       printf("index of mesh %d \n",*cur->mMeshes);
       std::cerr << transMatrix << std::endl;
-      addMeshToScene(device, scene, mesh, glm::mat4(1.f)); //transMatrix  temp!!! glm::mat4(1.f)
+      addMeshToScene(device, scene, mesh, transMatrix); //transMatrix  temp!!! glm::mat4(1.f)
     //   transMatrix = glm::mat4(1.f); //!!!!!
       return;
     }
@@ -214,17 +213,18 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
   // Iterate through all nodes
   while (tempNode != NULL) {
     cur = RTUtil::a2g(tempNode->mTransformation);
-    std::cerr << cur << std::endl;
+    // std::cerr << cur << std::endl;
     cmt = cmt * cur;  // this is (i think) matrix multiplation, may be wrong
     tempNode = tempNode->mParent;
   }
   // Now, alter camera attributes
-  glm::vec4 chg = glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) * cmt;
+  glm::vec4 chg = cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) ;
   cam.pos = glm::vec3(chg);
-  chg = glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1) * cmt;
+  chg = cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1);
   cam.target = glm::vec3(chg);
-  chg = glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0) * cmt;
+  chg = cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0);
   cam.up = glm::vec3(chg);
+  std::cerr << "after change:" << cam.pos  << cam.target << cam.up << std::endl;
 
   // Look at mesh stuff
   RTCScene scene = rtcNewScene(device);
@@ -262,7 +262,7 @@ Color castRay(RTCScene scene,
   //printf("%f, %f, %f: ", ox, oy, oz);`
   if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
     glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-    float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, -1.f)));
+    float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
     out = out < 0 ? 0 : out;
     return Color(out);
   }
@@ -283,7 +283,7 @@ int run() {
         aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera(rawcam); //rawcam
+    Camera cam = Camera(); //rawcam
     RTCScene scene = initializeScene(device, obj, cam);
 
     // Constants
@@ -293,8 +293,8 @@ int run() {
     // New tracing with camera
     glm::vec3 dir;
     for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
-        dir = cam.generateRay(i + .5 / n, j + .5 / n, n);
-        Color col = castRay(scene, cam.pos.x, cam.pos.z, cam.pos.y, dir.x, dir.z, dir.y);
+        dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
+        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
         img[(3 * j * n) + (3 * i) + 0] = col.r;
         img[(3 * j * n) + (3 * i) + 1] = col.g;
         img[(3 * j * n) + (3 * i) + 2] = col.b;
@@ -326,10 +326,10 @@ std::vector<glm::vec3> getImgData(int width, int height) {
     // New tracing with camera
     glm::vec3 dir;
     for(int i = 0; i < width; ++i) for (int j = 0; j < height; ++j) {
-        dir = cam.generateRay(i + .5 / width, j + .5 / height, width);  // wierd fov ratio!!
-        Color col = castRay(scene, cam.pos.x, cam.pos.z, cam.pos.y, dir.x, dir.z, dir.y);
-        img[i*width + j] = glm::vec3(col.r,col.g,col.b);
-        // std::cerr <<  glm::vec3(col.r,col.g,col.b) << std::endl;
+        dir = cam.generateRay((i + .5 )/ width, (j + .5 )/ height);  // wierd fov ratio!!
+        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+        img[j*height + i] = glm::vec3(col.r/255.0,col.g/255.0,col.b/255.0); 
+
     }
 
   return img;

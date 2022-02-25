@@ -7,12 +7,13 @@ public:
 	BunnyGUI(): ImgGUI(800,800) {
 		std::cout << windowWidth << windowHeight << "\n";
 		
+
 		img_data = getImgData(windowWidth,windowHeight);
 		
 	}
 	void compute_image() {
 		// always updating 
-		// img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(255,255,255));
+		// img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(0.5f,0.5f,0.5f));
 }
 
 };
