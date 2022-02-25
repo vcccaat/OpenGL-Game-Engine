@@ -38,43 +38,13 @@ RTC_NAMESPACE_USE
 
 
 struct Color {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-
-    Color(unsigned char r, unsigned char g, unsigned char b) {
-        this->r = r;
-        this->g = g;
-        this->b = b;
-    }
-
-    Color(float r, float g, float b) {
-        this->r = 255 * r;
-        this->g = 255 * g;
-        this->b = 255 * b;
-    }
-
-    Color(unsigned char c) {
-        this->r = c;
-        this->g = c;
-        this->b = c;
-    }
-
-    Color(float c) {
-        this->r = 255 * c;
-        this->g = 255 * c;
-        this->b = 255 * c;
-    }
-
-    Color() {
-        this->r = 0;
-        this->g = 0;
-        this->b = 0;
-    }
-
-    void print() {
-        printf("%d, %d, %d\n", this->r, this->g, this->b);
-    }
+    unsigned char r, g, b;
+    Color(unsigned char r, unsigned char g, unsigned char b) { this->r = r; this->g = g; this->b = b; }
+    Color(float r, float g, float b) { this->r = 255 * r; this->g = 255 * g; this->b = 255 * b; }
+    Color(unsigned char c) { this->r = c; this->g = c; this->b = c; }
+    Color(float c) { this->r = 255 * c; this->g = 255 * c; this->b = 255 * c; }
+    Color() { this->r = 0; this->g = 0; this->b = 0; }
+    void print() { printf("%d, %d, %d\n", this->r, this->g, this->b); }
 };
 
 class Camera {
@@ -203,7 +173,7 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
 RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) {
     // Dealing with node transformations
     aiNode *rootNode = aiscene->mRootNode;
-    aiCamera *camera = aiscene->mCameras[0];    //get the first camera
+    aiCamera *camera = aiscene->mCameras[0]; //get the first camera
     aiNode *tempNode = rootNode->FindNode(camera->mName);
     glm::mat4 cmt = glm::mat4(1.f);
     glm::mat4 cur;
@@ -230,10 +200,10 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
 
 Color castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCIntersectContext context;
-        rtcInitIntersectContext(&context);
+    rtcInitIntersectContext(&context);
 
-        struct RTCRayHit rayhit;
-        rayhit.ray.org_x = ox;
+    struct RTCRayHit rayhit;
+    rayhit.ray.org_x = ox;
     rayhit.ray.org_y = oy;
     rayhit.ray.org_z = oz;
     rayhit.ray.dir_x = dx;
@@ -263,38 +233,38 @@ Color castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, 
 
 
 int run() {
-        Assimp::Importer importer;
-        // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
-        //                C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
-        //                ../resources/meshes/bunny.obj
-        //                ../resources/scenes/bunnyscene.glb
-        const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
-                aiProcess_Triangulate |
-                aiProcess_JoinIdenticalVertices |
-                aiProcess_SortByPType);
-        RTCDevice device = initializeDevice();
-        aiCamera* rawcam = obj->mCameras[0];
-        Camera cam = Camera(); //rawcam
-        RTCScene scene = initializeScene(device, obj, cam);
+    Assimp::Importer importer;
+    // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
+    //                C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
+    //                ../resources/meshes/bunny.obj
+    //                ../resources/scenes/bunnyscene.glb
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
+            aiProcess_Triangulate |
+            aiProcess_JoinIdenticalVertices |
+            aiProcess_SortByPType);
+    RTCDevice device = initializeDevice();
+    aiCamera* rawcam = obj->mCameras[0];
+    Camera cam = Camera(); //rawcam
+    RTCScene scene = initializeScene(device, obj, cam);
 
-        // Constants
-        const int n = 256;
-        unsigned char img [n * n * 3];
+    // Constants
+    const int n = 256;
+    unsigned char img [n * n * 3];
 
-        // New tracing with camera
-        glm::vec3 dir;
-        for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
-                dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
-                Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-                img[(3 * j * n) + (3 * i) + 0] = col.r;
-                img[(3 * j * n) + (3 * i) + 1] = col.g;
-                img[(3 * j * n) + (3 * i) + 2] = col.b;
-        }
+    // New tracing with camera
+    glm::vec3 dir;
+    for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
+            dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
+            Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+            img[(3 * j * n) + (3 * i) + 0] = col.r;
+            img[(3 * j * n) + (3 * i) + 1] = col.g;
+            img[(3 * j * n) + (3 * i) + 2] = col.b;
+    }
 
-        // Write the image
-        stbi_flip_vertically_on_write(1);
-        stbi_write_png("bunny.png", n, n, 3, img, n * 3);
-        return 0;
+    // Write the image
+    stbi_flip_vertically_on_write(1);
+    stbi_write_png("bunny.png", n, n, 3, img, n * 3);
+    return 0;
 }
 
 std::vector<glm::vec3> getImgData(int width, int height) {
