@@ -15,12 +15,16 @@ public:
 };
 
 int main() {
-	
-	/*nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI();
-	nanogui::mainloop(16);
-	nanogui::shutdown();*/
-	run();
+	bool window = true;
+	if (window) {
+		nanogui::init();
+		nanogui::ref<BunnyGUI> app = new BunnyGUI();
+		nanogui::mainloop(16);
+		nanogui::shutdown();
+	}
+	else {
+		run();
+	}
 	// getImgData(800,800);  //not work for rectangle screen, check!!
 	return 0;
 }
