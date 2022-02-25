@@ -61,7 +61,7 @@ class Camera {
         this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
         this->hfov = cam->mHorizontalFOV;
         this->aspect = cam->mAspect;
-       // std::cout << "init camera" << this->pos << this->target << this->up << this->hfov << this->aspect << std::endl;
+        //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
     }
 
     Camera() {
@@ -73,7 +73,7 @@ class Camera {
     }
 
     glm::vec3 generateRay(float xp, float yp) {
-        glm::vec3 w = glm::normalize(-this->target);
+        glm::vec3 w = glm::normalize(this->target);
         glm::vec3 u = glm::normalize(glm::cross(this->up, w));
         glm::vec3 v = glm::normalize(glm::cross(w, u));
 
@@ -185,12 +185,9 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
         tempNode = tempNode->mParent;
     }
     // Alter camera attributes
-    glm::vec4 chg = cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) ;
-    chg = cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1);
-    chg = cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0);
-    //cam.pos = glm::vec3(chg);
-    //cam.target = glm::vec3(chg);
-    //cam.up = glm::vec3(chg);
+    cam.pos = glm::vec3(cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
+    cam.target = glm::vec3(cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1));
+    cam.up = glm::vec3(cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
 
     RTCScene scene = rtcNewScene(device);
     traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f));
@@ -244,8 +241,10 @@ int run() {
             aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera(); //rawcam
+    Camera cam = Camera(rawcam); //rawcam
+    std::cerr << cam.pos << "\n" << cam.target << "\n" << cam.up << "\n\n";
     RTCScene scene = initializeScene(device, obj, cam);
+    std::cerr << cam.pos << "\n" << cam.target << "\n" << cam.up << "\n\n";
 
     // Constants
     const int n = 256;
