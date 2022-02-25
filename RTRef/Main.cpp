@@ -5,7 +5,6 @@
 class BunnyGUI : public RTUtil::ImgGUI {
 public:
 	BunnyGUI(): ImgGUI(500, 500) {
-		std::cout << windowWidth << windowHeight << "\n";
 		img_data = getImgData(windowWidth,windowHeight);
 	}
 	void compute_image() {

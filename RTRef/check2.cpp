@@ -196,9 +196,9 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
     cam.up = glm::vec3(cam.target.x, -cam.target.z, cam.target.y);
     cam.target = tmp;
 
-    std::cerr << cam.pos << "\n";
+    /*std::cerr << cam.pos << "\n";
     std::cerr << cam.target << "\n";
-    std::cerr << cam.up << "\n";
+    std::cerr << cam.up << "\n";*/
 
     RTCScene scene = rtcNewScene(device);
     traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f));
@@ -253,9 +253,7 @@ int run() {
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
     Camera cam = Camera(rawcam); //rawcam
-    //std::cerr << cam.pos << "\n" << cam.target << "\n" << cam.up << "\n\n";
-    RTCScene scene = initializeScene(device, obj, cam);
-    //std::cerr << cam.pos << "\n" << cam.target << "\n" << cam.up << "\n\n";     //-1.62, 1.35, 5.41; 0.249, -0.097, -0.963; 0.024, 0.099, -0.094; 0.703, 1.33333
+    RTCScene scene = initializeScene(device, obj, cam); //-1.62, 1.35, 5.41; 0.249, -0.097, -0.963; 0.024, 0.099, -0.094; 0.703, 1.33333
 
     // Constants
     const int n = 256;
@@ -289,7 +287,7 @@ std::vector<glm::vec3> getImgData(int width, int height) {
             aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera(rawcam); //rawcam
+    Camera cam = Camera(rawcam);
     RTCScene scene = initializeScene(device, obj, cam);
     std::vector<glm::vec3> img = std::vector<glm::vec3>(width * height,glm::vec3(0.0f));
 
