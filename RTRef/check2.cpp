@@ -36,6 +36,7 @@ RTC_NAMESPACE_USE
 
 /**************************************** STRUCTURES ****************************************/
 
+
 struct Color {
     unsigned char r;
     unsigned char g;
@@ -119,7 +120,9 @@ class Camera {
     }
 };
 
+
 /**************************************** GIVEN FUNCTIONS ****************************************/
+
 
 void errorFunction(void *userPtr, enum RTCError error, const char *str) {
     printf("error %d: %s\n", error, str);
@@ -150,7 +153,9 @@ void waitForKeyPressedUnderWindows() {
 #endif
 }
 
+
 /**************************************** SCENE AND RAY ****************************************/
+
 
 void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 transMatrix) {
     // get vertices from aiscene meshList by mMeshes indexes
@@ -159,7 +164,6 @@ void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 tr
                                                        3 * sizeof(float), 3 * mesh->mNumVertices);
     unsigned *indices = (unsigned *)rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3,
                                                        3 * sizeof(unsigned), 3 * mesh->mNumFaces);
-
     for (int i = 0; i < mesh->mNumVertices; ++i) {
         float x = mesh->mVertices[i][0];
         float y = mesh->mVertices[i][1];
@@ -177,24 +181,18 @@ void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 tr
     rtcCommitGeometry(geom);
     rtcAttachGeometry(scene, geom);
     rtcReleaseGeometry(geom);
-    //printf("finish adding mesh to scene\n");
 }
 
 void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aiscene, aiNode *cur, glm::mat4 transMatrix) {
     // top down, compute transformation matrix while traversing down the tree
     if (cur != NULL) {
-        transMatrix =    RTUtil::a2g(cur->mTransformation)*transMatrix;
-        
+        transMatrix = RTUtil::a2g(cur->mTransformation)*transMatrix;
         // when it reaches mesh, transform the vertices
-        if (cur->mNumMeshes > 0) { /// temp: only has bunny     && *cur->mMeshes == 0
-            
-            aiMesh **meshList = aiscene->mMeshes;
-            aiMesh *mesh = meshList[*cur->mMeshes];
-            //printf("index of mesh %d \n",*cur->mMeshes);
-            //std::cerr << transMatrix << std::endl;
-            addMeshToScene(device, scene, mesh, transMatrix); //transMatrix    temp!!! glm::mat4(1.f)
-        //     transMatrix = glm::mat4(1.f); //!!!!!
-            return;
+        if (cur->mNumMeshes > 0) {
+            for (int i = 0; i < cur->mNumMeshes; ++i) {
+                aiMesh* mesh = aiscene->mMeshes[cur->mMeshes[i]];
+                addMeshToScene(device, scene, mesh, transMatrix);
+            }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
             traverseNodeHierarchy(device, scene, aiscene, cur->mChildren[i], transMatrix);
@@ -213,30 +211,23 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
     // Iterate through all nodes
     while (tempNode != NULL) {
         cur = RTUtil::a2g(tempNode->mTransformation);
-        // std::cerr << cur << std::endl;
-        cmt = cmt * cur;    // this is (i think) matrix multiplation, may be wrong
+        cmt = cmt * cur;
         tempNode = tempNode->mParent;
     }
-    // Now, alter camera attributes
+    // Alter camera attributes
     glm::vec4 chg = cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1) ;
-    //cam.pos = glm::vec3(chg);
     chg = cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1);
-    //cam.target = glm::vec3(chg);
     chg = cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0);
+    //cam.pos = glm::vec3(chg);
+    //cam.target = glm::vec3(chg);
     //cam.up = glm::vec3(chg);
-    //std::cerr << "after change:" << cam.pos    << cam.target << cam.up << std::endl;
 
-    // Look at mesh stuff
     RTCScene scene = rtcNewScene(device);
     traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f));
     rtcCommitScene(scene);
     return scene;
 }
 
-/*
- * Cast a single ray with origin (ox, oy, oz) and direction
- * (dx, dy, dz).
- */
 Color castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCIntersectContext context;
         rtcInitIntersectContext(&context);
@@ -267,7 +258,9 @@ Color castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, 
     return Color();
 }
 
+
 /**************************************** MAIN ****************************************/
+
 
 int run() {
         Assimp::Importer importer;
@@ -304,32 +297,28 @@ int run() {
         return 0;
 }
 
-
 std::vector<glm::vec3> getImgData(int width, int height) {
-        Assimp::Importer importer;
-        // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
-        //                C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
-        //                ../resources/meshes/bunny.obj
-        //                ../resources/scenes/bunnyscene.glb
-        const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
-                aiProcess_Triangulate |
-                aiProcess_JoinIdenticalVertices |
-                aiProcess_SortByPType);
-        RTCDevice device = initializeDevice();
-        aiCamera* rawcam = obj->mCameras[0];
-        Camera cam = Camera(rawcam); //rawcam
-        RTCScene scene = initializeScene(device, obj, cam);
+    Assimp::Importer importer;
+    // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
+    //                C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
+    //                ../resources/meshes/bunny.obj
+    //                ../resources/scenes/bunnyscene.glb
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
+            aiProcess_Triangulate |
+            aiProcess_JoinIdenticalVertices |
+            aiProcess_SortByPType);
+    RTCDevice device = initializeDevice();
+    aiCamera* rawcam = obj->mCameras[0];
+    Camera cam = Camera(); //rawcam
+    RTCScene scene = initializeScene(device, obj, cam);
+    std::vector<glm::vec3> img = std::vector<glm::vec3>(width * height,glm::vec3(0.0f));
 
-        std::vector<glm::vec3> img    = std::vector<glm::vec3>(width * height,glm::vec3(0.0f));
-
-        // New tracing with camera
-        glm::vec3 dir;
-        for(int i = 0; i < width; ++i) for (int j = 0; j < height; ++j) {
-                dir = cam.generateRay((i + .5 )/ width, (j + .5 )/ height);    // wierd fov ratio!!
-                Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-                img[j*height + i] = glm::vec3(col.r/255.0,col.g/255.0,col.b/255.0); 
-
-        }
-
+    // New tracing with camera
+    glm::vec3 dir;
+    for(int i = 0; i < width; ++i) for (int j = 0; j < height; ++j) {
+            dir = cam.generateRay((i + .5 )/ width, (j + .5 )/ height);
+            Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+            img[j*height + i] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0); 
+    }
     return img;
 }
