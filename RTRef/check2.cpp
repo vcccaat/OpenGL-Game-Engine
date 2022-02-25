@@ -73,7 +73,7 @@ class Camera {
     }
 
     glm::vec3 generateRay(float xp, float yp) {
-        glm::vec3 w = glm::normalize(this->target);
+        glm::vec3 w = glm::normalize(-this->target);
         glm::vec3 u = glm::normalize(glm::cross(this->up, w));
         glm::vec3 v = glm::normalize(glm::cross(w, u));
 
@@ -181,13 +181,16 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
     // Iterate through all nodes
     while (tempNode != NULL) {
         cur = RTUtil::a2g(tempNode->mTransformation);
-        cmt = cmt * cur;
+        cmt = cur * cmt;
         tempNode = tempNode->mParent;
     }
     // Alter camera attributes
+    std::cout<< "transform matrix" << cmt << std::endl;
+    // std::cout<< "inverse transform matrix" << glm::inverse(cmt) << std::endl;
     cam.pos = glm::vec3(cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
-    cam.target = glm::vec3(cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 1));
+    cam.target = glm::vec3(cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
     cam.up = glm::vec3(cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
+    std::cout<< "camera" << cam.pos << cam.target << cam.up << std::endl;
 
     RTCScene scene = rtcNewScene(device);
     traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f));
