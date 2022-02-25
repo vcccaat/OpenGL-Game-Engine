@@ -235,7 +235,7 @@ int run() {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
             aiProcess_SortByPType);
@@ -272,22 +272,22 @@ std::vector<glm::vec3> getImgData(int width, int height) {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
             aiProcess_SortByPType);
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera(); //rawcam
+    Camera cam = Camera(rawcam); //rawcam
     RTCScene scene = initializeScene(device, obj, cam);
     std::vector<glm::vec3> img = std::vector<glm::vec3>(width * height,glm::vec3(0.0f));
 
     // New tracing with camera
     glm::vec3 dir;
     for(int i = 0; i < width; ++i) for (int j = 0; j < height; ++j) {
-            dir = cam.generateRay((i + .5 )/ width, (j + .5 )/ height);
+            dir = cam.generateRay( (j + .5 )/ height,(i + .5 )/ width);
             Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-            img[j*height + i] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0); 
+            img[i*width + j] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0); 
     }
     return img;
 }
