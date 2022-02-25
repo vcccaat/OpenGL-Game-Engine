@@ -192,13 +192,6 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
     cam.up = glm::vec3(cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
     std::cout<< "camera" << cam.pos << cam.target << cam.up << std::endl;
 
-    // To utilize below bandaid, make cmt on left side of multiplication for the above, and get rid of glm::inverse.
-    // To use "better" soln, have cmt = cmt * glm::inverse(cur);, and cmt on the right side of multiplication for the above
-    cam.pos = glm::vec3(cam.pos.x, -cam.pos.z, cam.pos.y);
-    glm::vec3 tmp = glm::vec3(-cam.up.x, cam.up.z, -cam.up.y);
-    cam.up = glm::vec3(cam.target.x, -cam.target.z, cam.target.y);
-    cam.target = tmp;
-
     /*std::cerr << cam.pos << "\n";
     std::cerr << cam.target << "\n";
     std::cerr << cam.up << "\n";*/
@@ -249,7 +242,7 @@ int run() {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
             aiProcess_SortByPType);
@@ -284,7 +277,7 @@ std::vector<glm::vec3> getImgData(int width, int height) {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
             aiProcess_SortByPType);
