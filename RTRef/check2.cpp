@@ -246,7 +246,7 @@ int run() {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
             aiProcess_SortByPType);
@@ -264,11 +264,11 @@ int run() {
     // New tracing with camera
     glm::vec3 dir;
     for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
-            dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
-            Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-            img[(3 * j * n) + (3 * i) + 0] = col.r;
-            img[(3 * j * n) + (3 * i) + 1] = col.g;
-            img[(3 * j * n) + (3 * i) + 2] = col.b;
+        dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
+        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+        img[(3 * j * n) + (3 * i) + 0] = col.r;
+        img[(3 * j * n) + (3 * i) + 1] = col.g;
+        img[(3 * j * n) + (3 * i) + 2] = col.b;
     }
 
     // Write the image
@@ -283,7 +283,7 @@ std::vector<glm::vec3> getImgData(int width, int height) {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
             aiProcess_SortByPType);
@@ -295,10 +295,10 @@ std::vector<glm::vec3> getImgData(int width, int height) {
 
     // New tracing with camera
     glm::vec3 dir;
-    for(int i = 0; i < width; ++i) for (int j = 0; j < height; ++j) {
-            dir = cam.generateRay( (j + .5 )/ height,(i + .5 )/ width);
-            Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-            img[i*width + j] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0); 
+    for(int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
+        dir = cam.generateRay((i + .5 )/height, (j + .5 )/width);
+        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+        img[j*width + i] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0);
     }
     return img;
 }
