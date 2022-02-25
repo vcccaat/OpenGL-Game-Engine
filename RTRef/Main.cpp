@@ -4,8 +4,7 @@
 
 class BunnyGUI : public RTUtil::ImgGUI {
 public:
-	BunnyGUI(): ImgGUI(800,600) {
-		std::cout << windowWidth << windowHeight << "\n";
+	BunnyGUI(): ImgGUI(500, 500) {
 		img_data = getImgData(windowWidth,windowHeight);
 	}
 	void compute_image() {
@@ -16,11 +15,14 @@ public:
 
 int main() {
 	
-	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI();
-	nanogui::mainloop(16);
-	nanogui::shutdown();
-	// run();
-	// getImgData(800,800);  //not work for rectangle screen, check!!
+	bool window = true;
+	if (window) {
+		nanogui::init();
+		nanogui::ref<BunnyGUI> app = new BunnyGUI();
+		nanogui::mainloop(16);
+		nanogui::shutdown();
+	} else {
+		run();
+	}
 	return 0;
 }
