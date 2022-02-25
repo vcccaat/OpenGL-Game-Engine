@@ -4,7 +4,7 @@
 
 class BunnyGUI : public RTUtil::ImgGUI {
 public:
-	BunnyGUI(): ImgGUI(800,800) {
+	BunnyGUI(): ImgGUI(400,400) { //C:/Users/Ponol/Documents/GitHub/Starter22/resources/shaders
 		std::cout << windowWidth << windowHeight << "\n";
 		img_data = getImgData(windowWidth,windowHeight);
 	}
@@ -15,14 +15,13 @@ public:
 };
 
 int main() {
-	bool window = true;
+	bool window = false;
 	if (window) {
 		nanogui::init();
 		nanogui::ref<BunnyGUI> app = new BunnyGUI();
 		nanogui::mainloop(16);
 		nanogui::shutdown();
-	}
-	else {
+	} else {
 		run();
 	}
 	// getImgData(800,800);  //not work for rectangle screen, check!!
