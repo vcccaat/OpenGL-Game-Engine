@@ -235,9 +235,9 @@ Color castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, 
 int run() {
     Assimp::Importer importer;
     // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
-    //                C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
-    //                ../resources/meshes/bunny.obj
-    //                ../resources/scenes/bunnyscene.glb
+    //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
+    //        ../resources/meshes/bunny.obj
+    //        ../resources/scenes/bunnyscene.glb
     const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
@@ -270,9 +270,9 @@ int run() {
 std::vector<glm::vec3> getImgData(int width, int height) {
     Assimp::Importer importer;
     // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
-    //                C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
-    //                ../resources/meshes/bunny.obj
-    //                ../resources/scenes/bunnyscene.glb
+    //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
+    //        ../resources/meshes/bunny.obj
+    //        ../resources/scenes/bunnyscene.glb
     const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |

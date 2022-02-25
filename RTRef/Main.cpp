@@ -16,11 +16,11 @@ public:
 
 int main() {
 	
-	/*nanogui::init();
+	nanogui::init();
 	nanogui::ref<BunnyGUI> app = new BunnyGUI();
 	nanogui::mainloop(16);
-	nanogui::shutdown();*/
-	run();
+	nanogui::shutdown();
+	//run();
 	// getImgData(800,800);  //not work for rectangle screen, check!!
 	return 0;
 }
