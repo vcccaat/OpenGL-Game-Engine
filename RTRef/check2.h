@@ -8,6 +8,6 @@
 
 int run();
 
-std::vector<glm::vec3> getImgData(int width, int height);
+void updateImgData(std::vector<glm::vec3>& img_data, int width, int height);
 
 #endif

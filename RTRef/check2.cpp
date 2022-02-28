@@ -271,7 +271,14 @@ int run() {
     return 0;
 }
 
-std::vector<glm::vec3> getImgData(int width, int height) {
+  // void IdentityMatrix4(glm::mat4& o){
+  //   o[ 0] = 1.f; o[ 1] = 0.f; o[ 2] = 0.f; o[ 3] = 0.f;
+  //   o[ 4] = 0.f; o[ 5] = 1.f; o[ 6] = 0.f; o[ 7] = 0.f;
+  //   o[ 8] = 0.f; o[ 9] = 0.f; o[10] = 1.f; o[11] = 0.f;
+  //   o[12] = 0.f; o[13] = 0.f; o[14] = 0.f; o[15] = 1.f;
+  // }
+
+void updateImgData(std::vector<glm::vec3>& img_data, int width, int height) {
     Assimp::Importer importer;
     // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
@@ -284,15 +291,16 @@ std::vector<glm::vec3> getImgData(int width, int height) {
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
     Camera cam = Camera(rawcam);
+    // manually add camera control
+    // glm::mat4 cameraChange = glm::mat4(1.f);
     RTCScene scene = initializeScene(device, obj, cam);
-    std::vector<glm::vec3> img = std::vector<glm::vec3>(width * height,glm::vec3(0.0f));
-
+   
     // New tracing with camera
     glm::vec3 dir;
     for(int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = cam.generateRay((i + .5 )/height, (j + .5 )/width);
         Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-        img[j*width + i] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0);
+        img_data[j*width + i] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0);
     }
-    return img;
+
 }
