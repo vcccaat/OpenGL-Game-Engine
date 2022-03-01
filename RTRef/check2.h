@@ -6,6 +6,26 @@
 #include <assimp/scene.h>          // Output data structure
 #include <embree3/rtcore.h>
 
+class Light {
+    std::string name;
+    glm::vec3 pos;
+    aiColor3D power;
+
+    class Point {
+
+    };
+
+    class Area {
+        // facing in the +z direction
+        float width;
+        float height;
+    };
+
+    class Ambient {
+        float dist;
+    };
+};
+
 class Camera {
 public:
     glm::vec3 pos;
