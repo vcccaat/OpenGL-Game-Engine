@@ -13,13 +13,14 @@ public:
     glm::vec3 up;
     float hfov;
     float aspect;
-    float angle1; //angle around y-axis, as measured from positive x-axis
-    float angle2; //angle up from x-z plane, clamped to [0:Pi/2]
+    float phi; //angle around y-axis, as measured from positive x-axis
+    float theta; //angle up from x-z plane, clamped to [0:Pi/2]
+    float dist;
 
     Camera(aiCamera* cam);
     Camera();
     glm::vec3 generateRay(float xp, float yp);
-    void orbitCamera(float nx, float ny); // nx ny is the new position of mouse after move
+    void orbitCamera(float nx, float ny, glm::mat4 trans); // nx ny is the new position of mouse after move
 };
 
 struct Environment {

@@ -34,8 +34,9 @@ Camera::Camera(aiCamera *cam) {
     this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
     this->hfov = cam->mHorizontalFOV;
     this->aspect = cam->mAspect;
-    this->angle1 = 0;
-    this->angle2 = 0;
+    this->phi = 0;
+    this->theta = 0;
+    this->dist = 8;
     //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
 }
 
@@ -45,8 +46,9 @@ Camera::Camera() {
     this->up = glm::vec3(0.f, 1.f, 0.f);
     this->hfov = 0.5;
     this->aspect = 1;
-    this->angle1 = 0;
-    this->angle2 = 0;
+    this->phi = 0;
+    this->theta = 0;
+    this->dist = 8;
 }
 
 glm::vec3 Camera::generateRay(float xp, float yp) {
@@ -67,26 +69,55 @@ glm::vec3 Camera::generateRay(float xp, float yp) {
 }
 
 /// nx ny is the new position of mouse after move
-void Camera::orbitCamera(float nx, float ny){
-    float d = glm::distance(this->target,this->pos); //??
-    // float t = d*cos(angle2);   // distance to y-axis after being rotated up
-    // float y = d*sin(angle2);
-    // float x = t*cos(angle1);
-    // float z = t*sin(angle1);
+void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
+    // Untransform
+    /*this->pos = glm::vec3(glm::inverse(trans) * glm::vec4(this->pos.x, this->pos.y, this->pos.z, 1));
+    this->target = glm::vec3(glm::inverse(trans) * glm::vec4(this->target.x, this->target.y, this->target.z, 0));
+    this->up = glm::vec3(glm::inverse(trans) * glm::vec4(this->up.x, this->up.y, this->up.z, 0));*/
 
-    float scale = 0.01f;
-    // mouse move to right shifting the camera looks to left
-    float dx = scale*(nx);
-    float dy = scale*(ny);
+    // "Sensitivity" of mouse movement
+    float scale = .0075;
 
-    //calculate the new target in spherical coordinates
-    angle1 = angle1 + dx;
-    angle2 = angle2 + dy; 
-    float t2 = d*cos(angle2);    // distance to y-axis after being rotated up
-    float y2 = d*sin(angle2);
-    float x2 = t2*cos(angle1);
-    float z2 = t2*sin(angle1);
-    this->target = glm::vec3(x2,y2,z2);
+    theta -= nx * scale;
+    phi -= ny * scale;
+
+    //std::cout << theta << "\n" << phi << "\n\n";
+
+    this->pos.x = dist * sin(phi) * cos(theta);
+    this->pos.y = dist * cos(phi);
+    this->pos.z = dist * sin(phi) * sin(theta);
+    this->target = -this->pos;
+    
+    // Retransform
+    /*this->pos = glm::vec3(trans * glm::vec4(this->pos.x, this->pos.y, this->pos.z, 1));
+    this->target = glm::vec3(trans * glm::vec4(this->target.x, this->target.y, this->target.z, 0));
+    this->up = glm::vec3(trans * glm::vec4(this->up.x, this->up.y, this->up.z, 0));*/
+
+
+
+    //float d = glm::distance(this->target,this->pos); //??
+    //float d = sqrt(pow(this->target.x, 2) + pow(this->target.y, 2) + pow(this->target.z, 2));
+    //std::cout << d << "\n";
+    //// float t = d*cos(angle2);   // distance to y-axis after being rotated up
+    //// float y = d*sin(angle2);
+    //// float x = t*cos(angle1);
+    //// float z = t*sin(angle1);
+
+    //float scale = 0.001f;
+    //// mouse move to right shifting the camera looks to left
+    //float dx = scale*(nx);
+    //float dy = scale*(ny);
+    //std::cout << dx << "\n";
+
+    ////calculate the new target in spherical coordinates
+    //angle1 = angle1 + dx;
+    //angle2 = angle2 + dy; 
+    //float t2 = d*cos(angle2);    // distance to y-axis after being rotated up
+    //float y2 = d*sin(angle2);
+    //float x2 = t2*cos(angle1);
+    //float z2 = t2*sin(angle1);
+    //this->pos = glm::vec3(x2,y2,z2);
+    //this->target = -glm::vec3(x2,y2,z2);
 }
 
 
@@ -193,6 +224,12 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
     return cmt;
 }
 
+void untransformCamera(Camera& cam, glm::mat4 cmt) {
+    cam.pos = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
+    cam.target = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
+    cam.up = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
+}
+
 void transformCamera(Camera& cam, glm::mat4 cmt) {
     cam.pos = glm::vec3(cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
     cam.target = glm::vec3(cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
@@ -243,7 +280,7 @@ Environment::Environment(std::string objpath, int width, int height) {
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     this->device = initializeDevice();
 
-    this->camera = Camera(obj->mCameras[0]);
+    this->camera = Camera(obj->mCameras[0]); 
     this->camTransMat = getCameraMatrix(obj);
     transformCamera(this->camera, camTransMat);
 

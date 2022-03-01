@@ -7,16 +7,17 @@ class BunnyGUI : public RTUtil::ImgGUI {
 public:
 	BunnyGUI(int windowWidth, int windowHeight):ImgGUI(windowWidth, windowHeight) {
 		env = startup(windowWidth, windowHeight);
-		// should init camera, scene here
+		env.camera.orbitCamera(0, 0, env.camTransMat);
 	}
 	void compute_image() {
-		updateImgData(img_data, env);
-		// always updating 
-		// img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(0.5f,0.5f,0.5f));
+		updateImgData(img_data, env); //img_data = std::vector<glm::vec3>(windowWidth * windowHeight, glm::vec3(0.5f, 0.5f, 0.5f));
 	}
-	// bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers){
-		// cam.orbitCamera(-rel.x(), -rel.y()); // check num is positive
-	// }
+	bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers){
+		if(button != 0) { // 0 is left
+			env.camera.orbitCamera(-rel.x(), -rel.y(), env.camTransMat); // check num is positive
+		}
+		return true;
+	}
   
 };
 
