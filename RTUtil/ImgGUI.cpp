@@ -25,8 +25,8 @@ nanogui::Screen(nanogui::Vector2i(width, height), "NanoGUI Demo", false) {
 
   // Look up paths to shader source code
   const std::string resourcePath =
-  cpplocate::locatePath("resources/shaders", "", nullptr) + "resources/";
-  //  cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources/shaders", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+  //cpplocate::locatePath("resources/shaders", "", nullptr) + "resources/";
+  cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources/shaders", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
    const std::string fsqVertSrcPath = resourcePath + "shaders/fsq.vs";
   const std::string srgbFragSrcPath = resourcePath + "shaders/srgb.fs";
 
