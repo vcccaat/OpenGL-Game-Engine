@@ -3,12 +3,14 @@
 #include <RTRef/check2.h>
 
 class BunnyGUI : public RTUtil::ImgGUI {
+	Environment env;
 public:
-	BunnyGUI():ImgGUI(500, 500) {
+	BunnyGUI(int windowWidth, int windowHeight):ImgGUI(windowWidth, windowHeight) {
+		env = startup(windowWidth, windowHeight);
 		// should init camera, scene here
-		updateImgData(img_data,windowWidth,windowHeight);
 	}
 	void compute_image() {
+		updateImgData(img_data, env);
 		// always updating 
 		// img_data = std::vector<glm::vec3>(windowWidth * windowHeight,glm::vec3(0.5f,0.5f,0.5f));
 	}
@@ -20,7 +22,7 @@ public:
 
 int main() {
 	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI();
+	nanogui::ref<BunnyGUI> app = new BunnyGUI(500, 500);
 	nanogui::mainloop(16);
 	nanogui::shutdown();
 	return 0;

@@ -321,8 +321,12 @@ struct Environment {
     }
 };
 
-void updateImgData(std::vector<glm::vec3>& img_data, int width, int height) {
+Environment startup(int width, int height) {
     //Environment env("../resources/scenes/bunnyscene.glb", width, height);
     Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
+    return env;
+}
+
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env) {
     env.rayTrace(img_data);
 }
