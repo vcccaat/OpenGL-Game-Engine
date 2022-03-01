@@ -34,8 +34,8 @@ Camera::Camera(aiCamera *cam) {
     this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
     this->hfov = cam->mHorizontalFOV;
     this->aspect = cam->mAspect;
-    this->phi = 0;
-    this->theta = 0;
+    this->phi = 1.3;
+    this->theta = 1.8;
     this->dist = 8;
     //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
 }
@@ -46,8 +46,8 @@ Camera::Camera() {
     this->up = glm::vec3(0.f, 1.f, 0.f);
     this->hfov = 0.5;
     this->aspect = 1;
-    this->phi = 0;
-    this->theta = 0;
+    this->phi = 1.3;
+    this->theta = 1.8;
     this->dist = 8;
 }
 
@@ -238,8 +238,6 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     }
     return aiColor3D();
 }
-
-
 
 
 /**************************************** ENVIRONMENT ****************************************/
