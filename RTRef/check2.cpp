@@ -85,10 +85,13 @@ void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
 
     // untransformCamera(*this, trans);
     // "Sensitivity" of mouse movement
+    float pi = 3.1415926;
     float scale = .0075;
 
     theta -= nx * scale;
-    phi -= ny * scale;
+    phi += ny * scale;
+    if (phi < 0) phi = 0;
+    else if (phi > pi) phi = pi;
 
     //std::cout << theta << "\n" << phi << "\n\n";
 
