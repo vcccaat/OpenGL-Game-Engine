@@ -4,7 +4,7 @@
 
 class BunnyGUI : public RTUtil::ImgGUI {
 public:
-	BunnyGUI(): ImgGUI(800, 600) {
+	BunnyGUI():ImgGUI(500, 500) {
 		// should init camera, scene here
 		updateImgData(img_data,windowWidth,windowHeight);
 	}
@@ -19,15 +19,9 @@ public:
 };
 
 int main() {
-	
-	bool window = true;
-	if (window) {
-		nanogui::init();
-		nanogui::ref<BunnyGUI> app = new BunnyGUI();
-		nanogui::mainloop(16);
-		nanogui::shutdown();
-	} else {
-		run();
-	}
+	nanogui::init();
+	nanogui::ref<BunnyGUI> app = new BunnyGUI();
+	nanogui::mainloop(16);
+	nanogui::shutdown();
 	return 0;
 }

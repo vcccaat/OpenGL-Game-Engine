@@ -265,40 +265,40 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 /**************************************** MAIN ****************************************/
 
 
-int run() {
-    Assimp::Importer importer;
-    // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
-    //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
-    //        ../resources/meshes/bunny.obj
-    //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
-            aiProcess_Triangulate |
-            aiProcess_JoinIdenticalVertices |
-            aiProcess_SortByPType);
-    RTCDevice device = initializeDevice();
-    aiCamera* rawcam = obj->mCameras[0];
-    Camera cam = Camera(rawcam); //rawcam
-    RTCScene scene = initializeScene(device, obj, cam); //-1.62, 1.35, 5.41; 0.249, -0.097, -0.963; 0.024, 0.099, -0.094; 0.703, 1.33333
-
-    // Constants
-    const int n = 256;
-    unsigned char img [n * n * 3];
-
-    // New tracing with camera
-    glm::vec3 dir;
-    for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
-        dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
-        aiColor3D col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-        img[(3 * j * n) + (3 * i) + 0] = col.r;
-        img[(3 * j * n) + (3 * i) + 1] = col.g;
-        img[(3 * j * n) + (3 * i) + 2] = col.b;
-    }
-
-    // Write the image
-    stbi_flip_vertically_on_write(1);
-    stbi_write_png("bunny.png", n, n, 3, img, n * 3);
-    return 0;
-}
+//int run() {
+//    Assimp::Importer importer;
+//    // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
+//    //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
+//    //        ../resources/meshes/bunny.obj
+//    //        ../resources/scenes/bunnyscene.glb
+//    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
+//            aiProcess_Triangulate |
+//            aiProcess_JoinIdenticalVertices |
+//            aiProcess_SortByPType);
+//    RTCDevice device = initializeDevice();
+//    aiCamera* rawcam = obj->mCameras[0];
+//    Camera cam = Camera(rawcam); //rawcam
+//    RTCScene scene = initializeScene(device, obj, cam); //-1.62, 1.35, 5.41; 0.249, -0.097, -0.963; 0.024, 0.099, -0.094; 0.703, 1.33333
+//
+//    // Constants
+//    const int n = 256;
+//    unsigned char img [n * n * 3];
+//
+//    // New tracing with camera
+//    glm::vec3 dir;
+//    for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
+//        dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
+//        aiColor3D col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+//        img[(3 * j * n) + (3 * i) + 0] = col.r;
+//        img[(3 * j * n) + (3 * i) + 1] = col.g;
+//        img[(3 * j * n) + (3 * i) + 2] = col.b;
+//    }
+//
+//    // Write the image
+//    stbi_flip_vertically_on_write(1);
+//    stbi_write_png("bunny.png", n, n, 3, img, n * 3);
+//    return 0;
+//}
 
 
 void updateImgData(std::vector<glm::vec3>& img_data, int width, int height) {
@@ -307,7 +307,7 @@ void updateImgData(std::vector<glm::vec3>& img_data, int width, int height) {
     //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
     //        ../resources/meshes/bunny.obj
     //        ../resources/scenes/bunnyscene.glb
-    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
+    const aiScene* obj = importer.ReadFile("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb",
             aiProcess_Triangulate |
             aiProcess_JoinIdenticalVertices |
             aiProcess_SortByPType);

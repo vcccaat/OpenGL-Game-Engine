@@ -6,8 +6,6 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-int run();
-
 void updateImgData(std::vector<glm::vec3>& img_data, int width, int height);
 
 #endif
