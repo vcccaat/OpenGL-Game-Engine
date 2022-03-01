@@ -1,26 +1,25 @@
 // Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include <assimp/postprocess.h>    // Post processing flags
-#include <assimp/scene.h>                // Output data structure
-#include <embree3/rtcore.h>
 #include <math.h>
 #include <stdio.h>
 
 #include <../RTUtil/conversions.hpp>
 #include <../RTUtil/output.hpp>
 #include <assimp/Importer.hpp>    // C++ importer interface
-#include <glm/glm.hpp>
-#include <iostream>
 #include <limits>
 
-//#define STBI_MSC_SECURE_CRT
-//#define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <cpplocate/cpplocate.h>
 #include <stb_image_write.h>
 
 #include <GLWrap/Program.hpp>
+
+#include <iostream>
+#include <vector>
+#include <glm/glm.hpp>
+
+#include "check2.h"
 
 #if defined(_WIN32)
 #include <conio.h>
@@ -31,82 +30,68 @@
 RTC_NAMESPACE_USE
 #endif
 
-#include "check2.h"
-
 
 /**************************************** STRUCTURES ****************************************/
+Camera::Camera(aiCamera *cam) {
+    this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
+    this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
+    this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
+    this->hfov = cam->mHorizontalFOV;
+    this->aspect = cam->mAspect;
+    this->angle1 = 0;
+    this->angle2 = 0;
+    //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
+}
 
-class Camera {
- public:
-    glm::vec3 pos;
-    glm::vec3 target; // a vector
-    glm::vec3 up;
-    float hfov;
-    float aspect;
-    float angle1; //angle around y-axis, as measured from positive x-axis
-    float angle2; //angle up from x-z plane, clamped to [0:Pi/2]
+Camera::Camera() {
+    this->pos = glm::vec3(3.f, 4.f, 5.f);
+    this->target = glm::vec3(-3.f, -4.f, -5.f);
+    this->up = glm::vec3(0.f, 1.f, 0.f);
+    this->hfov = 0.5;
+    this->aspect = 1;
+    this->angle1 = 0;
+    this->angle2 = 0;
+}
 
-    Camera(aiCamera *cam) {
-        this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
-        this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
-        this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
-        this->hfov = cam->mHorizontalFOV;
-        this->aspect = cam->mAspect;
-        this->angle1 = 0;
-        this->angle2 = 0;
-        //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
-    }
+glm::vec3 Camera::generateRay(float xp, float yp) {
+    glm::vec3 w = glm::normalize(-this->target);
+    glm::vec3 u = glm::normalize(glm::cross(this->up, w));
+    glm::vec3 v = glm::normalize(glm::cross(w, u));
 
-    Camera() {
-        this->pos = glm::vec3(3.f, 4.f, 5.f);
-        this->target = glm::vec3(-3.f, -4.f, -5.f);
-        this->up = glm::vec3(0.f, 1.f, 0.f);
-        this->hfov = 0.5;
-        this->aspect = 1;
-        this->angle1 = 0;
-        this->angle2 = 0;
-    }
+    double wide = 2 * tan(hfov / 2);
+    double h = wide / this->aspect;
+    double u_small = xp * wide;
+    double v_small = yp * h;
+    u_small -= wide / 2;
+    v_small -= h / 2;
+    float x = u.x * u_small + v.x * v_small - w.x;
+    float y = u.y * u_small + v.y * v_small - w.y;
+    float z = u.z * u_small + v.z * v_small - w.z;
+    return glm::vec3(x, y, z);
+}
 
-    glm::vec3 generateRay(float xp, float yp) {
-        glm::vec3 w = glm::normalize(-this->target);
-        glm::vec3 u = glm::normalize(glm::cross(this->up, w));
-        glm::vec3 v = glm::normalize(glm::cross(w, u));
+/// nx ny is the new position of mouse after move
+void Camera::orbitCamera(float nx, float ny){
+    float d = glm::distance(this->target,this->pos); //??
+    // float t = d*cos(angle2);   // distance to y-axis after being rotated up
+    // float y = d*sin(angle2);
+    // float x = t*cos(angle1);
+    // float z = t*sin(angle1);
 
-        double wide = 2 * tan(hfov / 2);
-        double h = wide / this->aspect;
-        double u_small = xp * wide;
-        double v_small = yp * h;
-        u_small -= wide / 2;
-        v_small -= h / 2;
-        float x = u.x * u_small + v.x * v_small - w.x;
-        float y = u.y * u_small + v.y * v_small - w.y;
-        float z = u.z * u_small + v.z * v_small - w.z;
-        return glm::vec3(x, y, z);
-    }
+    float scale = 0.01f;
+    // mouse move to right shifting the camera looks to left
+    float dx = scale*(nx);
+    float dy = scale*(ny);
 
-  /// nx ny is the new position of mouse after move
-    void orbitCamera(float nx, float ny){  
-      float d = glm::distance(this->target,this->pos); //??
-      // float t = d*cos(angle2);   // distance to y-axis after being rotated up
-      // float y = d*sin(angle2);
-      // float x = t*cos(angle1);
-      // float z = t*sin(angle1);
-
-      float scale = 0.01f;
-      // mouse move to right shifting the camera looks to left
-      float dx = scale*(nx);
-      float dy = scale*(ny);
-
-      //calculate the new target in spherical coordinates
-      angle1 = angle1 + dx;
-      angle2 = angle2 + dy; 
-      float t2 = d*cos(angle2);    // distance to y-axis after being rotated up
-      float y2 = d*sin(angle2);
-      float x2 = t2*cos(angle1);
-      float z2 = t2*sin(angle1);
-      this->target = glm::vec3(x2,y2,z2);
-    }
-};
+    //calculate the new target in spherical coordinates
+    angle1 = angle1 + dx;
+    angle2 = angle2 + dy; 
+    float t2 = d*cos(angle2);    // distance to y-axis after being rotated up
+    float y2 = d*sin(angle2);
+    float x2 = t2*cos(angle1);
+    float z2 = t2*sin(angle1);
+    this->target = glm::vec3(x2,y2,z2);
+}
 
 
 /**************************************** GIVEN FUNCTIONS ****************************************/
@@ -288,38 +273,31 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 //    return 0;
 //}
 
-struct Environment {
-    int width;
-    int height;
-    Camera camera;
-    glm::mat4 camTransMat;
-    RTCDevice device;
-    RTCScene scene;
+Environment::Environment() {}
 
-    Environment(std::string objpath, int width, int height) {
-        this->width = width;
-        this->height = height;
+Environment::Environment(std::string objpath, int width, int height) {
+    this->width = width;
+    this->height = height;
 
-        Assimp::Importer importer;
-        const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-        device = initializeDevice();
+    Assimp::Importer importer;
+    const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    this->device = initializeDevice();
 
-        camera = Camera(obj->mCameras[0]);
-        camTransMat = getCameraMatrix(obj);
-        transformCamera(camera, camTransMat);
+    this->camera = Camera(obj->mCameras[0]);
+    this->camTransMat = getCameraMatrix(obj);
+    transformCamera(this->camera, camTransMat);
 
-        scene = initializeScene(device, obj, camera);
+    this->scene = initializeScene(this->device, obj, this->camera);
+}
+
+void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
+    glm::vec3 dir;
+    for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
+        dir = camera.generateRay((i + .5) / height, (j + .5) / width);
+        aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
+        img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
     }
-
-    void rayTrace(std::vector<glm::vec3>& img_data) {
-        glm::vec3 dir;
-        for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
-            dir = camera.generateRay((i + .5) / height, (j + .5) / width);
-            aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
-            img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
-        }
-    }
-};
+}
 
 Environment startup(int width, int height) {
     //Environment env("../resources/scenes/bunnyscene.glb", width, height);
