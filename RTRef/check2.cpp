@@ -50,10 +50,12 @@ struct Color {
 class Camera {
  public:
     glm::vec3 pos;
-    glm::vec3 target;
+    glm::vec3 target; // a vector
     glm::vec3 up;
     float hfov;
     float aspect;
+    float angle1; //angle around y-axis, as measured from positive x-axis
+    float angle2; //angle up from x-z plane, clamped to [0:Pi/2]
 
     Camera(aiCamera *cam) {
         this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
@@ -61,6 +63,8 @@ class Camera {
         this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
         this->hfov = cam->mHorizontalFOV;
         this->aspect = cam->mAspect;
+        this->angle1 = 0;
+        this->angle2 = 0;
         //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
     }
 
@@ -70,6 +74,8 @@ class Camera {
         this->up = glm::vec3(0.f, 1.f, 0.f);
         this->hfov = 0.5;
         this->aspect = 1;
+        this->angle1 = 0;
+        this->angle2 = 0;
     }
 
     glm::vec3 generateRay(float xp, float yp) {
@@ -87,6 +93,29 @@ class Camera {
         float y = u.y * u_small + v.y * v_small - w.y;
         float z = u.z * u_small + v.z * v_small - w.z;
         return glm::vec3(x, y, z);
+    }
+
+  /// nx ny is the new position of mouse after move
+    void orbitCamera(float nx, float ny){  
+      float d = glm::distance(this->target,this->pos); //??
+      // float t = d*cos(angle2);   // distance to y-axis after being rotated up
+      // float y = d*sin(angle2);
+      // float x = t*cos(angle1);
+      // float z = t*sin(angle1);
+
+      float scale = 0.01f;
+      // mouse move to right shifting the camera looks to left
+      float dx = scale*(nx);
+      float dy = scale*(ny);
+
+      //calculate the new target in spherical coordinates
+      angle1 = angle1 + dx;
+      angle2 = angle2 + dy; 
+      float t2 = d*cos(angle2);    // distance to y-axis after being rotated up
+      float y2 = d*sin(angle2);
+      float x2 = t2*cos(angle1);
+      float z2 = t2*sin(angle1);
+      this->target = glm::vec3(x2,y2,z2);
     }
 };
 
@@ -202,7 +231,7 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
     return scene;
 }
 
-Color castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz) {
+aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
 
@@ -227,9 +256,9 @@ Color castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, 
         glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
         float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
         out = out < 0 ? 0 : out;
-        return Color(out);
+        return aiColor3D(out);
     }
-    return Color();
+    return aiColor3D();
 }
 
 
@@ -259,7 +288,7 @@ int run() {
     glm::vec3 dir;
     for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
         dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
-        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+        aiColor3D col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
         img[(3 * j * n) + (3 * i) + 0] = col.r;
         img[(3 * j * n) + (3 * i) + 1] = col.g;
         img[(3 * j * n) + (3 * i) + 2] = col.b;
@@ -271,12 +300,6 @@ int run() {
     return 0;
 }
 
-  // void IdentityMatrix4(glm::mat4& o){
-  //   o[ 0] = 1.f; o[ 1] = 0.f; o[ 2] = 0.f; o[ 3] = 0.f;
-  //   o[ 4] = 0.f; o[ 5] = 1.f; o[ 6] = 0.f; o[ 7] = 0.f;
-  //   o[ 8] = 0.f; o[ 9] = 0.f; o[10] = 1.f; o[11] = 0.f;
-  //   o[12] = 0.f; o[13] = 0.f; o[14] = 0.f; o[15] = 1.f;
-  // }
 
 void updateImgData(std::vector<glm::vec3>& img_data, int width, int height) {
     Assimp::Importer importer;
@@ -291,16 +314,19 @@ void updateImgData(std::vector<glm::vec3>& img_data, int width, int height) {
     RTCDevice device = initializeDevice();
     aiCamera* rawcam = obj->mCameras[0];
     Camera cam = Camera(rawcam);
-    // manually add camera control
+    // // manually add camera control
+
+
     // glm::mat4 cameraChange = glm::mat4(1.f);
+   
     RTCScene scene = initializeScene(device, obj, cam);
    
-    // New tracing with camera
+  // New tracing with camera
     glm::vec3 dir;
     for(int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = cam.generateRay((i + .5 )/height, (j + .5 )/width);
-        Color col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-        img_data[j*width + i] = glm::vec3(col.r/255.0, col.g/255.0, col.b/255.0);
+        aiColor3D col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
+        img_data[j*width + i] = glm::vec3(col.r, col.g, col.b);
     }
 
 }
