@@ -68,13 +68,22 @@ glm::vec3 Camera::generateRay(float xp, float yp) {
     return glm::vec3(x, y, z);
 }
 
+void transformCamera(Camera& cam, glm::mat4 cmt) {
+    cam.pos = glm::vec3(cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
+    cam.target = glm::vec3(cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
+    cam.up = glm::vec3(cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
+}
+
+void untransformCamera(Camera& cam, glm::mat4 cmt) {
+    cam.pos = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
+    cam.target = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
+    cam.up = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
+}
+
 /// nx ny is the new position of mouse after move
 void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
-    // Untransform
-    /*this->pos = glm::vec3(glm::inverse(trans) * glm::vec4(this->pos.x, this->pos.y, this->pos.z, 1));
-    this->target = glm::vec3(glm::inverse(trans) * glm::vec4(this->target.x, this->target.y, this->target.z, 0));
-    this->up = glm::vec3(glm::inverse(trans) * glm::vec4(this->up.x, this->up.y, this->up.z, 0));*/
 
+    // untransformCamera(*this, trans);
     // "Sensitivity" of mouse movement
     float scale = .0075;
 
@@ -88,36 +97,7 @@ void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
     this->pos.z = dist * sin(phi) * sin(theta);
     this->target = -this->pos;
     
-    // Retransform
-    /*this->pos = glm::vec3(trans * glm::vec4(this->pos.x, this->pos.y, this->pos.z, 1));
-    this->target = glm::vec3(trans * glm::vec4(this->target.x, this->target.y, this->target.z, 0));
-    this->up = glm::vec3(trans * glm::vec4(this->up.x, this->up.y, this->up.z, 0));*/
-
-
-
-    //float d = glm::distance(this->target,this->pos); //??
-    //float d = sqrt(pow(this->target.x, 2) + pow(this->target.y, 2) + pow(this->target.z, 2));
-    //std::cout << d << "\n";
-    //// float t = d*cos(angle2);   // distance to y-axis after being rotated up
-    //// float y = d*sin(angle2);
-    //// float x = t*cos(angle1);
-    //// float z = t*sin(angle1);
-
-    //float scale = 0.001f;
-    //// mouse move to right shifting the camera looks to left
-    //float dx = scale*(nx);
-    //float dy = scale*(ny);
-    //std::cout << dx << "\n";
-
-    ////calculate the new target in spherical coordinates
-    //angle1 = angle1 + dx;
-    //angle2 = angle2 + dy; 
-    //float t2 = d*cos(angle2);    // distance to y-axis after being rotated up
-    //float y2 = d*sin(angle2);
-    //float x2 = t2*cos(angle1);
-    //float z2 = t2*sin(angle1);
-    //this->pos = glm::vec3(x2,y2,z2);
-    //this->target = -glm::vec3(x2,y2,z2);
+    // transformCamera(*this, trans);
 }
 
 
@@ -224,17 +204,7 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
     return cmt;
 }
 
-void untransformCamera(Camera& cam, glm::mat4 cmt) {
-    cam.pos = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
-    cam.target = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
-    cam.up = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
-}
 
-void transformCamera(Camera& cam, glm::mat4 cmt) {
-    cam.pos = glm::vec3(cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
-    cam.target = glm::vec3(cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
-    cam.up = glm::vec3(cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
-}
 
 aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCIntersectContext context;
@@ -265,6 +235,8 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     }
     return aiColor3D();
 }
+
+
 
 
 /**************************************** ENVIRONMENT ****************************************/
@@ -301,8 +273,9 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
 
 
 Environment startup(int width, int height) {
-    //Environment env("../resources/scenes/bunnyscene.glb", width, height);
-    Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
+    Environment env("../resources/scenes/bunnyscene.glb", width, height);
+    // Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
+  
     return env;
 }
 
