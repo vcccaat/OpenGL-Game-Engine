@@ -3,35 +3,31 @@
 
 #include <math.h>
 #include <stdio.h>
-
 #include <../RTUtil/conversions.hpp>
 #include <../RTUtil/output.hpp>
 #include <assimp/Importer.hpp>    // C++ importer interface
 #include <limits>
-
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <cpplocate/cpplocate.h>
 #include <stb_image_write.h>
-
 #include <GLWrap/Program.hpp>
-
 #include <iostream>
 #include <vector>
 #include <glm/glm.hpp>
-
 #include "check2.h"
 
 #if defined(_WIN32)
 #include <conio.h>
 #include <windows.h>
 #endif
-
 #if defined(RTC_NAMESPACE_USE)
 RTC_NAMESPACE_USE
 #endif
 
 
-/**************************************** STRUCTURES ****************************************/
+/**************************************** CAMERA ****************************************/
+
+
 Camera::Camera(aiCamera *cam) {
     this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
     this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
@@ -127,7 +123,7 @@ void waitForKeyPressedUnderWindows() {
 }
 
 
-/**************************************** SCENE AND RAY ****************************************/
+/**************************************** SCENE, CAMERA, AND RAY HELPERS ****************************************/
 
 
 void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 transMatrix) {
@@ -194,7 +190,6 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
         cmt = cur * cmt;
         tempNode = tempNode->mParent;
     }
-
     return cmt;
 }
 
@@ -235,43 +230,8 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 }
 
 
-/**************************************** MAIN ****************************************/
+/**************************************** ENVIRONMENT ****************************************/
 
-
-//int run() {
-//    Assimp::Importer importer;
-//    // Paths: C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.
-//    //        C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb
-//    //        ../resources/meshes/bunny.obj
-//    //        ../resources/scenes/bunnyscene.glb
-//    const aiScene* obj = importer.ReadFile("../resources/scenes/bunnyscene.glb",
-//            aiProcess_Triangulate |
-//            aiProcess_JoinIdenticalVertices |
-//            aiProcess_SortByPType);
-//    RTCDevice device = initializeDevice();
-//    aiCamera* rawcam = obj->mCameras[0];
-//    Camera cam = Camera(rawcam); //rawcam
-//    RTCScene scene = initializeScene(device, obj, cam); //-1.62, 1.35, 5.41; 0.249, -0.097, -0.963; 0.024, 0.099, -0.094; 0.703, 1.33333
-//
-//    // Constants
-//    const int n = 256;
-//    unsigned char img [n * n * 3];
-//
-//    // New tracing with camera
-//    glm::vec3 dir;
-//    for(int i = 0; i < n; ++i) for (int j = 0; j < n; ++j) {
-//        dir = cam.generateRay((i + .5) / n, (j + .5 )/ n);
-//        aiColor3D col = castRay(scene, cam.pos.x, cam.pos.y, cam.pos.z, dir.x, dir.y, dir.z);
-//        img[(3 * j * n) + (3 * i) + 0] = col.r;
-//        img[(3 * j * n) + (3 * i) + 1] = col.g;
-//        img[(3 * j * n) + (3 * i) + 2] = col.b;
-//    }
-//
-//    // Write the image
-//    stbi_flip_vertically_on_write(1);
-//    stbi_write_png("bunny.png", n, n, 3, img, n * 3);
-//    return 0;
-//}
 
 Environment::Environment() {}
 
@@ -298,6 +258,10 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
         img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
     }
 }
+
+
+/**************************************** MAIN FUNCTIONS ****************************************/
+
 
 Environment startup(int width, int height) {
     //Environment env("../resources/scenes/bunnyscene.glb", width, height);

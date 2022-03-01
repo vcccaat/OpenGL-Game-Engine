@@ -17,13 +17,9 @@ public:
     float angle2; //angle up from x-z plane, clamped to [0:Pi/2]
 
     Camera(aiCamera* cam);
-
     Camera();
-
     glm::vec3 generateRay(float xp, float yp);
-
-    /// nx ny is the new position of mouse after move
-    void orbitCamera(float nx, float ny);
+    void orbitCamera(float nx, float ny); // nx ny is the new position of mouse after move
 };
 
 struct Environment {
@@ -36,11 +32,8 @@ public:
     RTCScene scene;
 
     Environment();
-
     Environment(std::string objpath, int width, int height);
-
     void rayTrace(std::vector<glm::vec3>& img_data);
-    
 };
 
 Environment startup(int width, int height);
