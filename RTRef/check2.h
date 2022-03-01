@@ -10,6 +10,7 @@ class Light {
     std::string name;
     glm::vec3 pos;
     aiColor3D power;
+    int sceneindex;
 
     class Point {
 
@@ -51,6 +52,7 @@ public:
     glm::mat4 camTransMat;
     RTCDevice device;
     RTCScene scene;
+    std::vector<Light> lights;
 
     Environment();
     Environment(std::string objpath, int width, int height);

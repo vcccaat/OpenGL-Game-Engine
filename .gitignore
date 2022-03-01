@@ -7,3 +7,4 @@ debug_build/
 .vs
 cmake-build-debug/
 .idea/.name
+CMakeSettings.json
