@@ -29,16 +29,16 @@ RTC_NAMESPACE_USE
 /**************************************** CAMERA ****************************************/
 
 
-Camera::Camera(aiCamera *cam) {
+Camera::Camera(aiCamera *cam, glm::vec3 tilt) {
     this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
     this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
-    this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
+    // adding tilt constant to make bunny striaght
+    this->up = glm::vec3(cam->mUp.x + tilt.x, cam->mUp.y + tilt.y, cam->mUp.z + tilt.z);
     this->hfov = cam->mHorizontalFOV;
     this->aspect = cam->mAspect;
     this->phi = 1.3;
     this->theta = 1.8;
     this->dist = 8;
-    //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
 }
 
 Camera::Camera() {
@@ -50,6 +50,7 @@ Camera::Camera() {
     this->phi = 1.3;
     this->theta = 1.8;
     this->dist = 8;
+    this->height = .4;
 }
 
 glm::vec3 Camera::generateRay(float xp, float yp) {
@@ -81,10 +82,17 @@ void Camera::untransformCamera() {
     up = glm::vec3(glm::inverse(transMat) * glm::vec4(up.x, up.y, up.z, 0));
 }
 
+void Camera::recomputeSpherical() {
+    this->pos.x = dist * sin(phi) * cos(theta);
+    this->pos.y = dist * cos(phi);
+    this->pos.z = dist * sin(phi) * sin(theta);
+    this->target = -this->pos;
+    this->pos += glm::vec3(0, height, 0);
+    this->target += glm::vec3(0, height, 0);
+}
+
 /// nx ny is the new position of mouse after move
 void Camera::orbitCamera(float nx, float ny){
-
-    // untransformCamera(*this, trans);
 
     // "Sensitivity" of mouse movement
     float pi = 3.1415926;
@@ -96,12 +104,7 @@ void Camera::orbitCamera(float nx, float ny){
     if (phi < ep) phi = ep;
     else if (phi > pi) phi = pi;
 
-    this->pos.x = dist * sin(phi) * cos(theta);
-    this->pos.y = dist * cos(phi);
-    this->pos.z = dist * sin(phi) * sin(theta);
-    this->target = -this->pos;
-    
-    // transformCamera(*this);
+    recomputeSpherical();
 }
 
 void Camera::zoomCamera(float ny) {
@@ -115,10 +118,21 @@ void Camera::zoomCamera(float ny) {
     if (dist < min) dist = min;
     else if (dist > max) dist = max;
 
-    this->pos.x = dist * sin(phi) * cos(theta);
-    this->pos.y = dist * cos(phi);
-    this->pos.z = dist * sin(phi) * sin(theta);
-    this->target = -this->pos;
+    recomputeSpherical();
+}
+
+void Camera::altitudeCamera(float ny) {
+
+    // "Sensitivity" of mouse movement
+    float scale = .00275;
+    float min = -1;
+    float max = 1.5;
+
+    height += ny * scale;
+    if (height < min) height = min;
+    else if (height > max) height = max;
+
+    recomputeSpherical();
 }
 
 
@@ -220,27 +234,7 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
     return cmt;
 }
 
-// aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 ) {
-//         //  wi: Incident direction from hit point to light
-//         //  wo: Outgoing direction from hit point to camera
-
-//         glm::vec3 wo = glm::normalize(glm::vec3(rayhit.ray.dir_x,rayhit.ray.dir_y,rayhit.ray.dir_z));
-//         glm::vec3 wi =glm::normalize(glm::vec3());
-//         nori::BSDFQueryRecord BSDFquery(wi,wo);
-//         nori::Microfacet bsdf; 
-//         glm::vec3 out = bsdf.eval(BSDFquery);
-//         return aiColor3D(out[0],out[1],out[2]);
-//     }
-
-// aiColor3D shade(env ){
-//     aiColor3D color;
-//     for light in env.lights:
-//         color = color + light.illuminate();
-//     return color 
-// }
-
-
-aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz, glm::vec3 hitPoint) {
+aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
 
@@ -273,38 +267,38 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     return aiColor3D();
 }
 
-//std::vector<Light> parseLights(const aiScene* scene) {
-//
-//    // Initial empty list, then loop over all lights
-//    std::vector<Light> lights = {};
-//    for (int i = 0; i < scene->mNumLights; i++) {
-//        // Construct light
-//        Light l = Light();
-//        l.name = scene->mLights[i]->mName.C_Str();
-//        l.sceneindex = i;
-//        // Parse area, ambient, and point
-//        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
-//            aiVector3D p = scene->mLights[i]->mPosition;
-//            l.pos = glm::vec3(p.x, p.y, p.z);
-//            l.power = scene->mLights[i]->mColorDiffuse;
-//            l.type = l.AREA;
-//        }
-//        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
-//            l.power = scene->mLights[i]->mColorAmbient;
-//            l.type = l.AMBIENT;
-//        }
-//        else {
-//            aiVector3D p = scene->mLights[i]->mPosition;
-//            l.pos = glm::vec3(p.x, p.y, p.z);
-//            l.power = scene->mLights[i]->mColorDiffuse;
-//            l.type = l.POINT;
-//        }
-//
-//        // Push to list
-//        lights.push_back(l);
-//    }
-//    return lights;
-//}
+std::vector<Light> parseLights(const aiScene* scene) {
+
+    // Initial empty list, then loop over all lights
+    std::vector<Light> lights = {};
+    for (int i = 0; i < scene->mNumLights; i++) {
+        // Construct light
+        Light l = Light();
+        l.name = scene->mLights[i]->mName.C_Str();
+        l.sceneindex = i;
+        // Parse area, ambient, and point
+        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.AREA;
+        }
+        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
+            l.power = scene->mLights[i]->mColorAmbient;
+            l.type = l.AMBIENT;
+        }
+        else {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.POINT;
+        }
+
+        // Push to list
+        lights.push_back(l);
+    }
+    return lights;
+}
 
 
 /**************************************** ENVIRONMENT ****************************************/
@@ -320,11 +314,12 @@ Environment::Environment(std::string objpath, int width, int height) {
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     this->device = initializeDevice();
 
-    this->camera = Camera(obj->mCameras[0]); 
+    glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
+    this->camera = Camera(obj->mCameras[0], camtilt); // apply tilting constants to constructor
     this->camera.transMat = getCameraMatrix(obj);
     this->camera.transformCamera();
 
-    //lights = parseLights(obj);
+    lights = parseLights(obj);
 
     this->scene = initializeScene(this->device, obj, this->camera);
 }
@@ -333,8 +328,7 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
     glm::vec3 dir;
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
-        glm::vec3 hitPoint = glm::vec3((i + .5) / width,(j + .5) / height, 0);
-        aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z, hitPoint);
+        aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
         img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
     }
 }
@@ -343,10 +337,14 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
 /**************************************** MAIN FUNCTIONS ****************************************/
 
 
-Environment startup(int width, int height) {
-    Environment env("../resources/scenes/bunnyscene.glb", width, height);
-    // Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
-  
+float getAspect(std::string path) {
+    Assimp::Importer importer;
+    const aiScene* obj = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    return obj->mCameras[0]->mAspect;
+}
+
+Environment startup(std::string path, int width, int height) {
+    Environment env(path, width, height);
     return env;
 }
 
