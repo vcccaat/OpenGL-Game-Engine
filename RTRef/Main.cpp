@@ -14,11 +14,11 @@ public:
 	}
 	bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers){
 		if(button == 1) {
-			env.camera.orbitCamera(rel.x(), rel.y()); // check num is positive
+			env.camera.orbitCamera(rel.x(), rel.y());
 		} else if (button == 2) {
-			env.camera.zoomCamera(rel.y()); // check num is positive
+			env.camera.zoomCamera(rel.y());
 		} else if (button == 4) {
-			env.camera.altitudeCamera(rel.y()); // check num is positive
+			env.camera.altitudeCamera(rel.y());
 		}
 		return true;
 	}

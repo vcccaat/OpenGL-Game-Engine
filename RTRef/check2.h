@@ -43,7 +43,7 @@ public:
     glm::mat4 transMat;
     float height;
 
-    Camera(aiCamera* cam);
+    Camera(aiCamera* cam, glm::vec3 tilt);
     Camera();
     glm::vec3 generateRay(float xp, float yp);
     void transformCamera();

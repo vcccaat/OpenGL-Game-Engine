@@ -28,16 +28,16 @@ RTC_NAMESPACE_USE
 /**************************************** CAMERA ****************************************/
 
 
-Camera::Camera(aiCamera *cam) {
+Camera::Camera(aiCamera *cam, glm::vec3 tilt) {
     this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
     this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
-    this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
+    // adding tilt constant to make bunny striaght
+    this->up = glm::vec3(cam->mUp.x + tilt.x, cam->mUp.y + tilt.y, cam->mUp.z + tilt.z);
     this->hfov = cam->mHorizontalFOV;
     this->aspect = cam->mAspect;
     this->phi = 1.3;
     this->theta = 1.8;
     this->dist = 8;
-    //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
 }
 
 Camera::Camera() {
@@ -310,7 +310,8 @@ Environment::Environment(std::string objpath, int width, int height) {
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     this->device = initializeDevice();
 
-    this->camera = Camera(obj->mCameras[0]); 
+    glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
+    this->camera = Camera(obj->mCameras[0], camtilt); // apply tilting constants to constructor
     this->camera.transMat = getCameraMatrix(obj);
     this->camera.transformCamera();
 
