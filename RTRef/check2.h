@@ -45,6 +45,7 @@ public:
     Camera();
     glm::vec3 generateRay(float xp, float yp);
     void orbitCamera(float nx, float ny, glm::mat4 trans); // nx ny is the new position of mouse after move
+    void zoomCamera(float ny, glm::mat4 trans); // nx ny is the new position of mouse after move
 };
 
 struct Environment {

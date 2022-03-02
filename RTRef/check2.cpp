@@ -87,13 +87,12 @@ void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
     // "Sensitivity" of mouse movement
     float pi = 3.1415926;
     float scale = .0075;
+    float ep = .2;
 
-    theta -= nx * scale;
-    phi += ny * scale;
-    if (phi < 0) phi = 0;
+    theta += nx * scale;
+    phi -= ny * scale;
+    if (phi < ep) phi = ep;
     else if (phi > pi) phi = pi;
-
-    //std::cout << theta << "\n" << phi << "\n\n";
 
     this->pos.x = dist * sin(phi) * cos(theta);
     this->pos.y = dist * cos(phi);
@@ -101,6 +100,23 @@ void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
     this->target = -this->pos;
     
     // transformCamera(*this, trans);
+}
+
+void Camera::zoomCamera(float ny, glm::mat4 trans) {
+    
+    // "Sensitivity" of mouse movement
+    float scale = .02;
+    float min = 2;
+    float max = 25;
+
+    dist += ny * scale;
+    if (dist < min) dist = min;
+    else if (dist > max) dist = max;
+
+    this->pos.x = dist * sin(phi) * cos(theta);
+    this->pos.y = dist * cos(phi);
+    this->pos.z = dist * sin(phi) * sin(theta);
+    this->target = -this->pos;
 }
 
 
@@ -241,7 +257,7 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 
     rtcIntersect1(scene, &context, &rayhit);
 
-    //printf("%f, %f, %f: ", ox, oy, oz);`
+    //printf("%f, %f, %f: ", ox, oy, oz);
     if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
         float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
@@ -251,38 +267,38 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     return aiColor3D();
 }
 
-std::vector<Light> parseLights(const aiScene* scene) {
-
-    // Initial empty list, then loop over all lights
-    std::vector<Light> lights = {};
-    for (int i = 0; i < scene->mNumLights; i++) {
-        // Construct light
-        Light l = Light();
-        l.name = scene->mLights[i]->mName.C_Str();
-        l.sceneindex = i;
-        // Parse area, ambient, and point
-        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
-            aiVector3D p = scene->mLights[i]->mPosition;
-            l.pos = glm::vec3(p.x, p.y, p.z);
-            l.power = scene->mLights[i]->mColorDiffuse;
-            l.type = l.AREA;
-        }
-        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
-            l.power = scene->mLights[i]->mColorAmbient;
-            l.type = l.AMBIENT;
-        }
-        else {
-            aiVector3D p = scene->mLights[i]->mPosition;
-            l.pos = glm::vec3(p.x, p.y, p.z);
-            l.power = scene->mLights[i]->mColorDiffuse;
-            l.type = l.POINT;
-        }
-
-        // Push to list
-        lights.push_back(l);
-    }
-    return lights;
-}
+//std::vector<Light> parseLights(const aiScene* scene) {
+//
+//    // Initial empty list, then loop over all lights
+//    std::vector<Light> lights = {};
+//    for (int i = 0; i < scene->mNumLights; i++) {
+//        // Construct light
+//        Light l = Light();
+//        l.name = scene->mLights[i]->mName.C_Str();
+//        l.sceneindex = i;
+//        // Parse area, ambient, and point
+//        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
+//            aiVector3D p = scene->mLights[i]->mPosition;
+//            l.pos = glm::vec3(p.x, p.y, p.z);
+//            l.power = scene->mLights[i]->mColorDiffuse;
+//            l.type = l.AREA;
+//        }
+//        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
+//            l.power = scene->mLights[i]->mColorAmbient;
+//            l.type = l.AMBIENT;
+//        }
+//        else {
+//            aiVector3D p = scene->mLights[i]->mPosition;
+//            l.pos = glm::vec3(p.x, p.y, p.z);
+//            l.power = scene->mLights[i]->mColorDiffuse;
+//            l.type = l.POINT;
+//        }
+//
+//        // Push to list
+//        lights.push_back(l);
+//    }
+//    return lights;
+//}
 
 //void getLight(const aiScene* scene){
 //    float width;
@@ -329,7 +345,7 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->camTransMat = getCameraMatrix(obj);
     transformCamera(this->camera, camTransMat);
 
-    lights = parseLights(obj);
+    //lights = parseLights(obj);
 
     this->scene = initializeScene(this->device, obj, this->camera);
 }
