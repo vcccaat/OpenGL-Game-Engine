@@ -104,10 +104,16 @@ void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
 }
 
 
-/**************************************** LIGHT ****************************************/
+/**************************************** LIGHT, MATERIAL ****************************************/
 
 
 Light::Light() {}
+
+Material::Material() {
+    this->diffuse = aiColor3D(.8, .5, .2);
+    this->roughness = .2;
+    this->indexofref = 1.5;
+}
 
 
 /**************************************** GIVEN FUNCTIONS ****************************************/

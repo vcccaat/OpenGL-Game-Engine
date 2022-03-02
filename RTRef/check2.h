@@ -6,6 +6,14 @@
 #include <assimp/scene.h>          // Output data structure
 #include <embree3/rtcore.h>
 
+class Material {
+    aiColor3D diffuse;
+    float roughness;
+    float indexofref;
+
+    Material();
+};
+
 class Light {
 public:
     std::string name;
