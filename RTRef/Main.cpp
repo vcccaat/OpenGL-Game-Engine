@@ -26,12 +26,13 @@ public:
 };
 
 int main() {
+	// Edittable constants
 	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
 	//std::string path = "../resources/scenes/bunnyscene.glb";
 	int height = 500;
-	float aspect = getAspect(path);
+
 	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * aspect, height);
+	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height);
 	nanogui::mainloop(16);
 	nanogui::shutdown();
 	return 0;
