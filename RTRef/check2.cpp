@@ -69,20 +69,20 @@ glm::vec3 Camera::generateRay(float xp, float yp) {
     return glm::vec3(x, y, z);
 }
 
-void transformCamera(Camera& cam, glm::mat4 cmt) {
-    cam.pos = glm::vec3(cmt * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
-    cam.target = glm::vec3(cmt * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
-    cam.up = glm::vec3(cmt * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
+void Camera::transformCamera() {
+    pos = glm::vec3(transMat * glm::vec4(pos.x, pos.y, pos.z, 1));
+    target = glm::vec3(transMat * glm::vec4(target.x, target.y, target.z, 0));
+    up = glm::vec3(transMat * glm::vec4(up.x, up.y, up.z, 0));
 }
 
-void untransformCamera(Camera& cam, glm::mat4 cmt) {
-    cam.pos = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.pos.x, cam.pos.y, cam.pos.z, 1));
-    cam.target = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.target.x, cam.target.y, cam.target.z, 0));
-    cam.up = glm::vec3(glm::inverse(cmt) * glm::vec4(cam.up.x, cam.up.y, cam.up.z, 0));
+void Camera::untransformCamera() {
+    pos = glm::vec3(glm::inverse(transMat) * glm::vec4(pos.x, pos.y, pos.z, 1));
+    target = glm::vec3(glm::inverse(transMat) * glm::vec4(target.x, target.y, target.z, 0));
+    up = glm::vec3(glm::inverse(transMat) * glm::vec4(up.x, up.y, up.z, 0));
 }
 
 /// nx ny is the new position of mouse after move
-void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
+void Camera::orbitCamera(float nx, float ny){
 
     // untransformCamera(*this, trans);
 
@@ -101,10 +101,10 @@ void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
     this->pos.z = dist * sin(phi) * sin(theta);
     this->target = -this->pos;
     
-    // transformCamera(*this, trans);
+    // transformCamera(*this);
 }
 
-void Camera::zoomCamera(float ny, glm::mat4 trans) {
+void Camera::zoomCamera(float ny) {
     
     // "Sensitivity" of mouse movement
     float scale = .02;
@@ -365,8 +365,8 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->device = initializeDevice();
 
     this->camera = Camera(obj->mCameras[0]); 
-    this->camTransMat = getCameraMatrix(obj);
-    transformCamera(this->camera, camTransMat);
+    this->camera.transMat = getCameraMatrix(obj);
+    this->camera.transformCamera();
 
     //lights = parseLights(obj);
 
