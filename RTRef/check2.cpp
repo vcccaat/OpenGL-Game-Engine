@@ -104,6 +104,12 @@ void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
 }
 
 
+/**************************************** LIGHT ****************************************/
+
+
+Light::Light() {}
+
+
 /**************************************** GIVEN FUNCTIONS ****************************************/
 
 
@@ -239,8 +245,40 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     return aiColor3D();
 }
 
+std::vector<Light> parseLights(const aiScene* scene) {
 
-//aiLight getLight(const aiScene* scene){
+    // Initial empty list, then loop over all lights
+    std::vector<Light> lights = {};
+    for (int i = 0; i < scene->mNumLights; i++) {
+        // Construct light
+        Light l = Light();
+        l.name = scene->mLights[i]->mName.C_Str();
+        l.sceneindex = i;
+        // Parse area, ambient, and point
+        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.AREA;
+        }
+        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
+            l.power = scene->mLights[i]->mColorAmbient;
+            l.type = l.AMBIENT;
+        }
+        else {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.POINT;
+        }
+
+        // Push to list
+        lights.push_back(l);
+    }
+    return lights;
+}
+
+//void getLight(const aiScene* scene){
 //    float width;
 //    float height;
 //    float range;
@@ -285,7 +323,7 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->camTransMat = getCameraMatrix(obj);
     transformCamera(this->camera, camTransMat);
 
-    //getLight(obj);
+    lights = parseLights(obj);
 
     this->scene = initializeScene(this->device, obj, this->camera);
 }
