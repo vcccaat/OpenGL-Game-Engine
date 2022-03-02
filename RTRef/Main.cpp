@@ -5,8 +5,8 @@
 class BunnyGUI : public RTUtil::ImgGUI {
 	Environment env;
 public:
-	BunnyGUI(int windowWidth, int windowHeight):ImgGUI(windowWidth, windowHeight) {
-		env = startup(windowWidth, windowHeight);
+	BunnyGUI(std::string path, int windowWidth, int windowHeight):ImgGUI(windowWidth, windowHeight) {
+		env = startup(path, windowWidth, windowHeight);
 		env.camera.orbitCamera(0, 0);
 	}
 	void compute_image() {
@@ -26,8 +26,12 @@ public:
 };
 
 int main() {
+	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+	//std::string path = "../resources/scenes/bunnyscene.glb";
+	int height = 500;
+	float aspect = getAspect(path);
 	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI(500, 500);
+	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * aspect, height);
 	nanogui::mainloop(16);
 	nanogui::shutdown();
 	return 0;

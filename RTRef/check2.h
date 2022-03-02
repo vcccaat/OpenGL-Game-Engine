@@ -68,7 +68,8 @@ public:
     void rayTrace(std::vector<glm::vec3>& img_data);
 };
 
-Environment startup(int width, int height);
+float getAspect(std::string path);
+Environment startup(std::string path, int width, int height);
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env);
 
 #endif

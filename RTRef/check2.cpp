@@ -322,7 +322,7 @@ Environment::Environment(std::string objpath, int width, int height) {
 void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
     glm::vec3 dir;
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
-        dir = camera.generateRay((i + .5) / height, (j + .5) / width);
+        dir = camera.generateRay((i + .5) / width, (j + .5) / height);
         aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
         img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
     }
@@ -332,10 +332,14 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
 /**************************************** MAIN FUNCTIONS ****************************************/
 
 
-Environment startup(int width, int height) {
-    //Environment env("../resources/scenes/bunnyscene.glb", width, height);
-    Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
-  
+float getAspect(std::string path) {
+    Assimp::Importer importer;
+    const aiScene* obj = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    return obj->mCameras[0]->mAspect;
+}
+
+Environment startup(std::string path, int width, int height) {
+    Environment env(path, width, height);
     return env;
 }
 

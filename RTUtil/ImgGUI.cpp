@@ -21,7 +21,7 @@ namespace RTUtil {
 ImgGUI::ImgGUI(int width, int height) :
 windowWidth(width),
 windowHeight(height),
-nanogui::Screen(nanogui::Vector2i(width, height), "NanoGUI Demo", false) {
+nanogui::Screen(nanogui::Vector2i(width, height), "Bunny", false) {
 
   // Look up paths to shader source code
   const std::string resourcePath =
