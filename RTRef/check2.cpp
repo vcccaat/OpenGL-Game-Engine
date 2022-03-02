@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <../RTUtil/conversions.hpp>
 #include <../RTUtil/output.hpp>
+#include <../RTUtil/microfacet.hpp>
 #include <assimp/Importer.hpp>    // C++ importer interface
 #include <limits>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -84,6 +85,7 @@ void untransformCamera(Camera& cam, glm::mat4 cmt) {
 void Camera::orbitCamera(float nx, float ny, glm::mat4 trans){
 
     // untransformCamera(*this, trans);
+
     // "Sensitivity" of mouse movement
     float pi = 3.1415926;
     float scale = .0075;
@@ -207,9 +209,27 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
     return cmt;
 }
 
+// aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 ) {
+//         //  wi: Incident direction from hit point to light
+//         //  wo: Outgoing direction from hit point to camera
+
+//         glm::vec3 wo = glm::normalize(glm::vec3(rayhit.ray.dir_x,rayhit.ray.dir_y,rayhit.ray.dir_z));
+//         glm::vec3 wi =glm::normalize(glm::vec3());
+//         nori::BSDFQueryRecord BSDFquery(wi,wo);
+//         nori::Microfacet bsdf; 
+//         glm::vec3 out = bsdf.eval(BSDFquery);
+//         return aiColor3D(out[0],out[1],out[2]);
+//     }
+
+// aiColor3D shade(env ){
+//     aiColor3D color;
+//     for light in env.lights:
+//         color = color + light.illuminate();
+//     return color 
+// }
 
 
-aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz) {
+aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz, glm::vec3 hitPoint) {
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
 
@@ -231,41 +251,43 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 
     //printf("%f, %f, %f: ", ox, oy, oz);`
     if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
-        glm::vec3 col = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-        float out = glm::dot(glm::normalize(col), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
+        glm::vec3 normal = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
+        float out = glm::dot(glm::normalize(normal), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
         out = out < 0 ? 0 : out;
         return aiColor3D(out);
+
+        // diffuse shading and specular reflectance
+        // return shade(env,)
     }
     return aiColor3D();
 }
 
 
-//aiLight getLight(const aiScene* scene){
-//    float width;
-//    float height;
-//    float range;
-//    aiColor3D power;
-//    if (scene->HasLights()){
-//        aiLight** lights = scene->mLights;
-//        for (int i = 0; i < scene->mNumLights; i++){
-//            // get point light
-//            char* lightName = scene->mLights[i]->mName.data;
-//            printf("%s\n",lightName);
-//            if (RTUtil::parseAreaLight(lightName,width,height)){
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "area" << power.r << power.g << power.b << std::endl;
-//            }
-//            else if (RTUtil::parseAmbientLight(lightName,range)){
-//                // here power is radiance
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "ambient" << power.r << power.g << power.b << std::endl;
-//            } else {
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "point light" << power.r << power.g << power.b << std::endl;
-//            }
-//        }
-//    }
-//}
+aiLight getLight(const aiScene* scene){
+   float width;
+   float height;
+   float range;
+   aiColor3D power;
+   if (scene->HasLights()){
+       aiLight** lights = scene->mLights;
+       for (int i = 0; i < scene->mNumLights; i++){
+           char* lightName = scene->mLights[i]->mName.data;
+           printf("%s\n",lightName);
+           if (RTUtil::parseAreaLight(lightName,width,height)){
+               power =  scene->mLights[i]->mColorDiffuse;
+               std::cout << "area" << power.r << power.g << power.b << std::endl;
+           }
+           else if (RTUtil::parseAmbientLight(lightName,range)){
+               // here power is radiance
+               power =  scene->mLights[i]->mColorDiffuse;
+               std::cout << "ambient" << power.r << power.g << power.b << std::endl;
+           } else {
+               power =  scene->mLights[i]->mColorDiffuse;
+               std::cout << "point light" << power.r << power.g << power.b << std::endl;
+           }
+       }
+   }
+}
 
 
 /**************************************** ENVIRONMENT ****************************************/
@@ -285,7 +307,7 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->camTransMat = getCameraMatrix(obj);
     transformCamera(this->camera, camTransMat);
 
-    //getLight(obj);
+    getLight(obj);
 
     this->scene = initializeScene(this->device, obj, this->camera);
 }
@@ -293,8 +315,9 @@ Environment::Environment(std::string objpath, int width, int height) {
 void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
     glm::vec3 dir;
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
-        dir = camera.generateRay((i + .5) / height, (j + .5) / width);
-        aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
+        dir = camera.generateRay((i + .5) / width, (j + .5) / height);
+        glm::vec3 hitPoint = glm::vec3((i + .5) / width,(j + .5) / height, 0);
+        aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z, hitPoint);
         img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
     }
 }
@@ -304,8 +327,8 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
 
 
 Environment startup(int width, int height) {
-    //Environment env("../resources/scenes/bunnyscene.glb", width, height);
-    Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
+    Environment env("../resources/scenes/bunnyscene.glb", width, height);
+    // Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
   
     return env;
 }
