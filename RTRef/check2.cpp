@@ -149,23 +149,6 @@ RTCDevice initializeDevice() {
     return device;
 }
 
-void waitForKeyPressedUnderWindows() {
-#if defined(_WIN32)
-    HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    if (!GetConsoleScreenBufferInfo(hStdOutput, &csbi)) {
-        printf("GetConsoleScreenBufferInfo failed: %d\n", GetLastError());
-        return;
-    }
-    /* do not pause when running on a shell */
-    if (csbi.dwCursorPosition.X != 0 || csbi.dwCursorPosition.Y != 0)
-        return;
-    /* only pause if running in separate console window. */
-    printf("\n\tPress any key to exit...\n");
-    int ch = getch();
-#endif
-}
-
 
 /**************************************** SCENE, CAMERA, AND RAY HELPERS ****************************************/
 
@@ -321,33 +304,6 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 //        lights.push_back(l);
 //    }
 //    return lights;
-//}
-
-//void getLight(const aiScene* scene){
-//    float width;
-//    float height;
-//    float range;
-//    aiColor3D power;
-//    if (scene->HasLights()){
-//        aiLight** lights = scene->mLights;
-//        for (int i = 0; i < scene->mNumLights; i++){
-//            // get point light
-//            char* lightName = scene->mLights[i]->mName.data;
-//            printf("%s\n",lightName);
-//            if (RTUtil::parseAreaLight(lightName,width,height)){
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "area" << power.r << power.g << power.b << std::endl;
-//            }
-//            else if (RTUtil::parseAmbientLight(lightName,range)){
-//                // here power is radiance
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "ambient" << power.r << power.g << power.b << std::endl;
-//            } else {
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "point light" << power.r << power.g << power.b << std::endl;
-//            }
-//        }
-//    }
 //}
 
 
