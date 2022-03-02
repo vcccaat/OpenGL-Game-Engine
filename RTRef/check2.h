@@ -6,6 +6,14 @@
 #include <assimp/scene.h>          // Output data structure
 #include <embree3/rtcore.h>
 
+class Material {
+    aiColor3D diffuse;
+    float roughness;
+    float indexofref;
+
+    Material();
+};
+
 class Light {
 public:
     std::string name;
@@ -37,6 +45,7 @@ public:
     Camera();
     glm::vec3 generateRay(float xp, float yp);
     void orbitCamera(float nx, float ny, glm::mat4 trans); // nx ny is the new position of mouse after move
+    void zoomCamera(float ny, glm::mat4 trans); // nx ny is the new position of mouse after move
 };
 
 struct Environment {
