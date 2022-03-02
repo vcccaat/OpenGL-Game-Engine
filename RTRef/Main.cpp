@@ -17,6 +17,8 @@ public:
 			env.camera.orbitCamera(rel.x(), rel.y()); // check num is positive
 		} else if (button == 2) {
 			env.camera.zoomCamera(rel.y()); // check num is positive
+		} else if (button == 4) {
+			env.camera.altitudeCamera(rel.y()); // check num is positive
 		}
 		return true;
 	}

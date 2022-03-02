@@ -41,14 +41,17 @@ public:
     float theta; //angle up from x-z plane, clamped to [0:Pi/2]
     float dist;
     glm::mat4 transMat;
+    float height;
 
     Camera(aiCamera* cam);
     Camera();
     glm::vec3 generateRay(float xp, float yp);
     void transformCamera();
     void untransformCamera();
+    void recomputeSpherical();
     void orbitCamera(float nx, float ny); // nx ny is the new position of mouse after move
-    void zoomCamera(float ny); // nx ny is the new position of mouse after move
+    void zoomCamera(float ny);
+    void altitudeCamera(float ny);
 };
 
 struct Environment {
