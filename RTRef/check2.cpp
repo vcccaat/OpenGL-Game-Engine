@@ -128,7 +128,7 @@ void Camera::zoomCamera(float ny) {
 Light::Light() {}
 
 Material::Material() {
-    this->diffuse = aiColor3D(.8, .5, .2);
+    this->diffuse = glm::vec3(.8, .5, .2);
     this->roughness = .2;
     this->indexofref = 1.5;
 }
@@ -147,6 +147,23 @@ RTCDevice initializeDevice() {
         printf("error %d: cannot create device\n", rtcGetDeviceError(NULL));
     rtcSetDeviceErrorFunction(device, errorFunction, NULL);
     return device;
+}
+
+void waitForKeyPressedUnderWindows() {
+#if defined(_WIN32)
+    HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (!GetConsoleScreenBufferInfo(hStdOutput, &csbi)) {
+        printf("GetConsoleScreenBufferInfo failed: %d\n", GetLastError());
+        return;
+    }
+    /* do not pause when running on a shell */
+    if (csbi.dwCursorPosition.X != 0 || csbi.dwCursorPosition.Y != 0)
+        return;
+    /* only pause if running in separate console window. */
+    printf("\n\tPress any key to exit...\n");
+    int ch = getch();
+#endif
 }
 
 
@@ -220,27 +237,36 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
     return cmt;
 }
 
-// aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 ) {
-//         //  wi: Incident direction from hit point to light
-//         //  wo: Outgoing direction from hit point to camera
+aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal) {
+    //  wi: Incident direction from hit point to light
+    //  wo: Outgoing direction from hit point to camera
 
-//         glm::vec3 wo = glm::normalize(glm::vec3(rayhit.ray.dir_x,rayhit.ray.dir_y,rayhit.ray.dir_z));
-//         glm::vec3 wi =glm::normalize(glm::vec3());
-//         nori::BSDFQueryRecord BSDFquery(wi,wo);
-//         nori::Microfacet bsdf; 
-//         glm::vec3 out = bsdf.eval(BSDFquery);
-//         return aiColor3D(out[0],out[1],out[2]);
-//     }
+    glm::vec3 wo = glm::normalize(-eyeRay);
 
-// aiColor3D shade(env ){
-//     aiColor3D color;
-//     for light in env.lights:
-//         color = color + light.illuminate();
-//     return color 
-// }
+    glm::vec3 lightPos = pos;
+    glm::vec3 lightDir = hitPos-lightPos;  // not sure should be reversed
+    float distance = pow(lightDir[0],2) + pow(lightDir[1],2) + pow(lightDir[2],2);
+    glm::vec3 wi =glm::normalize(lightDir);
+
+    nori::BSDFQueryRecord BSDFquery(wi,wo);
+
+    Material material = Material();
+    nori::Microfacet bsdf = nori::Microfacet(material.roughness,material.indexofref, 1.f, material.diffuse); 
+    glm::vec3 fr = bsdf.eval(BSDFquery);
+    glm::vec3 out = glm::vec3(power[0] * fr[0],power[1] * fr[1],power[2] * fr[2])* glm::dot(normal, lightDir)/distance;
+    return aiColor3D(out[0],out[1],out[2]);
+    }
+
+aiColor3D shade(std::vector<Light> lights,  glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal){
+    aiColor3D color;
+    for (int i = 0; i < lights.size(); i++){
+        color = color + lights[i].illuminate(eyeRay, hitPos, normal);
+    }
+    return color;
+}
 
 
-aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz, glm::vec3 hitPoint) {
+aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float dy, float dz, std::vector<Light> lights) {
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
 
@@ -263,47 +289,76 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     //printf("%f, %f, %f: ", ox, oy, oz);
     if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         glm::vec3 normal = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-        float out = glm::dot(glm::normalize(normal), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
-        out = out < 0 ? 0 : out;
-        return aiColor3D(out);
+        // float out = glm::dot(glm::normalize(normal), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
+        // out = out < 0 ? 0 : out;
+        // return aiColor3D(out);
 
         // diffuse shading and specular reflectance
-        // return shade(env,)
+        glm::vec3 rayDir = glm::vec3(dx,dy,dz);
+        glm::vec3 hitPos = glm::vec3(ox,oy,oz) + rayhit.ray.tfar * rayDir;
+        return shade(lights, rayDir,hitPos,normal);
     }
     return aiColor3D();
 }
 
-//std::vector<Light> parseLights(const aiScene* scene) {
-//
-//    // Initial empty list, then loop over all lights
-//    std::vector<Light> lights = {};
-//    for (int i = 0; i < scene->mNumLights; i++) {
-//        // Construct light
-//        Light l = Light();
-//        l.name = scene->mLights[i]->mName.C_Str();
-//        l.sceneindex = i;
-//        // Parse area, ambient, and point
-//        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
-//            aiVector3D p = scene->mLights[i]->mPosition;
-//            l.pos = glm::vec3(p.x, p.y, p.z);
-//            l.power = scene->mLights[i]->mColorDiffuse;
-//            l.type = l.AREA;
+std::vector<Light> parseLights(const aiScene* scene) {
+
+   // Initial empty list, then loop over all lights
+   std::vector<Light> lights = {};
+   for (int i = 0; i < scene->mNumLights; i++) {
+       // Construct light
+       Light l = Light();
+       l.name = scene->mLights[i]->mName.C_Str();
+       l.sceneindex = i;
+       // Parse area, ambient, and point
+       if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
+           aiVector3D p = scene->mLights[i]->mPosition;
+           l.pos = glm::vec3(p.x, p.y, p.z);
+           l.power = scene->mLights[i]->mColorDiffuse;
+           l.type = l.AREA;
+       }
+       else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
+           l.power = scene->mLights[i]->mColorAmbient;
+           l.type = l.AMBIENT;
+       }
+       else {
+           aiVector3D p = scene->mLights[i]->mPosition;
+           l.pos = glm::vec3(p.x, p.y, p.z);
+           l.power = scene->mLights[i]->mColorDiffuse;
+           l.type = l.POINT;
+       }
+
+       // Push to list
+       lights.push_back(l);
+   }
+   return lights;
+}
+
+//void getLight(const aiScene* scene){
+//    float width;
+//    float height;
+//    float range;
+//    aiColor3D power;
+//    if (scene->HasLights()){
+//        aiLight** lights = scene->mLights;
+//        for (int i = 0; i < scene->mNumLights; i++){
+//            // get point light
+//            char* lightName = scene->mLights[i]->mName.data;
+//            printf("%s\n",lightName);
+//            if (RTUtil::parseAreaLight(lightName,width,height)){
+//                power =  scene->mLights[i]->mColorDiffuse;
+//                std::cout << "area" << power.r << power.g << power.b << std::endl;
+//            }
+//            else if (RTUtil::parseAmbientLight(lightName,range)){
+//                // here power is radiance
+//                power =  scene->mLights[i]->mColorDiffuse;
+//                std::cout << "ambient" << power.r << power.g << power.b << std::endl;
+//            } else {
+//                power =  scene->mLights[i]->mColorDiffuse;
+//                std::cout << "point light" << power.r << power.g << power.b << std::endl;
+//            }
 //        }
-//        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
-//            l.power = scene->mLights[i]->mColorAmbient;
-//            l.type = l.AMBIENT;
-//        }
-//        else {
-//            aiVector3D p = scene->mLights[i]->mPosition;
-//            l.pos = glm::vec3(p.x, p.y, p.z);
-//            l.power = scene->mLights[i]->mColorDiffuse;
-//            l.type = l.POINT;
-//        }
-//
-//        // Push to list
-//        lights.push_back(l);
 //    }
-//    return lights;
 //}
 
 
@@ -324,7 +379,7 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->camera.transMat = getCameraMatrix(obj);
     this->camera.transformCamera();
 
-    //lights = parseLights(obj);
+    lights = parseLights(obj);
 
     this->scene = initializeScene(this->device, obj, this->camera);
 }
@@ -334,7 +389,7 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
         glm::vec3 hitPoint = glm::vec3((i + .5) / width,(j + .5) / height, 0);
-        aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z, hitPoint);
+        aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z, lights);
         img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
     }
 }

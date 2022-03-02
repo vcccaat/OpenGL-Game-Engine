@@ -25,7 +25,7 @@ public:
 
 int main() {
 	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI(800, 100);
+	nanogui::ref<BunnyGUI> app = new BunnyGUI(800, 600);
 	nanogui::mainloop(16);
 	nanogui::shutdown();
 	return 0;

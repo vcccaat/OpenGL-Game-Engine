@@ -7,7 +7,8 @@
 #include <embree3/rtcore.h>
 
 class Material {
-    aiColor3D diffuse;
+public:
+    glm::vec3 diffuse;
     float roughness;
     float indexofref;
 
@@ -28,6 +29,7 @@ public:
     Type type;
     
     Light();
+    aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal);
 };
 
 class Camera {
