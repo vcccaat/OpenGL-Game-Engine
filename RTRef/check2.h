@@ -40,12 +40,15 @@ public:
     float phi; //angle around y-axis, as measured from positive x-axis
     float theta; //angle up from x-z plane, clamped to [0:Pi/2]
     float dist;
+    glm::mat4 transMat;
 
     Camera(aiCamera* cam);
     Camera();
     glm::vec3 generateRay(float xp, float yp);
-    void orbitCamera(float nx, float ny, glm::mat4 trans); // nx ny is the new position of mouse after move
-    void zoomCamera(float ny, glm::mat4 trans); // nx ny is the new position of mouse after move
+    void transformCamera();
+    void untransformCamera();
+    void orbitCamera(float nx, float ny); // nx ny is the new position of mouse after move
+    void zoomCamera(float ny); // nx ny is the new position of mouse after move
 };
 
 struct Environment {
@@ -53,7 +56,6 @@ public:
     int width;
     int height;
     Camera camera;
-    glm::mat4 camTransMat;
     RTCDevice device;
     RTCScene scene;
     std::vector<Light> lights;
