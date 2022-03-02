@@ -15,6 +15,8 @@
 #include <assimp/scene.h>
 #include <assimp/anim.h>
 
+#include "common.hpp"
+
 
 namespace RTUtil {
 
@@ -62,7 +64,7 @@ namespace RTUtil {
      * returns true; otherwise it returns false and the output parameters are
      * unchanged.
      */
-    bool parseAreaLight(const std::string &name, float &width, float &height);
+    RTUTIL_EXPORT bool parseAreaLight(const std::string &name, float &width, float &height);
 
     /*
      * Parse the name of an ambient light source that encodes its range in our
@@ -70,6 +72,6 @@ namespace RTUtil {
      * the format the range parameter is filled in, and the function returns 
      * true; otherwise it returns false and the output parameters are unchanged.
      */
-    bool parseAmbientLight(const std::string &name, float &range);
+    RTUTIL_EXPORT bool parseAmbientLight(const std::string &name, float &range);
 
 }
