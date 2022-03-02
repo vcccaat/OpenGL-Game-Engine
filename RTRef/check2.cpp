@@ -240,32 +240,32 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 }
 
 
-aiLight getLight(const aiScene* scene){
-    float width;
-    float height;
-    float range;
-    aiColor3D power;
-    if (scene->HasLights()){
-        aiLight** lights = scene->mLights;
-        for (int i = 0; i < scene->mNumLights; i++){
-            // get point light
-            char* lightName = scene->mLights[i]->mName.data;
-            printf("%s\n",lightName);
-            if (RTUtil::parseAreaLight(lightName,width,height)){
-                power =  scene->mLights[i]->mColorDiffuse;
-                std::cout << "area" << power.r << power.g << power.b << std::endl;
-            }
-            else if (RTUtil::parseAmbientLight(lightName,range)){
-                // here power is radiance
-                power =  scene->mLights[i]->mColorDiffuse;
-                std::cout << "ambient" << power.r << power.g << power.b << std::endl;
-            } else {
-                power =  scene->mLights[i]->mColorDiffuse;
-                std::cout << "point light" << power.r << power.g << power.b << std::endl;
-            }
-        }
-    }
-}
+//aiLight getLight(const aiScene* scene){
+//    float width;
+//    float height;
+//    float range;
+//    aiColor3D power;
+//    if (scene->HasLights()){
+//        aiLight** lights = scene->mLights;
+//        for (int i = 0; i < scene->mNumLights; i++){
+//            // get point light
+//            char* lightName = scene->mLights[i]->mName.data;
+//            printf("%s\n",lightName);
+//            if (RTUtil::parseAreaLight(lightName,width,height)){
+//                power =  scene->mLights[i]->mColorDiffuse;
+//                std::cout << "area" << power.r << power.g << power.b << std::endl;
+//            }
+//            else if (RTUtil::parseAmbientLight(lightName,range)){
+//                // here power is radiance
+//                power =  scene->mLights[i]->mColorDiffuse;
+//                std::cout << "ambient" << power.r << power.g << power.b << std::endl;
+//            } else {
+//                power =  scene->mLights[i]->mColorDiffuse;
+//                std::cout << "point light" << power.r << power.g << power.b << std::endl;
+//            }
+//        }
+//    }
+//}
 
 
 /**************************************** ENVIRONMENT ****************************************/
@@ -285,7 +285,7 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->camTransMat = getCameraMatrix(obj);
     transformCamera(this->camera, camTransMat);
 
-    getLight(obj);
+    //getLight(obj);
 
     this->scene = initializeScene(this->device, obj, this->camera);
 }
