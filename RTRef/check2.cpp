@@ -3,9 +3,10 @@
 
 #include <math.h>
 #include <stdio.h>
-#include <../RTUtil/conversions.hpp>
-#include <../RTUtil/output.hpp>
-#include <../RTUtil/microfacet.hpp>
+#include "../RTUtil/conversions.hpp"
+#include "../RTUtil/output.hpp"
+#include "../RTUtil/microfacet.hpp"
+#include "../RTUtil/frame.hpp"
 #include <assimp/Importer.hpp>    // C++ importer interface
 #include <limits>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -15,6 +16,7 @@
 #include <iostream>
 #include <vector>
 #include <glm/glm.hpp>
+#include <algorithm>    // std::max
 #include "check2.h"
 
 #if defined(_WIN32)
@@ -240,27 +242,32 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
 aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal) {
     //  wi: Incident direction from hit point to light
     //  wo: Outgoing direction from hit point to camera
-
     glm::vec3 wo = glm::normalize(-eyeRay);
 
     glm::vec3 lightPos = pos;
-    glm::vec3 lightDir = hitPos-lightPos;  // not sure should be reversed
+    glm::vec3 lightDir = hitPos-lightPos;  
     float distance = pow(lightDir[0],2) + pow(lightDir[1],2) + pow(lightDir[2],2);
     glm::vec3 wi =glm::normalize(lightDir);
 
-    nori::BSDFQueryRecord BSDFquery(wi,wo);
+    nori::Frame frame = nori::Frame(normal);
+    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi),frame.toLocal(wo));
 
     Material material = Material();
     nori::Microfacet bsdf = nori::Microfacet(material.roughness,material.indexofref, 1.f, material.diffuse); 
     glm::vec3 fr = bsdf.eval(BSDFquery);
-    glm::vec3 out = glm::vec3(power[0] * fr[0],power[1] * fr[1],power[2] * fr[2])* glm::dot(normal, lightDir)/distance;
+    // std::cout << "fr" << fr << std::endl;
+    // std::cout << "power" << power[0]<<power[1]<<power[2]  << std::endl;
+    glm::vec3 out = glm::vec3(power[0] * fr[0],power[1] * fr[1],power[2] * fr[2])* std::max(0.f,glm::dot(normal, lightDir))/distance;
     return aiColor3D(out[0],out[1],out[2]);
     }
 
 aiColor3D shade(std::vector<Light> lights,  glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal){
     aiColor3D color;
-    for (int i = 0; i < lights.size(); i++){
-        color = color + lights[i].illuminate(eyeRay, hitPos, normal);
+    for (int i = 0; i < lights.size(); i++){ 
+        // temp: do point light
+        if (lights[i].type == 0){
+            color = color + lights[i].illuminate(eyeRay, hitPos, normal);
+        }
     }
     return color;
 }
