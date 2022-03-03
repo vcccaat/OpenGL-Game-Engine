@@ -43,14 +43,17 @@ public:
     float theta; //angle up from x-z plane, clamped to [0:Pi/2]
     float dist;
     glm::mat4 transMat;
+    float height;
 
-    Camera(aiCamera* cam);
+    Camera(aiCamera* cam, glm::vec3 tilt);
     Camera();
     glm::vec3 generateRay(float xp, float yp);
     void transformCamera();
     void untransformCamera();
+    void recomputeSpherical();
     void orbitCamera(float nx, float ny); // nx ny is the new position of mouse after move
-    void zoomCamera(float ny); // nx ny is the new position of mouse after move
+    void zoomCamera(float ny);
+    void altitudeCamera(float ny);
 };
 
 struct Environment {
@@ -67,7 +70,8 @@ public:
     void rayTrace(std::vector<glm::vec3>& img_data);
 };
 
-Environment startup(int width, int height);
+float getAspect(std::string path);
+Environment startup(std::string path, int width, int height);
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env);
 
 #endif

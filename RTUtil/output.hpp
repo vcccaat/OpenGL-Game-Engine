@@ -22,7 +22,7 @@ namespace glm {
     std::ostream &operator <<(std::ostream &ost, const glm::vec<N, T, Q> &v) {
         ost << "[ ";
         for (int i = 0; i < N; i++)
-            ost << v[i] << " ";
+            ost << +v[i] << " ";   // unary + hack to ensure numeric output even for char
         return ost << "]";
     }
 
@@ -35,7 +35,7 @@ namespace glm {
         for (int i = 0; i < M; i++) {
             if (i != 0) ost << "; ";
             for (int j = 0; j < N; j++)
-                ost << m[j][i] << " ";
+                ost << +m[j][i] << " ";   // unary + hack to ensure numeric output
         }
         return ost << "]";
     }

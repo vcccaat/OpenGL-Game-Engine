@@ -31,16 +31,16 @@ RTC_NAMESPACE_USE
 /**************************************** CAMERA ****************************************/
 
 
-Camera::Camera(aiCamera *cam) {
+Camera::Camera(aiCamera *cam, glm::vec3 tilt) {
     this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
     this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
-    this->up = glm::vec3(cam->mUp.x, cam->mUp.y, cam->mUp.z);
+    // adding tilt constant to make bunny striaght
+    this->up = glm::vec3(cam->mUp.x + tilt.x, cam->mUp.y + tilt.y, cam->mUp.z + tilt.z);
     this->hfov = cam->mHorizontalFOV;
     this->aspect = cam->mAspect;
     this->phi = 1.3;
     this->theta = 1.8;
     this->dist = 8;
-    //std::cout << "camera position: " << this->pos << ", camera target: " << this->target << ", camera up: " << this->up << this->hfov << this->aspect << std::endl;
 }
 
 Camera::Camera() {
@@ -52,6 +52,7 @@ Camera::Camera() {
     this->phi = 1.3;
     this->theta = 1.8;
     this->dist = 8;
+    this->height = .4;
 }
 
 glm::vec3 Camera::generateRay(float xp, float yp) {
@@ -83,10 +84,17 @@ void Camera::untransformCamera() {
     up = glm::vec3(glm::inverse(transMat) * glm::vec4(up.x, up.y, up.z, 0));
 }
 
+void Camera::recomputeSpherical() {
+    this->pos.x = dist * sin(phi) * cos(theta);
+    this->pos.y = dist * cos(phi);
+    this->pos.z = dist * sin(phi) * sin(theta);
+    this->target = -this->pos;
+    this->pos += glm::vec3(0, height, 0);
+    this->target += glm::vec3(0, height, 0);
+}
+
 /// nx ny is the new position of mouse after move
 void Camera::orbitCamera(float nx, float ny){
-
-    // untransformCamera(*this, trans);
 
     // "Sensitivity" of mouse movement
     float pi = 3.1415926;
@@ -98,12 +106,7 @@ void Camera::orbitCamera(float nx, float ny){
     if (phi < ep) phi = ep;
     else if (phi > pi) phi = pi;
 
-    this->pos.x = dist * sin(phi) * cos(theta);
-    this->pos.y = dist * cos(phi);
-    this->pos.z = dist * sin(phi) * sin(theta);
-    this->target = -this->pos;
-    
-    // transformCamera(*this);
+    recomputeSpherical();
 }
 
 void Camera::zoomCamera(float ny) {
@@ -117,10 +120,21 @@ void Camera::zoomCamera(float ny) {
     if (dist < min) dist = min;
     else if (dist > max) dist = max;
 
-    this->pos.x = dist * sin(phi) * cos(theta);
-    this->pos.y = dist * cos(phi);
-    this->pos.z = dist * sin(phi) * sin(theta);
-    this->target = -this->pos;
+    recomputeSpherical();
+}
+
+void Camera::altitudeCamera(float ny) {
+
+    // "Sensitivity" of mouse movement
+    float scale = .00275;
+    float min = -1;
+    float max = 1.5;
+
+    height += ny * scale;
+    if (height < min) height = min;
+    else if (height > max) height = max;
+
+    recomputeSpherical();
 }
 
 
@@ -310,63 +324,36 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
 
 std::vector<Light> parseLights(const aiScene* scene) {
 
-   // Initial empty list, then loop over all lights
-   std::vector<Light> lights = {};
-   for (int i = 0; i < scene->mNumLights; i++) {
-       // Construct light
-       Light l = Light();
-       l.name = scene->mLights[i]->mName.C_Str();
-       l.sceneindex = i;
-       // Parse area, ambient, and point
-       if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
-           aiVector3D p = scene->mLights[i]->mPosition;
-           l.pos = glm::vec3(p.x, p.y, p.z);
-           l.power = scene->mLights[i]->mColorDiffuse;
-           l.type = l.AREA;
-       }
-       else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
-           l.power = scene->mLights[i]->mColorAmbient;
-           l.type = l.AMBIENT;
-       }
-       else {
-           aiVector3D p = scene->mLights[i]->mPosition;
-           l.pos = glm::vec3(p.x, p.y, p.z);
-           l.power = scene->mLights[i]->mColorDiffuse;
-           l.type = l.POINT;
-       }
+    // Initial empty list, then loop over all lights
+    std::vector<Light> lights = {};
+    for (int i = 0; i < scene->mNumLights; i++) {
+        // Construct light
+        Light l = Light();
+        l.name = scene->mLights[i]->mName.C_Str();
+        l.sceneindex = i;
+        // Parse area, ambient, and point
+        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.AREA;
+        }
+        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
+            l.power = scene->mLights[i]->mColorAmbient;
+            l.type = l.AMBIENT;
+        }
+        else {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.POINT;
+        }
 
-       // Push to list
-       lights.push_back(l);
-   }
-   return lights;
+        // Push to list
+        lights.push_back(l);
+    }
+    return lights;
 }
-
-//void getLight(const aiScene* scene){
-//    float width;
-//    float height;
-//    float range;
-//    aiColor3D power;
-//    if (scene->HasLights()){
-//        aiLight** lights = scene->mLights;
-//        for (int i = 0; i < scene->mNumLights; i++){
-//            // get point light
-//            char* lightName = scene->mLights[i]->mName.data;
-//            printf("%s\n",lightName);
-//            if (RTUtil::parseAreaLight(lightName,width,height)){
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "area" << power.r << power.g << power.b << std::endl;
-//            }
-//            else if (RTUtil::parseAmbientLight(lightName,range)){
-//                // here power is radiance
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "ambient" << power.r << power.g << power.b << std::endl;
-//            } else {
-//                power =  scene->mLights[i]->mColorDiffuse;
-//                std::cout << "point light" << power.r << power.g << power.b << std::endl;
-//            }
-//        }
-//    }
-//}
 
 
 /**************************************** ENVIRONMENT ****************************************/
@@ -382,7 +369,8 @@ Environment::Environment(std::string objpath, int width, int height) {
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     this->device = initializeDevice();
 
-    this->camera = Camera(obj->mCameras[0]); 
+    glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
+    this->camera = Camera(obj->mCameras[0], camtilt); // apply tilting constants to constructor
     this->camera.transMat = getCameraMatrix(obj);
     this->camera.transformCamera();
 
@@ -405,10 +393,14 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
 /**************************************** MAIN FUNCTIONS ****************************************/
 
 
-Environment startup(int width, int height) {
-    Environment env("../resources/scenes/bunnyscene.glb", width, height);
-    // Environment env("C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb", width, height);
-  
+float getAspect(std::string path) {
+    Assimp::Importer importer;
+    const aiScene* obj = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    return obj->mCameras[0]->mAspect;
+}
+
+Environment startup(std::string path, int width, int height) {
+    Environment env(path, width, height);
     return env;
 }
 
