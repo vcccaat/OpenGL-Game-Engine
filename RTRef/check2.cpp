@@ -130,7 +130,7 @@ void Camera::zoomCamera(float ny) {
 Light::Light() {}
 
 Material::Material() {
-    this->diffuse = glm::vec3(.8, .5, .2);
+    this->diffuse = glm::vec3(.2, .5, .8);
     this->roughness = .2;
     this->indexofref = 1.5;
 }
