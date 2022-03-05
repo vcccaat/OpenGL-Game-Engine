@@ -11,7 +11,6 @@ public:
     glm::vec3 diffuse;
     float roughness;
     float indexofref;
-    int matindex;
 
     Material();
 };
@@ -32,7 +31,7 @@ public:
     Type type;
     
     Light();
-    aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal);
+    aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
 };
 
 class Camera {
@@ -68,13 +67,13 @@ public:
     RTCScene scene;
     std::vector<Light> lights;
     std::vector<Material> materials;
-    std::unordered_map<int, int> geomIdToMatIndex;
+    std::vector<int> geomIdToMatInd;
 
     Environment();
     Environment(std::string objpath, int width, int height);
     void rayTrace(std::vector<glm::vec3>& img_data);
     aiColor3D castRay( float ox, float oy, float oz, float dx, float dy, float dz);
-    aiColor3D shade( glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal);
+    aiColor3D shade( glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID);
  
 };
 

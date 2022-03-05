@@ -185,9 +185,8 @@ void waitForKeyPressedUnderWindows() {
 
 /**************************************** SCENE, CAMERA, AND RAY HELPERS ****************************************/
 
-
-unsigned int id = 0;
-void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 transMatrix, std::unordered_map<int, int> &mp) {
+int id = 0;
+void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 transMatrix, std::vector<int>& mp) {
     // get vertices from aiscene meshList by mMeshes indexes
     RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
     float *vertices = (float *)rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3,
@@ -210,13 +209,13 @@ void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 tr
     }
     rtcCommitGeometry(geom);
     rtcAttachGeometryByID(scene, geom, id);
-    mp.insert(id, mesh->mMaterialIndex);
     id++;
+    mp.push_back(mesh->mMaterialIndex);
     rtcReleaseGeometry(geom);
 }
 
 void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aiscene, aiNode *cur,
-                            glm::mat4 transMatrix, std::unordered_map<int, int> &mp) {
+                            glm::mat4 transMatrix, std::vector<int> &mp) {
     // top down, compute transformation matrix while traversing down the tree
     if (cur != NULL) {
         transMatrix = RTUtil::a2g(cur->mTransformation)*transMatrix;
@@ -233,7 +232,7 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
     }
 }
 
-RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam, std::unordered_map<int, int> &mp) {
+RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam, std::vector<int> &mp) {
     RTCScene scene = rtcNewScene(device);
     traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f), mp);
     rtcCommitScene(scene);
@@ -255,8 +254,8 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     return cmt;
 }
 
-aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal) {
-        
+aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+       
     glm::vec3 lightDir = pos - hitPos;
     
     //  wi: Incident direction from hit point to light
@@ -270,7 +269,6 @@ aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 n
     nori::Frame frame = nori::Frame(normal);
     nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi),frame.toLocal(wo));
 
-    Material material = Material();
     nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse); 
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
@@ -326,7 +324,7 @@ std::vector<Material> parseMats(const aiScene* scene) {
         Material m = Material();
         scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
         scene->mMaterials[i]->Get(AI_MATKEY_BASE_COLOR, reinterpret_cast<aiColor3D&>(m.diffuse));
-        m.matindex = i;
+        mats.push_back(m);
     }
     return mats;
 }
@@ -360,10 +358,8 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->lights = parseLights(rootNode, obj);
     this->materials = parseMats(obj);
 
-    this->scene = initializeScene(this->device, obj, this->camera, this->geomIdToMatIndex);
-    /*for (auto const& pair : this->geomIdToMatIndex) {
-        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
-    }*/
+    this->geomIdToMatInd = {};
+    this->scene = initializeScene(this->device, obj, this->camera, this->geomIdToMatInd);
 }
 
 void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
@@ -407,13 +403,12 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
         // diffuse shading and specular reflectance
         glm::vec3 rayDir = glm::vec3(dx,dy,dz);
         glm::vec3 hitPos = glm::vec3(ox,oy,oz) + rayhit.ray.tfar * rayDir;
-        
-        return shade(rayDir, hitPos, normal);
+        return shade(rayDir, hitPos, normal, rayhit.hit.geomID);
     }
     return aiColor3D();
 }
 
-aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal){
+aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID){
     aiColor3D color;
     for (int i = 0; i < lights.size(); i++){ 
         // temp: do point light
@@ -427,7 +422,7 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
             rtcOccluded1(scene, &context, &shadowRayhit.ray);
             if (shadowRayhit.ray.tfar != -std::numeric_limits<float>::infinity()) {
             // diffuse and reflectance color
-                color = color + lights[i].pointIlluminate(eyeRay, hitPos, normal);
+                color = color + lights[i].pointIlluminate(eyeRay, hitPos, normal, materials[geomIdToMatInd[geomID]]);
             }
         }
     }
