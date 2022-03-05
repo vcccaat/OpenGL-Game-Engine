@@ -261,7 +261,7 @@ aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal
     glm::vec3 wo = glm::normalize(-eyeRay);
     float distance = pow(lightDir[0],2) + pow(lightDir[1],2) + pow(lightDir[2],2);
 
-    // normal = glm::normalize(normal);
+    normal = glm::normalize(normal);
 
     nori::Frame frame = nori::Frame(normal);
     nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi),frame.toLocal(wo));
@@ -270,7 +270,6 @@ aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal
     nori::Microfacet bsdf = nori::Microfacet(material.roughness,material.indexofref, 1.f, material.diffuse); 
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
-    normal = glm::normalize(normal);
     glm::vec3 out = glm::vec3(power[0] * fr[0],power[1] * fr[1],power[2] * fr[2])* std::max(0.f,glm::dot(normal, wi));
     return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
     }
@@ -308,7 +307,7 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     rtcIntersect1(scene, &context, &rayhit);
 
     //printf("%f, %f, %f: ", ox, oy, oz);
-    if (rayhit.ray.tfar  != std::numeric_limits<float>::infinity()  ) {  //rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID
+    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar  != std::numeric_limits<float>::infinity()  ) {  //rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID
         glm::vec3 normal = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
 
         // diffuse shading and specular reflectance
