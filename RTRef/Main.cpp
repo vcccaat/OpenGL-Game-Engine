@@ -8,6 +8,7 @@ public:
 	BunnyGUI(std::string path, int windowWidth, int windowHeight):ImgGUI(windowWidth, windowHeight) {
 		env = startup(path, windowWidth, windowHeight);
 		env.camera.orbitCamera(0, 0);
+		// updateImgData(img_data, env);
 	}
 	void compute_image() {
 		updateImgData(img_data, env); //img_data = std::vector<glm::vec3>(windowWidth * windowHeight, glm::vec3(0.5f, 0.5f, 0.5f));
@@ -27,8 +28,8 @@ public:
 
 int main() {
 	// Edittable constants
-	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
-	//std::string path = "../resources/scenes/bunnyscene.glb";
+	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+	std::string path = "../resources/scenes/bunnyscene.glb";
 	int height = 500;
 
 	nanogui::init();

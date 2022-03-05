@@ -217,7 +217,7 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
     if (cur != NULL) {
         transMatrix = RTUtil::a2g(cur->mTransformation)*transMatrix;
         // when it reaches mesh, transform the vertices
-        if (cur->mNumMeshes > 0) {
+        if (cur->mNumMeshes > 0 ) { //&& *cur->mMeshes == 1
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* mesh = aiscene->mMeshes[cur->mMeshes[i]];
                 addMeshToScene(device, scene, mesh, transMatrix);
@@ -236,11 +236,9 @@ RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) 
     return scene;
 }
 
-glm::mat4 getCameraMatrix(const aiScene* obj) {
+glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     // Dealing with node hierarchy
-    aiNode* rootNode = obj->mRootNode;
-    aiCamera* camera = obj->mCameras[0]; //get the first camera
-    aiNode* tempNode = rootNode->FindNode(camera->mName);
+    aiNode* tempNode = rootNode->FindNode(nodeName);
     glm::mat4 cmt = glm::mat4(1.f);
     glm::mat4 cur;
 
@@ -256,12 +254,14 @@ glm::mat4 getCameraMatrix(const aiScene* obj) {
 aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal) {
     //  wi: Incident direction from hit point to light
     //  wo: Outgoing direction from hit point to camera
-    glm::vec3 wo = glm::normalize(-eyeRay);
-
+    
     glm::vec3 lightPos = pos;
-    glm::vec3 lightDir = hitPos-lightPos;  
-    float distance = pow(lightDir[0],2) + pow(lightDir[1],2) + pow(lightDir[2],2);
+    glm::vec3 lightDir = lightPos-hitPos;  
     glm::vec3 wi =glm::normalize(lightDir);
+    glm::vec3 wo = glm::normalize(-eyeRay);
+    float distance = pow(lightDir[0],2) + pow(lightDir[1],2) + pow(lightDir[2],2);
+
+    // normal = glm::normalize(normal);
 
     nori::Frame frame = nori::Frame(normal);
     nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi),frame.toLocal(wo));
@@ -269,10 +269,10 @@ aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal
     Material material = Material();
     nori::Microfacet bsdf = nori::Microfacet(material.roughness,material.indexofref, 1.f, material.diffuse); 
     glm::vec3 fr = bsdf.eval(BSDFquery);
-    // std::cout << "fr" << fr << std::endl;
-    // std::cout << "power" << power[0]<<power[1]<<power[2]  << std::endl;
-    glm::vec3 out = glm::vec3(power[0] * fr[0],power[1] * fr[1],power[2] * fr[2])* std::max(0.f,glm::dot(normal, lightDir))/distance;
-    return aiColor3D(out[0],out[1],out[2]);
+
+    normal = glm::normalize(normal);
+    glm::vec3 out = glm::vec3(power[0] * fr[0],power[1] * fr[1],power[2] * fr[2])* std::max(0.f,glm::dot(normal, wi));
+    return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
     }
 
 aiColor3D shade(std::vector<Light> lights,  glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal){
@@ -308,11 +308,8 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     rtcIntersect1(scene, &context, &rayhit);
 
     //printf("%f, %f, %f: ", ox, oy, oz);
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
+    if (rayhit.ray.tfar  != std::numeric_limits<float>::infinity()  ) {  //rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID
         glm::vec3 normal = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
-        // float out = glm::dot(glm::normalize(normal), glm::normalize(glm::vec3(1.f, 1.f, 1.f)));
-        // out = out < 0 ? 0 : out;
-        // return aiColor3D(out);
 
         // diffuse shading and specular reflectance
         glm::vec3 rayDir = glm::vec3(dx,dy,dz);
@@ -322,7 +319,7 @@ aiColor3D castRay(RTCScene scene, float ox, float oy, float oz, float dx, float 
     return aiColor3D();
 }
 
-std::vector<Light> parseLights(const aiScene* scene) {
+std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
     // Initial empty list, then loop over all lights
     std::vector<Light> lights = {};
@@ -331,6 +328,7 @@ std::vector<Light> parseLights(const aiScene* scene) {
         Light l = Light();
         l.name = scene->mLights[i]->mName.C_Str();
         l.sceneindex = i;
+
         // Parse area, ambient, and point
         if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
             aiVector3D p = scene->mLights[i]->mPosition;
@@ -349,6 +347,9 @@ std::vector<Light> parseLights(const aiScene* scene) {
             l.type = l.POINT;
         }
 
+        // transform light
+        glm::mat4 transMat = getTransMatrix(rootNode, scene->mLights[i]->mName);
+        l.pos = glm::vec3(transMat * glm::vec4(l.pos.x, l.pos.y, l.pos.z, 1));
         // Push to list
         lights.push_back(l);
     }
@@ -368,13 +369,20 @@ Environment::Environment(std::string objpath, int width, int height) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     this->device = initializeDevice();
+    
+    aiNode* rootNode = obj->mRootNode;
 
     glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
-    this->camera = Camera(obj->mCameras[0], camtilt); // apply tilting constants to constructor
-    this->camera.transMat = getCameraMatrix(obj);
+    //get the first camera
+    aiCamera* camera = obj->mCameras[0]; 
+    this->camera = Camera(camera, camtilt); // apply tilting constants to constructor
+    
+    // this->camera.transMat = getCameraMatrix(obj);
+    this->camera.transMat = getTransMatrix(rootNode,camera->mName);
     this->camera.transformCamera();
 
-    lights = parseLights(obj);
+    //get light and set transformation matrix 
+    this->lights = parseLights(rootNode, obj);    
 
     this->scene = initializeScene(this->device, obj, this->camera);
 }
@@ -383,7 +391,6 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
     glm::vec3 dir;
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
-        glm::vec3 hitPoint = glm::vec3((i + .5) / width,(j + .5) / height, 0);
         aiColor3D col = castRay(scene, camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z, lights);
         img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
     }

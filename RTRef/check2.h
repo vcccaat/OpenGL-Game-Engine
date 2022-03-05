@@ -24,6 +24,7 @@ public:
     float width;
     float height;
     float dist;
+    glm::mat4 transMat;
 
     enum Type {POINT, AREA, AMBIENT};
     Type type;
