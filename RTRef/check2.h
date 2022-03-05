@@ -65,7 +65,6 @@ public:
     RTCDevice device;
     RTCScene scene;
     std::vector<Light> lights;
-    RTCIntersectContext context;
 
     Environment();
     Environment(std::string objpath, int width, int height);

@@ -381,7 +381,7 @@ aiColor3D Environment::castRay( float ox, float oy, float oz, float dx, float dy
     rtcIntersect1(scene, &context, &rayhit);
 
     //printf("%f, %f, %f: ", ox, oy, oz);
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar  != std::numeric_limits<float>::infinity()  ) {  //rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID
+    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar  != std::numeric_limits<float>::infinity()  ) {  
         glm::vec3 normal = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
 
         // diffuse shading and specular reflectance
@@ -401,13 +401,20 @@ aiColor3D Environment::shade( glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 norma
     for (int i = 0; i < lights.size(); i++){ 
         // temp: do point light
         if (lights[i].type == 0){
-            //draw shadow
-            // lightDir = glm::normalize(light.position - hit.point)
-            // RTCRayHit shadowRayhit = generateRay(ox, oy, oz, dx, dy, dz);
-            // rtcIntersect1(scene, &context, &shadowRayhit);
 
+            //draw shadow
+            glm::vec3 lightDir = glm::normalize(lights[i].pos - hitPos);
+            RTCRayHit shadowRayhit = generateRay(hitPos[0], hitPos[1], hitPos[2], lightDir[0], lightDir[1], lightDir[2]);
+            struct RTCIntersectContext context;
+            rtcInitIntersectContext(&context);
+            rtcIntersect1(scene, &context, &shadowRayhit);
+            if (0.0001 < shadowRayhit.ray.tfar && shadowRayhit.ray.tfar != std::numeric_limits<float>::infinity()){
+                continue;
+            }
+            else{
             // diffuse and reflectance color
             color = color + lights[i].illuminate(eyeRay, hitPos, normal);
+            }
         }
     }
     return color;
