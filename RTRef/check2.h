@@ -30,7 +30,7 @@ public:
     Type type;
     
     Light();
-    aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal);
+    aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal);
 };
 
 class Camera {

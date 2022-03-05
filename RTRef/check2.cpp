@@ -251,7 +251,7 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     return cmt;
 }
 
-aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal) {
+aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal) {
         
     glm::vec3 lightDir = pos - hitPos;
     
@@ -381,7 +381,7 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
 
     //printf("%f, %f, %f: ", ox, oy, oz);
     if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar != std::numeric_limits<float>::infinity()) {  
-        glm::vec3 normal = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
+        glm::vec3 normal = glm::normalize(glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
 
         // diffuse shading and specular reflectance
         glm::vec3 rayDir = glm::vec3(dx,dy,dz);
@@ -397,19 +397,16 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
     for (int i = 0; i < lights.size(); i++){ 
         // temp: do point light
         if (lights[i].type == 0){
-
             // check for shadow
             glm::vec3 lightDir = glm::normalize(lights[i].pos - hitPos);
             glm::vec3 newOrig = hitPos + lightDir * .001f;
             RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
             struct RTCIntersectContext context;
             rtcInitIntersectContext(&context);
-            rtcIntersect1(scene, &context, &shadowRayhit);
-            if (0.0001 < shadowRayhit.ray.tfar && shadowRayhit.ray.tfar != std::numeric_limits<float>::infinity()){
-                continue;
-            } else {
+            rtcOccluded1(scene, &context, &shadowRayhit.ray);
+            if (shadowRayhit.ray.tfar != -std::numeric_limits<float>::infinity()) {
             // diffuse and reflectance color
-            color = color + lights[i].illuminate(eyeRay, hitPos, normal);
+                color = color + lights[i].pointIlluminate(eyeRay, hitPos, normal);
             }
         }
     }
