@@ -18,6 +18,7 @@
 #include <glm/glm.hpp>
 #include <algorithm>    // std::max
 #include "check2.h"
+#include <stdlib.h>
 
 #if defined(_WIN32)
 #include <conio.h>
@@ -278,7 +279,35 @@ aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 n
 }
 
 aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
-    return aiColor3D();
+
+    // Determine random position of light
+    float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float xLocal = (r1 * width) - width / 2;
+    float yLocal = (r2 * height) - height / 2;\
+    // first, make into 3d vector (x, y, 0) with current normal (0, 0, 1)
+    // then, rotate so it faces in direction of the normal (vec *= trans matrix, but only rotation part)
+    // finally, translate it by position (vec += position)
+    glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
+    lightpos = lightpos * glm::mat3(transMat);
+    lightpos = lightpos + pos;
+
+    // Eval BRDF and formula
+    glm::vec3 wi = glm::normalize(-eyeRay);
+    glm::vec3 wo = glm::normalize(lightpos - hitPos);
+
+    normal = glm::normalize(normal);
+    nori::Frame frame = nori::Frame(normal);
+    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi), frame.toLocal(wo));
+    nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
+    glm::vec3 fr = bsdf.eval(BSDFquery);
+
+    glm::vec3 firstpt = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]);
+    float toppt = glm::dot(normal, glm::normalize(lightpos - hitPos)) * glm::dot(areaNormal, glm::normalize(lightpos - hitPos));
+    float bottompt = pow(glm::length(hitPos - lightpos), 2);
+    glm::vec3 out = firstpt * (toppt / bottompt);
+
+    return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
 
 aiColor3D Light::ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
@@ -287,6 +316,7 @@ aiColor3D Light::ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3
 
 aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
     if (type == 0) {
+        return aiColor3D();
         return pointIlluminate(eyeRay, hitPos, normal, material);
     } else if (type == 1) {
         return areaIlluminate(eyeRay, hitPos, normal, material);
