@@ -233,7 +233,7 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
     }
 }
 
-RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam, std::unordered_map<int, int> mp) {
+RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam, std::unordered_map<int, int> &mp) {
     RTCScene scene = rtcNewScene(device);
     traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f), mp);
     rtcCommitScene(scene);
