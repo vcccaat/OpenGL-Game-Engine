@@ -31,10 +31,10 @@ public:
     Type type;
     
     Light();
-    aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
-    aiColor3D areaIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, RTCScene scene);
+    aiColor3D areaIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, RTCScene scene);
     aiColor3D ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
-    aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, RTCScene scene);
 };
 
 class Camera {
@@ -76,7 +76,6 @@ public:
     Environment(std::string objpath, int width, int height);
     void rayTrace(std::vector<glm::vec3>& img_data);
     aiColor3D castRay( float ox, float oy, float oz, float dx, float dy, float dz);
-    bool isShadowed(glm::vec3 lightpos, glm::vec3 hitPos);
     aiColor3D shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID);
  
 };

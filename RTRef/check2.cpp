@@ -255,8 +255,37 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     return cmt;
 }
 
-aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
-       
+RTCRayHit generateRay(float ox, float oy, float oz, float dx, float dy, float dz) {
+    struct RTCRayHit rayhit;
+    rayhit.ray.org_x = ox;
+    rayhit.ray.org_y = oy;
+    rayhit.ray.org_z = oz;
+    rayhit.ray.dir_x = dx;
+    rayhit.ray.dir_y = dy;
+    rayhit.ray.dir_z = dz;
+    rayhit.ray.tnear = 0;
+    rayhit.ray.tfar = std::numeric_limits<float>::infinity();
+    rayhit.ray.mask = -1;
+    rayhit.ray.flags = 0;
+    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+    return rayhit;
+}
+
+bool isShadowed(glm::vec3 lightpos, glm::vec3 hitPos, RTCScene scene) {
+    glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
+    glm::vec3 newOrig = hitPos + lightDir * .001f;
+    RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
+    struct RTCIntersectContext context;
+    rtcInitIntersectContext(&context);
+    rtcOccluded1(scene, &context, &shadowRayhit.ray);
+    return shadowRayhit.ray.tfar == -std::numeric_limits<float>::infinity();
+}
+
+aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material, RTCScene scene) {
+    if (isShadowed(pos, hitPos, scene)) {
+        return aiColor3D();
+    }
     glm::vec3 lightDir = pos - hitPos;
     
     //  wi: Incident direction from hit point to light
@@ -278,7 +307,7 @@ aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 n
     return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
 }
 
-aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material, RTCScene scene) {
 
     // Determine random position of light
     float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -291,6 +320,11 @@ aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 no
     glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
     lightpos = lightpos * glm::mat3(transMat);
     lightpos = lightpos + pos;
+
+    // See if shadowed
+    if (isShadowed(lightpos, hitPos, scene)) {
+        return aiColor3D();
+    }
 
     // Eval BRDF and formula
     glm::vec3 wi = glm::normalize(-eyeRay);
@@ -314,11 +348,12 @@ aiColor3D Light::ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3
     return aiColor3D();
 }
 
-aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material, RTCScene scene) {
     if (type == 0) {
-        return pointIlluminate(eyeRay, hitPos, normal, material);
+        return aiColor3D();
+        return pointIlluminate(eyeRay, hitPos, normal, material, scene);
     } else if (type == 1) {
-        return areaIlluminate(eyeRay, hitPos, normal, material);
+        return areaIlluminate(eyeRay, hitPos, normal, material, scene);
     } else {
         return ambientIlluminate(eyeRay, hitPos, normal, material);
     }
@@ -418,23 +453,6 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
     }
 }
 
-RTCRayHit generateRay(float ox, float oy, float oz, float dx, float dy, float dz) {
-    struct RTCRayHit rayhit;
-    rayhit.ray.org_x = ox;
-    rayhit.ray.org_y = oy;
-    rayhit.ray.org_z = oz;
-    rayhit.ray.dir_x = dx;
-    rayhit.ray.dir_y = dy;
-    rayhit.ray.dir_z = dz;
-    rayhit.ray.tnear = 0;
-    rayhit.ray.tfar = std::numeric_limits<float>::infinity();
-    rayhit.ray.mask = -1;
-    rayhit.ray.flags = 0;
-    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
-    return rayhit;
-}
-
 aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
@@ -455,23 +473,10 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
     return aiColor3D();
 }
 
-bool Environment::isShadowed(glm::vec3 lightpos, glm::vec3 hitPos) {
-    glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
-    glm::vec3 newOrig = hitPos + lightDir * .001f;
-    RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
-    struct RTCIntersectContext context;
-    rtcInitIntersectContext(&context);
-    rtcOccluded1(scene, &context, &shadowRayhit.ray);
-    return shadowRayhit.ray.tfar == -std::numeric_limits<float>::infinity();
-}
-
 aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID){
     aiColor3D color;
     for (int i = 0; i < lights.size(); i++) { 
-        // check for shadow
-        if (!isShadowed(lights[i].pos, hitPos)) {
-            color = color + lights[i].illuminate(eyeRay, hitPos, normal, materials[geomIdToMatInd[geomID]]);
-        }
+        color = color + lights[i].illuminate(eyeRay, hitPos, normal, materials[geomIdToMatInd[geomID]], scene);
     }
     return color;
 }
