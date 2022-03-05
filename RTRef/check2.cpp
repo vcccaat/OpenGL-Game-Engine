@@ -253,14 +253,13 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
 
 aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal) {
         
-    glm::vec3 lightPos = pos;
-    glm::vec3 lightDir = lightPos-hitPos;  
+    glm::vec3 lightDir = pos - hitPos;
     
     //  wi: Incident direction from hit point to light
     //  wo: Outgoing direction from hit point to camera
-    glm::vec3 wi =glm::normalize(lightDir);
+    glm::vec3 wi = glm::normalize(lightDir);
     glm::vec3 wo = glm::normalize(-eyeRay);
-    float distance = pow(lightDir[0],2) + pow(lightDir[1],2) + pow(lightDir[2],2);
+    //float distance = pow(lightDir[0],2) + pow(lightDir[1],2) + pow(lightDir[2],2);
 
     normal = glm::normalize(normal);
 
@@ -268,13 +267,13 @@ aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal
     nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi),frame.toLocal(wo));
 
     Material material = Material();
-    nori::Microfacet bsdf = nori::Microfacet(material.roughness,material.indexofref, 1.f, material.diffuse); 
+    nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse); 
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
-    glm::vec3 out = glm::vec3(power[0] * fr[0],power[1] * fr[1],power[2] * fr[2])* std::max(0.f,glm::dot(normal, wi));
+    glm::vec3 out = glm::vec3(power[0]*fr[0], power[1]*fr[1], power[2]*fr[2])*std::max(0.f,glm::dot(normal, wi));
 
     return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
-    }
+}
 
 
 
@@ -355,7 +354,7 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
     }
 }
 
-RTCRayHit generateRay( float ox, float oy, float oz, float dx, float dy, float dz) {
+RTCRayHit generateRay(float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCRayHit rayhit;
     rayhit.ray.org_x = ox;
     rayhit.ray.org_y = oy;
@@ -372,7 +371,7 @@ RTCRayHit generateRay( float ox, float oy, float oz, float dx, float dy, float d
     return rayhit;
 }
 
-aiColor3D Environment::castRay( float ox, float oy, float oz, float dx, float dy, float dz) {
+aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy, float dz) {
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
 
@@ -381,37 +380,34 @@ aiColor3D Environment::castRay( float ox, float oy, float oz, float dx, float dy
     rtcIntersect1(scene, &context, &rayhit);
 
     //printf("%f, %f, %f: ", ox, oy, oz);
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar  != std::numeric_limits<float>::infinity()  ) {  
+    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar != std::numeric_limits<float>::infinity()) {  
         glm::vec3 normal = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
 
         // diffuse shading and specular reflectance
         glm::vec3 rayDir = glm::vec3(dx,dy,dz);
         glm::vec3 hitPos = glm::vec3(ox,oy,oz) + rayhit.ray.tfar * rayDir;
         
-        return shade(rayDir,hitPos,normal);
+        return shade(rayDir, hitPos, normal);
     }
     return aiColor3D();
 }
 
-aiColor3D Environment::shade( glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal){
+aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal){
     aiColor3D color;
-
-
-
     for (int i = 0; i < lights.size(); i++){ 
         // temp: do point light
         if (lights[i].type == 0){
 
-            //draw shadow
+            // check for shadow
             glm::vec3 lightDir = glm::normalize(lights[i].pos - hitPos);
-            RTCRayHit shadowRayhit = generateRay(hitPos[0], hitPos[1], hitPos[2], lightDir[0], lightDir[1], lightDir[2]);
+            glm::vec3 newOrig = hitPos + lightDir * .001f;
+            RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
             struct RTCIntersectContext context;
             rtcInitIntersectContext(&context);
             rtcIntersect1(scene, &context, &shadowRayhit);
             if (0.0001 < shadowRayhit.ray.tfar && shadowRayhit.ray.tfar != std::numeric_limits<float>::infinity()){
                 continue;
-            }
-            else{
+            } else {
             // diffuse and reflectance color
             color = color + lights[i].illuminate(eyeRay, hitPos, normal);
             }

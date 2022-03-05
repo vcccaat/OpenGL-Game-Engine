@@ -28,8 +28,8 @@ public:
 
 int main() {
 	// Edittable constants
-	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
-	std::string path = "../resources/scenes/bunnyscene.glb";
+	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+	//std::string path = "../resources/scenes/bunnyscene.glb";
 	int height = 500;
 
 	nanogui::init();
