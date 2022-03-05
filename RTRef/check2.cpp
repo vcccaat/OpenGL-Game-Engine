@@ -444,12 +444,17 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->scene = initializeScene(this->device, obj, this->camera, this->geomIdToMatInd);
 }
 
-void Environment::rayTrace(std::vector<glm::vec3>& img_data) {
+glm::vec3 times(glm::vec3 v, float i) {
+    return glm::vec3(v.x * i, v.y * i, v.z * i);
+}
+
+void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter) {
     glm::vec3 dir;
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
         aiColor3D col = castRay(camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
-        img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
+        //img_data[j * width + i] = glm::vec3(col.r, col.g, col.b);
+        img_data[j * width + i] = times(img_data[j * width + i], (iter - 1) / iter) + times(glm::vec3(col.r, col.g, col.b), (1 / iter));
     }
 }
 
@@ -496,6 +501,6 @@ Environment startup(std::string path, int width, int height) {
     return env;
 }
 
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env) {
-    env.rayTrace(img_data);
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter) {
+    env.rayTrace(img_data, (float) iter);
 }

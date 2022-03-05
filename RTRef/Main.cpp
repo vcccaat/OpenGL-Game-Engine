@@ -4,22 +4,31 @@
 
 class BunnyGUI : public RTUtil::ImgGUI {
 	Environment env;
+	bool stationary;
+	int iter;
 public:
 	BunnyGUI(std::string path, int windowWidth, int windowHeight):ImgGUI(windowWidth, windowHeight) {
 		env = startup(path, windowWidth, windowHeight);
 		env.camera.orbitCamera(0, 0);
-		// updateImgData(img_data, env);
+		iter = 1;
 	}
 	void compute_image() {
-		updateImgData(img_data, env); //img_data = std::vector<glm::vec3>(windowWidth * windowHeight, glm::vec3(0.5f, 0.5f, 0.5f));
+		iter = stationary ? iter + 1 : 1;
+		//std::cout << iter << "\n";
+		updateImgData(img_data, env, iter); //img_data = std::vector<glm::vec3>(windowWidth * windowHeight, glm::vec3(0.5f, 0.5f, 0.5f));
 	}
 	bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers){
 		if(button == 1) {
 			env.camera.orbitCamera(rel.x(), rel.y());
+			stationary = false; // will always move as this function is only called on mouse movement
 		} else if (button == 2) {
 			env.camera.zoomCamera(rel.y());
+			stationary = (rel.y() == 0);
 		} else if (button == 4) {
 			env.camera.altitudeCamera(rel.y());
+			stationary = (rel.y() == 0);
+		} else {
+			stationary = true;
 		}
 		return true;
 	}
