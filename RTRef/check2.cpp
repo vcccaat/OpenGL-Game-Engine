@@ -186,7 +186,8 @@ void waitForKeyPressedUnderWindows() {
 /**************************************** SCENE, CAMERA, AND RAY HELPERS ****************************************/
 
 
-void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 transMatrix) {
+unsigned int id = 0;
+void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 transMatrix, std::unordered_map<int, int> &mp) {
     // get vertices from aiscene meshList by mMeshes indexes
     RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
     float *vertices = (float *)rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3,
@@ -208,11 +209,14 @@ void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 tr
         indices[3 * i + 2] = mesh->mFaces[i].mIndices[2];
     }
     rtcCommitGeometry(geom);
-    rtcAttachGeometry(scene, geom);
+    rtcAttachGeometryByID(scene, geom, id);
+    mp.insert(id, mesh->mMaterialIndex);
+    id++;
     rtcReleaseGeometry(geom);
 }
 
-void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aiscene, aiNode *cur, glm::mat4 transMatrix) {
+void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aiscene, aiNode *cur,
+                            glm::mat4 transMatrix, std::unordered_map<int, int> &mp) {
     // top down, compute transformation matrix while traversing down the tree
     if (cur != NULL) {
         transMatrix = RTUtil::a2g(cur->mTransformation)*transMatrix;
@@ -220,18 +224,18 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
         if (cur->mNumMeshes > 0 ) { //&& *cur->mMeshes == 1
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* mesh = aiscene->mMeshes[cur->mMeshes[i]];
-                addMeshToScene(device, scene, mesh, transMatrix);
+                addMeshToScene(device, scene, mesh, transMatrix, mp);
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(device, scene, aiscene, cur->mChildren[i], transMatrix);
+            traverseNodeHierarchy(device, scene, aiscene, cur->mChildren[i], transMatrix, mp);
         }
     }
 }
 
-RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam) {
+RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam, std::unordered_map<int, int> mp) {
     RTCScene scene = rtcNewScene(device);
-    traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f));
+    traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f), mp);
     rtcCommitScene(scene);
     return scene;
 }
@@ -275,8 +279,6 @@ aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 n
     return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
 }
 
-
-
 std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
     // Initial empty list, then loop over all lights
@@ -293,6 +295,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
+            l.areaNormal = glm::vec3(0, 0, 1);
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
@@ -308,10 +311,24 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         // transform light
         glm::mat4 transMat = getTransMatrix(rootNode, scene->mLights[i]->mName);
         l.pos = glm::vec3(transMat * glm::vec4(l.pos.x, l.pos.y, l.pos.z, 1));
+        if (l.type == l.AREA) {
+            l.areaNormal = glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0));
+        }
         // Push to list
         lights.push_back(l);
     }
     return lights;
+}
+
+std::vector<Material> parseMats(const aiScene* scene) {
+    std::vector<Material> mats = {};
+    for (int i = 0; i < scene->mNumMaterials; ++i) {
+        Material m = Material();
+        scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
+        scene->mMaterials[i]->Get(AI_MATKEY_BASE_COLOR, reinterpret_cast<aiColor3D&>(m.diffuse));
+        m.matindex = i;
+    }
+    return mats;
 }
 
 
@@ -340,9 +357,13 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->camera.transformCamera();
 
     //get light and set transformation matrix 
-    this->lights = parseLights(rootNode, obj);    
+    this->lights = parseLights(rootNode, obj);
+    this->materials = parseMats(obj);
 
-    this->scene = initializeScene(this->device, obj, this->camera);
+    this->scene = initializeScene(this->device, obj, this->camera, this->geomIdToMatIndex);
+    /*for (auto const& pair : this->geomIdToMatIndex) {
+        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
+    }*/
 }
 
 void Environment::rayTrace(std::vector<glm::vec3>& img_data) {

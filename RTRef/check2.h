@@ -11,6 +11,7 @@ public:
     glm::vec3 diffuse;
     float roughness;
     float indexofref;
+    int matindex;
 
     Material();
 };
@@ -19,6 +20,7 @@ class Light {
 public:
     std::string name;
     glm::vec3 pos;
+    glm::vec3 areaNormal;
     aiColor3D power;
     int sceneindex;
     float width;
@@ -65,6 +67,8 @@ public:
     RTCDevice device;
     RTCScene scene;
     std::vector<Light> lights;
+    std::vector<Material> materials;
+    std::unordered_map<int, int> geomIdToMatIndex;
 
     Environment();
     Environment(std::string objpath, int width, int height);
