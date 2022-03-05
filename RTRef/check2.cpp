@@ -305,7 +305,7 @@ aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 no
     glm::vec3 firstpt = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]);
     float toppt = glm::dot(normal, glm::normalize(lightpos - hitPos)) * glm::dot(areaNormal, glm::normalize(lightpos - hitPos));
     float bottompt = pow(glm::length(hitPos - lightpos), 2);
-    glm::vec3 out = firstpt * (toppt / bottompt);
+    glm::vec3 out = width * height * firstpt * (toppt / bottompt);
 
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
