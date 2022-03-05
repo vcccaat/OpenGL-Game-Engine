@@ -32,6 +32,9 @@ public:
     
     Light();
     aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D areaIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
 };
 
 class Camera {

@@ -277,6 +277,24 @@ aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 n
     return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
 }
 
+aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+    return aiColor3D();
+}
+
+aiColor3D Light::ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+    return aiColor3D();
+}
+
+aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+    if (type == 0) {
+        return pointIlluminate(eyeRay, hitPos, normal, material);
+    } else if (type == 1) {
+        return areaIlluminate(eyeRay, hitPos, normal, material);
+    } else {
+        return ambientIlluminate(eyeRay, hitPos, normal, material);
+    }
+}
+
 std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
     // Initial empty list, then loop over all lights
@@ -411,19 +429,16 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
 aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID){
     aiColor3D color;
     for (int i = 0; i < lights.size(); i++){ 
-        // temp: do point light
-        if (lights[i].type == 0){
-            // check for shadow
-            glm::vec3 lightDir = glm::normalize(lights[i].pos - hitPos);
-            glm::vec3 newOrig = hitPos + lightDir * .001f;
-            RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
-            struct RTCIntersectContext context;
-            rtcInitIntersectContext(&context);
-            rtcOccluded1(scene, &context, &shadowRayhit.ray);
-            if (shadowRayhit.ray.tfar != -std::numeric_limits<float>::infinity()) {
-            // diffuse and reflectance color
-                color = color + lights[i].pointIlluminate(eyeRay, hitPos, normal, materials[geomIdToMatInd[geomID]]);
-            }
+        // check for shadow
+        glm::vec3 lightDir = glm::normalize(lights[i].pos - hitPos);
+        glm::vec3 newOrig = hitPos + lightDir * .001f;
+        RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
+        struct RTCIntersectContext context;
+        rtcInitIntersectContext(&context);
+        rtcOccluded1(scene, &context, &shadowRayhit.ray);
+        if (shadowRayhit.ray.tfar != -std::numeric_limits<float>::infinity()) {
+        // diffuse and reflectance color
+            color = color + lights[i].illuminate(eyeRay, hitPos, normal, materials[geomIdToMatInd[geomID]]);
         }
     }
     return color;
