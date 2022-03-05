@@ -65,10 +65,14 @@ public:
     RTCDevice device;
     RTCScene scene;
     std::vector<Light> lights;
+    RTCIntersectContext context;
 
     Environment();
     Environment(std::string objpath, int width, int height);
     void rayTrace(std::vector<glm::vec3>& img_data);
+    aiColor3D castRay( float ox, float oy, float oz, float dx, float dy, float dz);
+    aiColor3D shade( glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal);
+ 
 };
 
 float getAspect(std::string path);
