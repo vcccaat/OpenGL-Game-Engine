@@ -294,7 +294,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     // lightpos = lightpos * glm::mat3(transMat);
     lightpos = lightpos + pos;
 
-    if (isShadowed(scene, lightpos,hitPos)) return aiColor3D();
+    if (isShadowed(scene, lightpos, hitPos)) return aiColor3D();
 
     // Eval BRDF and formula
     glm::vec3 wi = glm::normalize(-eyeRay);
@@ -307,9 +307,9 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
     glm::vec3 firstpt = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]);
-    float toppt = glm::dot(normal, glm::normalize(lightpos - hitPos)) * glm::dot(areaNormal, glm::normalize(lightpos - hitPos));
+    float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
     float bottompt = pow(glm::length(hitPos - lightpos), 2);
-    glm::vec3 out = width * height * firstpt * (toppt / bottompt);
+    glm::vec3 out = width * height * width * height * firstpt * (toppt / bottompt); // may need to multiply by area again?
 
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
@@ -472,7 +472,7 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
     for (int i = 0; i < lights.size(); i++) { 
         if (lights[i].type == 0) {
             color = color + aiColor3D();
-            // color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
+            //color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         } else if (lights[i].type == 1) {
             color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         } else {
