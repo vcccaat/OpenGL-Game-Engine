@@ -31,10 +31,10 @@ public:
     Type type;
     
     Light();
-    aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
-    aiColor3D areaIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
-    aiColor3D ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
-    aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    // aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
 };
 
 class Camera {
@@ -76,11 +76,11 @@ public:
     Environment(std::string objpath, int width, int height);
     void rayTrace(std::vector<glm::vec3>& img_data);
     aiColor3D castRay( float ox, float oy, float oz, float dx, float dy, float dz);
-    bool isShadowed(glm::vec3 lightpos, glm::vec3 hitPos);
     aiColor3D shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID);
  
 };
 
+bool isShadowed(RTCScene scene ,glm::vec3 lightpos, glm::vec3 hitPos);
 float getAspect(std::string path);
 Environment startup(std::string path, int width, int height);
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env);

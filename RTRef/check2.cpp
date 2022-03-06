@@ -255,8 +255,10 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     return cmt;
 }
 
-aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
        
+    if (isShadowed(scene, pos,hitPos)) return aiColor3D();
+
     glm::vec3 lightDir = pos - hitPos;
     
     //  wi: Incident direction from hit point to light
@@ -278,19 +280,21 @@ aiColor3D Light::pointIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 n
     return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
 }
 
-aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
 
     // Determine random position of light
     float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float xLocal = (r1 * width) - width / 2;
-    float yLocal = (r2 * height) - height / 2;\
+    float yLocal = (r2 * height) - height / 2;
     // first, make into 3d vector (x, y, 0) with current normal (0, 0, 1)
     // then, rotate so it faces in direction of the normal (vec *= trans matrix, but only rotation part)
     // finally, translate it by position (vec += position)
     glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
-    lightpos = lightpos * glm::mat3(transMat);
+    // lightpos = lightpos * glm::mat3(transMat);
     lightpos = lightpos + pos;
+
+    if (isShadowed(scene, lightpos,hitPos)) return aiColor3D();
 
     // Eval BRDF and formula
     glm::vec3 wi = glm::normalize(-eyeRay);
@@ -310,19 +314,20 @@ aiColor3D Light::areaIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 no
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
 
-aiColor3D Light::ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
     return aiColor3D();
 }
 
-aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
-    if (type == 0) {
-        return pointIlluminate(eyeRay, hitPos, normal, material);
-    } else if (type == 1) {
-        return areaIlluminate(eyeRay, hitPos, normal, material);
-    } else {
-        return ambientIlluminate(eyeRay, hitPos, normal, material);
-    }
-}
+// aiColor3D Light::illuminate(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
+//     if (type == 0) {
+//         return aiColor3D();
+//         return pointIlluminate(eyeRay, hitPos, normal, material);
+//     } else if (type == 1) {
+//         return areaIlluminate(eyeRay, hitPos, normal, material);
+//     } else {
+//         return ambientIlluminate(eyeRay, hitPos, normal, material);
+//     }
+// }
 
 std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
@@ -455,7 +460,7 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
     return aiColor3D();
 }
 
-bool Environment::isShadowed(glm::vec3 lightpos, glm::vec3 hitPos) {
+bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos) {
     glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
     glm::vec3 newOrig = hitPos + lightDir * .001f;
     RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
@@ -467,11 +472,18 @@ bool Environment::isShadowed(glm::vec3 lightpos, glm::vec3 hitPos) {
 
 aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID){
     aiColor3D color;
+    Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) { 
-        // check for shadow
-        if (!isShadowed(lights[i].pos, hitPos)) {
-            color = color + lights[i].illuminate(eyeRay, hitPos, normal, materials[geomIdToMatInd[geomID]]);
+        if (lights[i].type == 0) {
+            color = color + aiColor3D();
+            // color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
+        } else if (lights[i].type == 1) {
+            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+        } else {
+            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
+     // color = color + lights[i].illuminate(eyeRay, hitPos, normal, materials[geomIdToMatInd[geomID]]);
+      
     }
     return color;
 }

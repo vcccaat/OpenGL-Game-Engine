@@ -28,9 +28,9 @@ public:
 
 int main() {
 	// Edittable constants
-	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
-	//std::string path = "../resources/scenes/bunnyscene.glb";
-	int height = 500;
+	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+	std::string path = "../resources/scenes/bunnyscene.glb";
+	int height = 800;
 
 	nanogui::init();
 	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height);
