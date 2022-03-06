@@ -74,7 +74,7 @@ public:
 
     Environment();
     Environment(std::string objpath, int width, int height);
-    void rayTrace(std::vector<glm::vec3>& img_data);
+    void rayTrace(std::vector<glm::vec3>& img_data, float iter, int sample);
     aiColor3D castRay( float ox, float oy, float oz, float dx, float dy, float dz);
     aiColor3D shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID);
  
@@ -83,6 +83,6 @@ public:
 bool isShadowed(RTCScene scene ,glm::vec3 lightpos, glm::vec3 hitPos);
 float getAspect(std::string path);
 Environment startup(std::string path, int width, int height);
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env);
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, int sample);
 
 #endif
