@@ -33,7 +33,7 @@ public:
     Light();
     aiColor3D pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
     aiColor3D areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
-    aiColor3D ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, float height);
     // aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
 };
 
@@ -84,5 +84,5 @@ bool isShadowed(RTCScene scene ,glm::vec3 lightpos, glm::vec3 hitPos, float maxD
 float getAspect(std::string path);
 Environment startup(std::string path, int width, int height);
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, int sample);
-
+glm::vec3 times(glm::vec3 v, float i);
 #endif
