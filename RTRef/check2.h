@@ -68,6 +68,7 @@ public:
     Camera camera;
     RTCDevice device;
     RTCScene scene;
+    aiColor3D background;
     std::vector<Light> lights;
     std::vector<Material> materials;
     std::vector<int> geomIdToMatInd;

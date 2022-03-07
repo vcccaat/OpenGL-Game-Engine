@@ -463,7 +463,7 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
         glm::vec3 hitPos = glm::vec3(ox,oy,oz) + rayhit.ray.tfar * rayDir;
         return shade(rayDir, hitPos, normal, rayhit.hit.geomID);
     }
-    return aiColor3D();
+    return background;
 }
 
 bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxDist) {

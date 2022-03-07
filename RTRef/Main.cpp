@@ -7,11 +7,12 @@ class BunnyGUI : public RTUtil::ImgGUI {
 	int sample;
 	int iter;
 public:
-	BunnyGUI(std::string path, int windowWidth, int windowHeight, int n):ImgGUI(windowWidth, windowHeight) {
+	BunnyGUI(std::string path, int windowWidth, int windowHeight, int n, aiColor3D background):ImgGUI(windowWidth, windowHeight) {
 		sample = n;
 		iter = 1;
 		env = startup(path, windowWidth, windowHeight);
 		env.camera.orbitCamera(0, 0);
+		env.background = background;
 		// updateImgData(img_data, env);
 	}
 	void compute_image() {
@@ -44,9 +45,10 @@ int main() {
 	std::string path = "../resources/scenes/bunnyscene.glb";
 	int height = 500;
 	int sample = 256;
+	aiColor3D background = aiColor3D(.5);
 
 	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height, sample);
+	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height, sample, background);
 	nanogui::mainloop(16);
 	nanogui::shutdown();
 	return 0;
