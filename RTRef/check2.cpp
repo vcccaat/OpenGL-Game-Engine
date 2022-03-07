@@ -48,8 +48,8 @@ Camera::Camera() {
     this->pos = glm::vec3(3.f, 4.f, 5.f);
     this->target = glm::vec3(-3.f, -4.f, -5.f);
     this->up = glm::vec3(0.f, 1.f, 0.f);
-    this->hfov = 0.5;
-    this->aspect = 1;
+    this->hfov = 0.523599;
+    this->aspect = 1.33333;
     this->phi = 1.3;
     this->theta = 1.8;
     this->dist = 8;
@@ -398,14 +398,17 @@ Environment::Environment(std::string objpath, int width, int height) {
     
     aiNode* rootNode = obj->mRootNode;
 
-    glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
-    //get the first camera
-    aiCamera* camera = obj->mCameras[0]; 
-    this->camera = Camera(camera, camtilt); // apply tilting constants to constructor
+    //get the first camera, or default if there is none
+    if (obj->mNumCameras == 0) {
+        this->camera = Camera();
+    } else {
+        glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
+        aiCamera* camera = obj->mCameras[0];
+        this->camera = Camera(camera, camtilt); // apply tilting constants to constructor
+        this->camera.transMat = getTransMatrix(rootNode, camera->mName);
+        this->camera.transformCamera();
+    }
     
-    // this->camera.transMat = getCameraMatrix(obj);
-    this->camera.transMat = getTransMatrix(rootNode,camera->mName);
-    this->camera.transformCamera();
 
     //get light and set transformation matrix 
     this->lights = parseLights(rootNode, obj);
@@ -419,14 +422,12 @@ glm::vec3 times(glm::vec3 v, float i) {
     return glm::vec3(v.x * i, v.y * i, v.z * i);
 }
 
-void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter, int sample) {
+void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter) {
     glm::vec3 dir;
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
         aiColor3D col = castRay(camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
-        if (iter > sample) {iter = sample;}
         img_data[j * width + i] = times(img_data[j * width + i], (iter-1)/iter) + times(glm::vec3(col.r, col.g, col.b) , 1/iter);
-        //  std::cout << img_data[j * width + i] << std::endl;
     }
 }
 
@@ -483,16 +484,23 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
     Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) { 
         if (lights[i].type == 0) {
-            color = color + aiColor3D();
-            //color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
+            //color = color + aiColor3D();
+            color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         } else if (lights[i].type == 1) {
-            color = color + aiColor3D();
-            // color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            //color = color + aiColor3D();
+            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         } else {
+            //color = color + aiColor3D();
             color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
     }
     return color;
+}
+
+float clip(float num, float min, float max) {
+    if (num < min) return min;
+    if (num > max) return max;
+    return num;
 }
 
 
@@ -510,6 +518,21 @@ Environment startup(std::string path, int width, int height) {
     return env;
 }
 
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, int sample) {
-    env.rayTrace(img_data, (float) iter, sample);
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName) {
+    env.rayTrace(img_data, (float) iter);
+    // Save image
+    if (iter % 64 == 0) {
+        unsigned char* img = new unsigned char[env.width * env.height * 3];
+        int k = 0;
+        for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
+            img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
+            img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
+            img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
+            k++;
+        }
+        stbi_flip_vertically_on_write(1);
+        std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
+        stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
+        delete[] img;
+    }
 }
