@@ -85,5 +85,6 @@ bool isShadowed(RTCScene scene ,glm::vec3 lightpos, glm::vec3 hitPos, float maxD
 float getAspect(std::string path);
 Environment startup(std::string path, int width, int height);
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName);
+glm::vec3 times(glm::vec3 v, float i);
 
 #endif
