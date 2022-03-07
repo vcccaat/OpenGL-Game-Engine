@@ -257,7 +257,7 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
 
 aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
        
-    if (isShadowed(scene, pos,hitPos)) return aiColor3D();
+    if (isShadowed(scene, pos, hitPos)) return aiColor3D();
 
     glm::vec3 lightDir = pos - hitPos;
     
@@ -291,7 +291,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     // then, rotate so it faces in direction of the normal (vec *= trans matrix, but only rotation part)
     // finally, translate it by position (vec += position)
     glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
-    // lightpos = lightpos * glm::mat3(transMat);
+    //lightpos = lightpos * glm::mat3(transMat);
     lightpos = lightpos + pos;
 
     if (isShadowed(scene, lightpos, hitPos)) return aiColor3D();
@@ -315,7 +315,18 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
 }
 
 aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
-    return aiColor3D();
+    float pi = 3.1415926;
+
+    float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    glm::vec3 samp = RTUtil::squareToCosineHemisphere(glm::vec2(r1, r2));
+    if (isShadowed(scene, samp, hitPos, dist)) return aiColor3D();
+
+    nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
+    glm::vec3 drefl = bsdf.diffuseReflectance();
+    glm::vec3 out = glm::vec3(drefl[0] * power[0], drefl[1] * power[1], drefl[2] * power[2]) * pi;
+
+    return aiColor3D(out[0], out[1], out[2]);
 }
 
 
@@ -456,13 +467,14 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
     return aiColor3D();
 }
 
-bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos) {
+bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxDist) {
     glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
     glm::vec3 newOrig = hitPos + lightDir * .001f;
     RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
     struct RTCIntersectContext context;
     rtcInitIntersectContext(&context);
     rtcOccluded1(scene, &context, &shadowRayhit.ray);
+    if (shadowRayhit.ray.tfar > maxDist) return false;
     return shadowRayhit.ray.tfar == -std::numeric_limits<float>::infinity();
 }
 
@@ -474,7 +486,8 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
             color = color + aiColor3D();
             //color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         } else if (lights[i].type == 1) {
-            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + aiColor3D();
+            // color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         } else {
             color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
