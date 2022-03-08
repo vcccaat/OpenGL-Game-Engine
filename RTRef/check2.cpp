@@ -500,14 +500,14 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
     aiColor3D color;
     Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) {
-        if (lights[i].type == 0 && pointIll) {
-            color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
+        if (lights[i].type == 0) {
+            if(pointIll) color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else if (lights[i].type == 1 && areaIll) {
-            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            if (areaIll) color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         }
-        else if (ambientIll) {
-            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float)height);
+        else {
+            if(ambientIll) color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float)height);
         }
     }
     return color;
