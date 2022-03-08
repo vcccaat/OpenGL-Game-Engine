@@ -42,9 +42,9 @@ public:
 int main() {
 	// Edittable constants
 	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
-	std::string path = "../resources/scenes/tree.glb";
+	std::string path = "../resources/scenes/tree.glb";  //bunnyscene
 	int height = 500;
-	std::string sceneName = "tree";
+	std::string sceneName = "bunny";
 	aiColor3D background = aiColor3D(1);
 	nanogui::init();
 	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height, sceneName, background);

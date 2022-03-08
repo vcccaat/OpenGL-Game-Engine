@@ -287,12 +287,16 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float xLocal = (r1 * width) - width / 2;
     float yLocal = (r2 * height) - height / 2;
+    // std::cout << "area x y" << xLocal << " " <<yLocal <<std::endl;
+    // std::cout << pos <<std::endl;
+    
     // first, make into 3d vector (x, y, 0) with current normal (0, 0, 1)
     // then, rotate so it faces in direction of the normal (vec *= trans matrix, but only rotation part)
     // finally, translate it by position (vec += position)
     glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
-    //lightpos = lightpos * glm::mat3(transMat);
-    lightpos = lightpos + pos;
+    lightpos = glm::vec3(transMat * glm::vec4(lightpos.x,lightpos.y, lightpos.z,1) );
+    // lightpos = lightpos + pos;
+    // std::cout << "sample area light pos " << lightpos << std::endl;
 
     if (isShadowed(scene, lightpos, hitPos)) return aiColor3D();
 
@@ -346,12 +350,12 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
-            std::cout << "area light: " << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
+            std::cout << l.name << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << "width " << l.width << "height " << l.height  << std::endl;
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
             l.type = l.AMBIENT;
-            std::cout << "ambient light: "<< " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
+            std::cout << l.name << " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
         }
         else {
             aiVector3D p = scene->mLights[i]->mPosition;
@@ -364,9 +368,11 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         // transform light
         glm::mat4 transMat = getTransMatrix(rootNode, scene->mLights[i]->mName);
         l.pos = glm::vec3(transMat * glm::vec4(l.pos.x, l.pos.y, l.pos.z, 1));
+        l.transMat = transMat;
         if (l.type == l.AREA) {
             l.areaNormal = glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0));
         }
+        std::cout << "light transMat " << transMat << std::endl;
         // Push to list
         lights.push_back(l);
     }
@@ -411,6 +417,7 @@ Environment::Environment(std::string objpath, int width, int height) {
         aiCamera* camera = obj->mCameras[0];
         this->camera = Camera(camera, camtilt); // apply tilting constants to constructor
         this->camera.transMat = getTransMatrix(rootNode, camera->mName);
+        std::cout << "camera transmat " <<this->camera.transMat <<std::endl;
         this->camera.transformCamera();
     }
     
@@ -493,7 +500,7 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
             color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         } else if (lights[i].type == 1) {
             // color = color + aiColor3D();
-            // color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         } else {
             // color = color + aiColor3D();
             color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float) height);
@@ -526,18 +533,18 @@ Environment startup(std::string path, int width, int height) {
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName) {
     env.rayTrace(img_data, (float) iter);
     // Save image
-    if (iter % 64 == 0) {
-        unsigned char* img = new unsigned char[env.width * env.height * 3];
-        int k = 0;
-        for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
-            img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
-            img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
-            img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
-            k++;
-        }
-        stbi_flip_vertically_on_write(1);
-        std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
-        stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
-        delete[] img;
-    }
+    // if (iter % 64 == 0) {
+    //     unsigned char* img = new unsigned char[env.width * env.height * 3];
+    //     int k = 0;
+    //     for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
+    //         img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
+    //         img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
+    //         img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
+    //         k++;
+    //     }
+    //     stbi_flip_vertically_on_write(1);
+    //     std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
+    //     stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
+    //     delete[] img;
+    // }
 }
