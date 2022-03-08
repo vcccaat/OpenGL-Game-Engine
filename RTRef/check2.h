@@ -31,10 +31,10 @@ public:
     Type type;
     
     Light();
-    aiColor3D pointIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, RTCScene scene);
-    aiColor3D areaIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, RTCScene scene);
-    aiColor3D ambientIlluminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
-    aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, RTCScene scene);
+    aiColor3D pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
+    aiColor3D ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material, float height);
+    // aiColor3D illuminate(glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
 };
 
 class Camera {
@@ -68,6 +68,7 @@ public:
     Camera camera;
     RTCDevice device;
     RTCScene scene;
+    aiColor3D background;
     std::vector<Light> lights;
     std::vector<Material> materials;
     std::vector<int> geomIdToMatInd;
@@ -80,8 +81,10 @@ public:
  
 };
 
+bool isShadowed(RTCScene scene ,glm::vec3 lightpos, glm::vec3 hitPos, float maxDist = std::numeric_limits<float>::infinity());
 float getAspect(std::string path);
 Environment startup(std::string path, int width, int height);
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter);
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName);
+glm::vec3 times(glm::vec3 v, float i);
 
 #endif
