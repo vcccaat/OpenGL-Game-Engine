@@ -446,6 +446,12 @@ Environment::Environment(std::string objpath, int width, int height) {
 
     //get light and set transformation matrix 
     this->lights = parseLights(rootNode, obj);
+    for (int i = 0; i < lights.size(); ++i) {
+        if (lights[i].type == lights[i].AMBIENT) {
+            this->background = lights[i].power;
+            break;
+        }
+    }
     this->materials = parseMats(obj);
 
     this->geomIdToMatInd = {};
@@ -478,7 +484,7 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
         glm::vec3 hitPos = glm::vec3(ox, oy, oz) + rayhit.ray.tfar * rayDir;
         return shade(rayDir, hitPos, normal, rayhit.hit.geomID);
     }
-    return background;
+    return this->background;
 }
 
 bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxDist) {
