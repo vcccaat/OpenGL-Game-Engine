@@ -541,21 +541,22 @@ Environment startup(std::string path, int width, int height) {
     return env;
 }
 
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName) {
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName, bool saveImg) {
     env.rayTrace(img_data, (float)iter);
     // Save image
-    // if (iter % 64 == 0) {
-    //     unsigned char* img = new unsigned char[env.width * env.height * 3];
-    //     int k = 0;
-    //     for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
-    //         img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
-    //         img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
-    //         img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
-    //         k++;
-    //     }
-    //     stbi_flip_vertically_on_write(1);
-    //     std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
-    //     stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
-    //     delete[] img;
-    // }
+     if (iter % 64 == 0 && saveImg) {
+         unsigned char* img = new unsigned char[env.width * env.height * 3];
+         int k = 0;
+         for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
+             img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
+             img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
+             img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
+             k++;
+         }
+         stbi_flip_vertically_on_write(1);
+         std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
+         stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
+         delete[] img;
+         std::cout << "Wrote " << name << "\n";
+     }
 }
