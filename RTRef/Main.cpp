@@ -43,22 +43,27 @@ public:
 	}
 };
 
-int main() {
+int main(int argc, char const* argv[]) {
 	// Path
-	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
-	//std::string path = "../resources/scenes/tree.glb";  //bunnyscene
+	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+	// std::string path = "../resources/scenes/tree.glb";  //bunnyscene
 
-	// Edittable constants
-	int height = 500;
-	bool saveImg = true;
+	if (argc > 1){
+		std::string path = std::string(argv[1]) ;
+		// Edittable constants
+		int height = 500;
+		bool saveImg = true;
 
-	// Start application
-	int start = path.find_last_of("/");
-	int end = path.find_first_of(".glb");
-	std::string sceneName = path.substr(start + 1, end - 3);
-	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int)height * getAspect(path), height, sceneName, saveImg);
-	nanogui::mainloop(16);
-	nanogui::shutdown();
-	return 0;
+		// Start application
+		int start = path.find_last_of("/");
+		int end = path.find_first_of(".glb");
+		std::string sceneName = path.substr(start + 1, end - 3);
+		nanogui::init();
+		nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int)height * getAspect(path), height, sceneName, saveImg);
+		nanogui::mainloop(16);
+		nanogui::shutdown();
+	}else {
+		std::cout << "Please provide a file path" << std::endl;
+	}
+		return 0;
 }
