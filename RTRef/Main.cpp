@@ -17,7 +17,7 @@ public:
 	}
 
 	void compute_image() {
-		iter = iter + 1;
+		iter = iter == 256? iter : iter + 1;
 		updateImgData(img_data, env, iter, sceneName);
 	}
 
@@ -42,10 +42,10 @@ public:
 int main() {
 	// Edittable constants
 	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
-	std::string path = "../resources/scenes/bunnyscene.glb";
+	std::string path = "../resources/scenes/tree.glb";
 	int height = 500;
-	std::string sceneName = "bunnyScene";
-	aiColor3D background = aiColor3D(.7);
+	std::string sceneName = "tree";
+	aiColor3D background = aiColor3D(1);
 	nanogui::init();
 	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height, sceneName, background);
 	nanogui::mainloop(16);

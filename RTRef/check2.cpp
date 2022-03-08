@@ -46,7 +46,7 @@ Camera::Camera(aiCamera *cam, glm::vec3 tilt) {
 
 Camera::Camera() {
     this->pos = glm::vec3(3.f, 4.f, 5.f);
-    this->target = glm::vec3(-3.f, -4.f, -5.f);
+    this->target = glm::vec3(0.f, 0.f, 0.f);
     this->up = glm::vec3(0.f, 1.f, 0.f);
     this->hfov = 0.523599;
     this->aspect = 1.33333;
@@ -346,16 +346,19 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
+            std::cout << "area light: " << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
             l.type = l.AMBIENT;
+            std::cout << "ambient light: "<< " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
         }
         else {
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.POINT;
+            std::cout << "point light: " << "pos " << l.pos << " power " <<reinterpret_cast<glm::vec3&>(l.power) << std::endl;
         }
 
         // transform light
@@ -372,10 +375,12 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
 std::vector<Material> parseMats(const aiScene* scene) {
     std::vector<Material> mats = {};
+    std::cout << "number of material: " << scene->mNumMaterials <<std::endl;
     for (int i = 0; i < scene->mNumMaterials; ++i) {
         Material m = Material();
         scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
         scene->mMaterials[i]->Get(AI_MATKEY_BASE_COLOR, reinterpret_cast<aiColor3D&>(m.diffuse));
+        std::cout << "material " << i << "color " << m.diffuse << std::endl;
         mats.push_back(m);
     }
     return mats;
@@ -399,6 +404,7 @@ Environment::Environment(std::string objpath, int width, int height) {
 
     //get the first camera, or default if there is none
     if (obj->mNumCameras == 0) {
+        std::cout << "no camera in the scene" << std::endl;
         this->camera = Camera();
     } else {
         glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
@@ -483,12 +489,13 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
     Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) { 
         if (lights[i].type == 0) {
-            //color = color + aiColor3D();
+            // color = color + aiColor3D();
             color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         } else if (lights[i].type == 1) {
-            //color = color + aiColor3D();
-            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            // color = color + aiColor3D();
+            // color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         } else {
+            // color = color + aiColor3D();
             color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float) height);
         }
     }
