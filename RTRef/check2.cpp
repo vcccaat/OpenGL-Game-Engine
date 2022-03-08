@@ -497,7 +497,7 @@ bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxD
     rtcInitIntersectContext(&context);
     rtcOccluded1(scene, &context, &shadowRayhit.ray);
     if (shadowRayhit.ray.tfar > maxDist) return false;
-    return shadowRayhit.ray.tfar == -std::numeric_limits<float>::infinity();
+    return shadowRayhit.ray.tfar == std::numeric_limits<float>::infinity();
 }
 
 aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, int geomID) {
