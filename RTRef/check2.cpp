@@ -257,6 +257,7 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
 
 aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
        
+    float pi = 3.1415926;
     if (isShadowed(scene, pos, hitPos)) return aiColor3D();
 
     glm::vec3 lightDir = pos - hitPos;
@@ -324,6 +325,7 @@ aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 h
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     glm::vec3 samp = RTUtil::squareToCosineHemisphere(glm::vec2(r1, r2));
     glm::vec3 globalSamp = times(samp,height);
+
     if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
     // std::cout << samp << std::endl;
     
@@ -496,13 +498,13 @@ aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal
     Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) { 
         if (lights[i].type == 0) {
-            // color = color + aiColor3D();
+            //color = color + aiColor3D();
             color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         } else if (lights[i].type == 1) {
             // color = color + aiColor3D();
             color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         } else {
-            // color = color + aiColor3D();
+            //color = color + aiColor3D();
             color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float) height);
         }
     }
