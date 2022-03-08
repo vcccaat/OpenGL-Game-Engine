@@ -190,6 +190,15 @@ glm::vec3 times(glm::vec3 v, float i) {
     return glm::vec3(v.x * i, v.y * i, v.z * i);
 }
 
+float toSRGB(float c) {
+    if (c > 0.0031308) {
+        c = 1.055 * (pow(c, (1.0 / 2.4))) - 0.055;
+    }
+    else {
+        c = 12.92 * c;
+    }
+    return clip(c * 255, 0, 255);
+}
 
 /**************************************** ILLUMINATION, PARSING, NODE HIERARCHY ****************************************/
 
@@ -350,19 +359,16 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
-            std::cout << l.name << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << "width " << l.width << "height " << l.height << std::endl;
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
             l.type = l.AMBIENT;
-            std::cout << l.name << " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
         }
         else {
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.POINT;
-            std::cout << "point light: " << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
         }
 
         // transform light
@@ -372,7 +378,6 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         if (l.type == l.AREA) {
             l.areaNormal = glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0));
         }
-        std::cout << "light transMat " << transMat << std::endl;
         // Push to list
         lights.push_back(l);
     }
@@ -381,12 +386,10 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
 std::vector<Material> parseMats(const aiScene* scene) {
     std::vector<Material> mats = {};
-    std::cout << "number of material: " << scene->mNumMaterials << std::endl;
     for (int i = 0; i < scene->mNumMaterials; ++i) {
         Material m = Material();
         scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
         scene->mMaterials[i]->Get(AI_MATKEY_BASE_COLOR, reinterpret_cast<aiColor3D&>(m.diffuse));
-        std::cout << "material " << i << "color " << m.diffuse << std::endl;
         mats.push_back(m);
     }
     return mats;
@@ -410,7 +413,6 @@ Environment::Environment(std::string objpath, int width, int height) {
 
     //get the first camera, or default if there is none
     if (obj->mNumCameras == 0) {
-        std::cout << "no camera in the scene" << std::endl;
         this->camera = Camera();
     }
     else {
@@ -418,7 +420,6 @@ Environment::Environment(std::string objpath, int width, int height) {
         aiCamera* camera = obj->mCameras[0];
         this->camera = Camera(camera, camtilt); // apply tilting constants to constructor
         this->camera.transMat = getTransMatrix(rootNode, camera->mName);
-        std::cout << "camera transmat " << this->camera.transMat << std::endl;
         this->camera.transformCamera();
     }
 
@@ -535,9 +536,9 @@ void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, 
          unsigned char* img = new unsigned char[env.width * env.height * 3];
          int k = 0;
          for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
-             img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
-             img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
-             img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
+             img[(3 * j * env.width) + (3 * i) + 0] = toSRGB(img_data[k][0]);
+             img[(3 * j * env.width) + (3 * i) + 1] = toSRGB(img_data[k][1]);
+             img[(3 * j * env.width) + (3 * i) + 2] = toSRGB(img_data[k][2]);
              k++;
          }
          stbi_flip_vertically_on_write(1);
