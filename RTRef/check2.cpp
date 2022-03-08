@@ -29,58 +29,6 @@ RTC_NAMESPACE_USE
 #endif
 
 
-/**************************************** MISC FUNCTIONS ****************************************/
-
-
-void errorFunction(void* userPtr, enum RTCError error, const char* str) {
-    printf("error %d: %s\n", error, str);
-}
-
-void waitForKeyPressedUnderWindows() {
-#if defined(_WIN32)
-    HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    if (!GetConsoleScreenBufferInfo(hStdOutput, &csbi)) {
-        printf("GetConsoleScreenBufferInfo failed: %d\n", GetLastError());
-        return;
-    }
-    /* do not pause when running on a shell */
-    if (csbi.dwCursorPosition.X != 0 || csbi.dwCursorPosition.Y != 0)
-        return;
-    /* only pause if running in separate console window. */
-    printf("\n\tPress any key to exit...\n");
-    int ch = getch();
-#endif
-}
-
-float clip(float num, float min, float max) {
-    if (num < min) return min;
-    if (num > max) return max;
-    return num;
-}
-
-glm::vec3 times(glm::vec3 v, float i) {
-    return glm::vec3(v.x * i, v.y * i, v.z * i);
-}
-
-RTCRayHit generateRay(float ox, float oy, float oz, float dx, float dy, float dz) {
-    struct RTCRayHit rayhit;
-    rayhit.ray.org_x = ox;
-    rayhit.ray.org_y = oy;
-    rayhit.ray.org_z = oz;
-    rayhit.ray.dir_x = dx;
-    rayhit.ray.dir_y = dy;
-    rayhit.ray.dir_z = dz;
-    rayhit.ray.tnear = 0;
-    rayhit.ray.tfar = std::numeric_limits<float>::infinity();
-    rayhit.ray.mask = -1;
-    rayhit.ray.flags = 0;
-    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
-    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
-    return rayhit;
-}
-
-
 /**************************************** CAMERA ****************************************/
 
 
@@ -146,8 +94,8 @@ void Camera::recomputeSpherical() {
     this->target += glm::vec3(0, height, 0);
 }
 
+/// nx ny is the new position of mouse after move
 void Camera::orbitCamera(float nx, float ny) {
-    /// nx ny is the new position of mouse after move
 
     // "Sensitivity" of mouse movement
     float pi = 3.1415926;
@@ -191,8 +139,24 @@ void Camera::altitudeCamera(float ny) {
 }
 
 
-/**************************************** SCENE AND NODE HIERARCHY ****************************************/
+/**************************************** LIGHT, MATERIAL ****************************************/
 
+
+Light::Light() {}
+
+Material::Material() {
+    this->diffuse = glm::vec3(.2, .5, .8);
+    this->roughness = .2;
+    this->indexofref = 1.5;
+}
+
+
+/**************************************** GIVEN FUNCTIONS ****************************************/
+
+
+void errorFunction(void* userPtr, enum RTCError error, const char* str) {
+    printf("error %d: %s\n", error, str);
+}
 
 RTCDevice initializeDevice() {
     RTCDevice device = rtcNewDevice(NULL);
@@ -201,6 +165,26 @@ RTCDevice initializeDevice() {
     rtcSetDeviceErrorFunction(device, errorFunction, NULL);
     return device;
 }
+
+void waitForKeyPressedUnderWindows() {
+#if defined(_WIN32)
+    HANDLE hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (!GetConsoleScreenBufferInfo(hStdOutput, &csbi)) {
+        printf("GetConsoleScreenBufferInfo failed: %d\n", GetLastError());
+        return;
+    }
+    /* do not pause when running on a shell */
+    if (csbi.dwCursorPosition.X != 0 || csbi.dwCursorPosition.Y != 0)
+        return;
+    /* only pause if running in separate console window. */
+    printf("\n\tPress any key to exit...\n");
+    int ch = getch();
+#endif
+}
+
+
+/**************************************** SCENE, CAMERA, AND RAY HELPERS ****************************************/
 
 int id = 0;
 void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh* mesh, glm::mat4 transMatrix, std::vector<int>& mp) {
@@ -271,12 +255,6 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     return cmt;
 }
 
-
-/**************************************** LIGHT ****************************************/
-
-
-Light::Light() {}
-
 aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
 
     float pi = 3.1415926;
@@ -310,8 +288,16 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float xLocal = (r1 * width) - width / 2;
     float yLocal = (r2 * height) - height / 2;
+    // std::cout << "area x y" << xLocal << " " <<yLocal <<std::endl;
+    // std::cout << pos <<std::endl;
+
+    // first, make into 3d vector (x, y, 0) with current normal (0, 0, 1)
+    // then, rotate so it faces in direction of the normal (vec *= trans matrix, but only rotation part)
+    // finally, translate it by position (vec += position)
     glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
     lightpos = glm::vec3(transMat * glm::vec4(lightpos.x, lightpos.y, lightpos.z, 1));
+    // lightpos = lightpos + pos;
+    // std::cout << "sample area light pos " << lightpos << std::endl;
 
     if (isShadowed(scene, lightpos, hitPos)) return aiColor3D();
 
@@ -328,7 +314,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     glm::vec3 firstpt = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]);
     float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
     float bottompt = pow(glm::length(hitPos - lightpos), 2);
-    glm::vec3 out = width * height * width * height * firstpt * (toppt / bottompt);
+    glm::vec3 out = width * height * width * height * firstpt * (toppt / bottompt); // may need to multiply by area again?
 
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
@@ -341,10 +327,13 @@ aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 h
     glm::vec3 globalSamp = times(samp, height);
 
     if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
+    // std::cout << samp << std::endl;
 
     glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]) * pi;
-    return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
+
+    return aiColor3D(out[0], out[1], out[2]);
 }
+
 
 std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
@@ -390,14 +379,6 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         lights.push_back(l);
     }
     return lights;
-}
-
-/**************************************** MATERIAL ****************************************/
-
-Material::Material() {
-    this->diffuse = glm::vec3(.2, .5, .8);
-    this->roughness = .2;
-    this->indexofref = 1.5;
 }
 
 std::vector<Material> parseMats(const aiScene* scene) {
@@ -458,6 +439,10 @@ Environment::Environment(std::string objpath, int width, int height) {
     this->scene = initializeScene(this->device, obj, this->camera, this->geomIdToMatInd);
 }
 
+glm::vec3 times(glm::vec3 v, float i) {
+    return glm::vec3(v.x * i, v.y * i, v.z * i);
+}
+
 void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter) {
     glm::vec3 dir;
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
@@ -465,6 +450,23 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter) {
         aiColor3D col = castRay(camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
         img_data[j * width + i] = times(img_data[j * width + i], (iter - 1) / iter) + times(glm::vec3(col.r, col.g, col.b), 1 / iter);
     }
+}
+
+RTCRayHit generateRay(float ox, float oy, float oz, float dx, float dy, float dz) {
+    struct RTCRayHit rayhit;
+    rayhit.ray.org_x = ox;
+    rayhit.ray.org_y = oy;
+    rayhit.ray.org_z = oz;
+    rayhit.ray.dir_x = dx;
+    rayhit.ray.dir_y = dy;
+    rayhit.ray.dir_z = dz;
+    rayhit.ray.tnear = 0;
+    rayhit.ray.tfar = std::numeric_limits<float>::infinity();
+    rayhit.ray.mask = -1;
+    rayhit.ray.flags = 0;
+    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+    return rayhit;
 }
 
 aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy, float dz) {
@@ -499,28 +501,33 @@ bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxD
 }
 
 aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, int geomID) {
-    // Edittable Constants
-    bool pointIll = false;
-    bool areaIll = false;
-    bool ambientIll = true;
     aiColor3D color;
     Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) {
         if (lights[i].type == 0) {
-            if(pointIll) color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
+            //color = color + aiColor3D();
+            color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         }
-        else if (lights[i].type == 1 && areaIll) {
-            if (areaIll) color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+        else if (lights[i].type == 1) {
+            // color = color + aiColor3D();
+            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else {
-            if(ambientIll) color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float)height);
+            //color = color + aiColor3D();
+            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float)height);
         }
     }
     return color;
 }
 
+float clip(float num, float min, float max) {
+    if (num < min) return min;
+    if (num > max) return max;
+    return num;
+}
 
-/**************************************** FUNCTIONS CALLED IN MAIN ****************************************/
+
+/**************************************** MAIN FUNCTIONS ****************************************/
 
 
 float getAspect(std::string path) {
@@ -534,22 +541,21 @@ Environment startup(std::string path, int width, int height) {
     return env;
 }
 
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName, bool writeImg) {
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName) {
     env.rayTrace(img_data, (float)iter);
     // Save image
-     if (iter % 64 == 0 && writeImg) {
-         unsigned char* img = new unsigned char[env.width * env.height * 3];
-         int k = 0;
-         for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
-             img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
-             img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
-             img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
-             k++;
-         }
-         stbi_flip_vertically_on_write(1);
-         std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
-         stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
-         delete[] img;
-         std::cout << "Wrote " << name << "\n";
-     }
+    // if (iter % 64 == 0) {
+    //     unsigned char* img = new unsigned char[env.width * env.height * 3];
+    //     int k = 0;
+    //     for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
+    //         img[(3 * j * env.width) + (3 * i) + 0] = clip(img_data[k][0] * 255, 0, 255);
+    //         img[(3 * j * env.width) + (3 * i) + 1] = clip(img_data[k][1] * 255, 0, 255);
+    //         img[(3 * j * env.width) + (3 * i) + 2] = clip(img_data[k][2] * 255, 0, 255);
+    //         k++;
+    //     }
+    //     stbi_flip_vertically_on_write(1);
+    //     std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
+    //     stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
+    //     delete[] img;
+    // }
 }
