@@ -18,26 +18,26 @@ public:
 	}
 
 	void compute_image() {
-		iter = iter == 256? iter : iter + 1;
+		iter = iter == 256 ? iter : iter + 1;
 		updateImgData(img_data, env, iter, sceneName);
 	}
 
-	bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers){
-		if(button == 1) {
+	bool mouse_motion_event(const nanogui::Vector2i& p, const nanogui::Vector2i& rel, int button, int modifiers) {
+		if (button == 1) {
 			iter = 1;
 			img_data = std::vector<glm::vec3>(windowWidth * windowHeight, glm::vec3(0.f, 0.f, 0.f));
 			env.camera.orbitCamera(rel.x(), rel.y());
-			stationary = false; // will always move as this function is only called on mouse movement
-		} else if (button == 2) {
+		}
+		else if (button == 2) {
 			iter = 1;
 			img_data = std::vector<glm::vec3>(windowWidth * windowHeight, glm::vec3(0.f, 0.f, 0.f));
 			env.camera.zoomCamera(rel.y());
-			stationary = (rel.y() == 0);
-		} else if (button == 4) {
+		}
+		else if (button == 4) {
 			iter = 1;
 			img_data = std::vector<glm::vec3>(windowWidth * windowHeight, glm::vec3(0.f, 0.f, 0.f));
 			env.camera.altitudeCamera(rel.y());
-		} 
+		}
 		return true;
 	}
 };
@@ -50,7 +50,7 @@ int main() {
 	std::string sceneName = "bunny";
 	aiColor3D background = aiColor3D(.6);
 	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height, sceneName, background);
+	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int)height * getAspect(path), height, sceneName, background);
 	nanogui::mainloop(16);
 	nanogui::shutdown();
 	return 0;

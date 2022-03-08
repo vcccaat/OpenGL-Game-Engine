@@ -27,9 +27,9 @@ public:
     float dist;
     glm::mat4 transMat;
 
-    enum Type {POINT, AREA, AMBIENT};
+    enum Type { POINT, AREA, AMBIENT };
     Type type;
-    
+
     Light();
     aiColor3D pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
     aiColor3D areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit, glm::vec3 normal, Material material);
@@ -76,12 +76,12 @@ public:
     Environment();
     Environment(std::string objpath, int width, int height);
     void rayTrace(std::vector<glm::vec3>& img_data, float iter);
-    aiColor3D castRay( float ox, float oy, float oz, float dx, float dy, float dz);
-    aiColor3D shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID);
- 
+    aiColor3D castRay(float ox, float oy, float oz, float dx, float dy, float dz);
+    aiColor3D shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, int geomID);
+
 };
 
-bool isShadowed(RTCScene scene ,glm::vec3 lightpos, glm::vec3 hitPos, float maxDist = std::numeric_limits<float>::infinity());
+bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxDist = std::numeric_limits<float>::infinity());
 float getAspect(std::string path);
 Environment startup(std::string path, int width, int height);
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName);

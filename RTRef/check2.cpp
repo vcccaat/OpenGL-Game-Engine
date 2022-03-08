@@ -32,7 +32,7 @@ RTC_NAMESPACE_USE
 /**************************************** CAMERA ****************************************/
 
 
-Camera::Camera(aiCamera *cam, glm::vec3 tilt) {
+Camera::Camera(aiCamera* cam, glm::vec3 tilt) {
     this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
     this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
     // adding tilt constant to make bunny striaght
@@ -95,7 +95,7 @@ void Camera::recomputeSpherical() {
 }
 
 /// nx ny is the new position of mouse after move
-void Camera::orbitCamera(float nx, float ny){
+void Camera::orbitCamera(float nx, float ny) {
 
     // "Sensitivity" of mouse movement
     float pi = 3.1415926;
@@ -111,7 +111,7 @@ void Camera::orbitCamera(float nx, float ny){
 }
 
 void Camera::zoomCamera(float ny) {
-    
+
     // "Sensitivity" of mouse movement
     float scale = .02;
     float min = 2;
@@ -154,7 +154,7 @@ Material::Material() {
 /**************************************** GIVEN FUNCTIONS ****************************************/
 
 
-void errorFunction(void *userPtr, enum RTCError error, const char *str) {
+void errorFunction(void* userPtr, enum RTCError error, const char* str) {
     printf("error %d: %s\n", error, str);
 }
 
@@ -187,18 +187,18 @@ void waitForKeyPressedUnderWindows() {
 /**************************************** SCENE, CAMERA, AND RAY HELPERS ****************************************/
 
 int id = 0;
-void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 transMatrix, std::vector<int>& mp) {
+void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh* mesh, glm::mat4 transMatrix, std::vector<int>& mp) {
     // get vertices from aiscene meshList by mMeshes indexes
     RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
-    float *vertices = (float *)rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3,
-                                                       3 * sizeof(float), 3 * mesh->mNumVertices);
-    unsigned *indices = (unsigned *)rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3,
-                                                       3 * sizeof(unsigned), 3 * mesh->mNumFaces);
+    float* vertices = (float*)rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3,
+        3 * sizeof(float), 3 * mesh->mNumVertices);
+    unsigned* indices = (unsigned*)rtcSetNewGeometryBuffer(geom, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3,
+        3 * sizeof(unsigned), 3 * mesh->mNumFaces);
     for (int i = 0; i < mesh->mNumVertices; ++i) {
         float x = mesh->mVertices[i][0];
         float y = mesh->mVertices[i][1];
         float z = mesh->mVertices[i][2];
-        glm::vec4 chg = transMatrix * glm::vec4(x, y, z, 1) ;
+        glm::vec4 chg = transMatrix * glm::vec4(x, y, z, 1);
         vertices[3 * i + 0] = chg.x;
         vertices[3 * i + 1] = chg.y;
         vertices[3 * i + 2] = chg.z;
@@ -215,13 +215,13 @@ void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh *mesh, glm::mat4 tr
     rtcReleaseGeometry(geom);
 }
 
-void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aiscene, aiNode *cur,
-                            glm::mat4 transMatrix, std::vector<int> &mp) {
+void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene* aiscene, aiNode* cur,
+    glm::mat4 transMatrix, std::vector<int>& mp) {
     // top down, compute transformation matrix while traversing down the tree
     if (cur != NULL) {
-        transMatrix = RTUtil::a2g(cur->mTransformation)*transMatrix;
+        transMatrix = RTUtil::a2g(cur->mTransformation) * transMatrix;
         // when it reaches mesh, transform the vertices
-        if (cur->mNumMeshes > 0 ) { //&& *cur->mMeshes == 1
+        if (cur->mNumMeshes > 0) { //&& *cur->mMeshes == 1
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* mesh = aiscene->mMeshes[cur->mMeshes[i]];
                 addMeshToScene(device, scene, mesh, transMatrix, mp);
@@ -233,7 +233,7 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene *aisc
     }
 }
 
-RTCScene initializeScene(RTCDevice device, const aiScene *aiscene, Camera &cam, std::vector<int> &mp) {
+RTCScene initializeScene(RTCDevice device, const aiScene* aiscene, Camera& cam, std::vector<int>& mp) {
     RTCScene scene = rtcNewScene(device);
     traverseNodeHierarchy(device, scene, aiscene, aiscene->mRootNode, glm::mat4(1.f), mp);
     rtcCommitScene(scene);
@@ -256,12 +256,12 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
 }
 
 aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
-       
+
     float pi = 3.1415926;
     if (isShadowed(scene, pos, hitPos)) return aiColor3D();
 
     glm::vec3 lightDir = pos - hitPos;
-    
+
     //  wi: Incident direction from hit point to light
     //  wo: Outgoing direction from hit point to camera
     glm::vec3 wi = glm::normalize(lightDir);
@@ -271,14 +271,14 @@ aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit
     normal = glm::normalize(normal);
 
     nori::Frame frame = nori::Frame(normal);
-    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi),frame.toLocal(wo));
+    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi), frame.toLocal(wo));
 
-    nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse); 
+    nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
-    glm::vec3 out = glm::vec3(power[0]*fr[0], power[1]*fr[1], power[2]*fr[2])*std::max(0.f,glm::dot(normal, wi));
+    glm::vec3 out = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]) * std::max(0.f, glm::dot(normal, wi));
 
-    return aiColor3D(out[0]/255,out[1]/255,out[2]/255);
+    return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
 
 aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
@@ -290,21 +290,16 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     float yLocal = (r2 * height) - height / 2;
     // std::cout << "area x y" << xLocal << " " <<yLocal <<std::endl;
     // std::cout << pos <<std::endl;
-    
+
     // first, make into 3d vector (x, y, 0) with current normal (0, 0, 1)
     // then, rotate so it faces in direction of the normal (vec *= trans matrix, but only rotation part)
     // finally, translate it by position (vec += position)
     glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
-    lightpos = glm::vec3(transMat * glm::vec4(lightpos.x,lightpos.y, lightpos.z,1) );
+    lightpos = glm::vec3(transMat * glm::vec4(lightpos.x, lightpos.y, lightpos.z, 1));
     // lightpos = lightpos + pos;
     // std::cout << "sample area light pos " << lightpos << std::endl;
 
     if (isShadowed(scene, lightpos, hitPos)) return aiColor3D();
-
-    // See if shadowed
-    if (isShadowed(lightpos, hitPos, scene)) {
-        return aiColor3D();
-    }
 
     // Eval BRDF and formula
     glm::vec3 wi = glm::normalize(-eyeRay);
@@ -329,11 +324,11 @@ aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 h
     float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     glm::vec3 samp = RTUtil::squareToCosineHemisphere(glm::vec2(r1, r2));
-    glm::vec3 globalSamp = times(samp,height);
+    glm::vec3 globalSamp = times(samp, height);
 
     if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
     // std::cout << samp << std::endl;
-    
+
     glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]) * pi;
 
     return aiColor3D(out[0], out[1], out[2]);
@@ -357,7 +352,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
-            std::cout << l.name << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << "width " << l.width << "height " << l.height  << std::endl;
+            std::cout << l.name << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << "width " << l.width << "height " << l.height << std::endl;
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
@@ -369,7 +364,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.POINT;
-            std::cout << "point light: " << "pos " << l.pos << " power " <<reinterpret_cast<glm::vec3&>(l.power) << std::endl;
+            std::cout << "point light: " << "pos " << l.pos << " power " << reinterpret_cast<glm::vec3&>(l.power) << std::endl;
         }
 
         // transform light
@@ -388,7 +383,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
 std::vector<Material> parseMats(const aiScene* scene) {
     std::vector<Material> mats = {};
-    std::cout << "number of material: " << scene->mNumMaterials <<std::endl;
+    std::cout << "number of material: " << scene->mNumMaterials << std::endl;
     for (int i = 0; i < scene->mNumMaterials; ++i) {
         Material m = Material();
         scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
@@ -412,22 +407,23 @@ Environment::Environment(std::string objpath, int width, int height) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     this->device = initializeDevice();
-    
+
     aiNode* rootNode = obj->mRootNode;
 
     //get the first camera, or default if there is none
     if (obj->mNumCameras == 0) {
         std::cout << "no camera in the scene" << std::endl;
         this->camera = Camera();
-    } else {
+    }
+    else {
         glm::vec3 camtilt = glm::vec3(0, 0, .0975); // constants to account for tilting. trial-and-error 
         aiCamera* camera = obj->mCameras[0];
         this->camera = Camera(camera, camtilt); // apply tilting constants to constructor
         this->camera.transMat = getTransMatrix(rootNode, camera->mName);
-        std::cout << "camera transmat " <<this->camera.transMat <<std::endl;
+        std::cout << "camera transmat " << this->camera.transMat << std::endl;
         this->camera.transformCamera();
     }
-    
+
 
     //get light and set transformation matrix 
     this->lights = parseLights(rootNode, obj);
@@ -446,8 +442,25 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter) {
     for (int j = 0; j < height; ++j) for (int i = 0; i < width; ++i) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
         aiColor3D col = castRay(camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
-        img_data[j * width + i] = times(img_data[j * width + i], (iter-1)/iter) + times(glm::vec3(col.r, col.g, col.b) , 1/iter);
+        img_data[j * width + i] = times(img_data[j * width + i], (iter - 1) / iter) + times(glm::vec3(col.r, col.g, col.b), 1 / iter);
     }
+}
+
+RTCRayHit generateRay(float ox, float oy, float oz, float dx, float dy, float dz) {
+    struct RTCRayHit rayhit;
+    rayhit.ray.org_x = ox;
+    rayhit.ray.org_y = oy;
+    rayhit.ray.org_z = oz;
+    rayhit.ray.dir_x = dx;
+    rayhit.ray.dir_y = dy;
+    rayhit.ray.dir_z = dz;
+    rayhit.ray.tnear = 0;
+    rayhit.ray.tfar = std::numeric_limits<float>::infinity();
+    rayhit.ray.mask = -1;
+    rayhit.ray.flags = 0;
+    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    rayhit.hit.instID[0] = RTC_INVALID_GEOMETRY_ID;
+    return rayhit;
 }
 
 aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy, float dz) {
@@ -459,12 +472,12 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
     rtcIntersect1(scene, &context, &rayhit);
 
     //printf("%f, %f, %f: ", ox, oy, oz);
-    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar != std::numeric_limits<float>::infinity()) {  
+    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar != std::numeric_limits<float>::infinity()) {
         glm::vec3 normal = glm::normalize(glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
 
         // diffuse shading and specular reflectance
-        glm::vec3 rayDir = glm::vec3(dx,dy,dz);
-        glm::vec3 hitPos = glm::vec3(ox,oy,oz) + rayhit.ray.tfar * rayDir;
+        glm::vec3 rayDir = glm::vec3(dx, dy, dz);
+        glm::vec3 hitPos = glm::vec3(ox, oy, oz) + rayhit.ray.tfar * rayDir;
         return shade(rayDir, hitPos, normal, rayhit.hit.geomID);
     }
     return background;
@@ -481,19 +494,21 @@ bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxD
     return shadowRayhit.ray.tfar == -std::numeric_limits<float>::infinity();
 }
 
-aiColor3D Environment::shade(glm::vec3 eyeRay,glm::vec3 hitPos, glm::vec3 normal, int geomID){
+aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, int geomID) {
     aiColor3D color;
     Material material = materials[geomIdToMatInd[geomID]];
-    for (int i = 0; i < lights.size(); i++) { 
+    for (int i = 0; i < lights.size(); i++) {
         if (lights[i].type == 0) {
             //color = color + aiColor3D();
             color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
-        } else if (lights[i].type == 1) {
+        }
+        else if (lights[i].type == 1) {
             // color = color + aiColor3D();
             color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
-        } else {
+        }
+        else {
             //color = color + aiColor3D();
-            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float) height);
+            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material, (float)height);
         }
     }
     return color;
@@ -521,7 +536,7 @@ Environment startup(std::string path, int width, int height) {
 }
 
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName) {
-    env.rayTrace(img_data, (float) iter);
+    env.rayTrace(img_data, (float)iter);
     // Save image
     // if (iter % 64 == 0) {
     //     unsigned char* img = new unsigned char[env.width * env.height * 3];
