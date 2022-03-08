@@ -8,12 +8,11 @@ class BunnyGUI : public RTUtil::ImgGUI {
 	std::string sceneName;
 
 public:
-	BunnyGUI(std::string path, int windowWidth, int windowHeight, std::string sceneName, aiColor3D background)
+	BunnyGUI(std::string path, int windowWidth, int windowHeight, std::string sceneName)
 		:ImgGUI(windowWidth, windowHeight) {
 		iter = 1;
 		env = startup(path, windowWidth, windowHeight);
 		env.camera.orbitCamera(0, 0);
-		env.background = background;
 		this->sceneName = sceneName;
 	}
 
@@ -42,13 +41,12 @@ public:
 
 int main() {
 	// Edittable constants
-	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/tree.glb";
 	//std::string path = "../resources/scenes/tree.glb";  //bunnyscene
 	int height = 500;
 	std::string sceneName = "bunny";
-	aiColor3D background = aiColor3D(.6);
 	nanogui::init();
-	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height, sceneName, background);
+	nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int) height * getAspect(path), height, sceneName);
 	nanogui::mainloop(16);
 	nanogui::shutdown();
 	return 0;
