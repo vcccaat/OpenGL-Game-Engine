@@ -2,9 +2,12 @@
   "ExpandedNodes": [
     "",
     "\\Demo",
+    "\\resources",
+    "\\resources\\meshes",
+    "\\resources\\scenes",
     "\\RTRef",
     "\\RTUtil"
   ],
-  "SelectedNode": "\\out",
+  "SelectedNode": "\\resources\\scenes\\bunnyscene.blend",
   "PreviewInSolutionExplorer": false
 }

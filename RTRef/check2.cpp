@@ -533,6 +533,7 @@ float clip(float num, float min, float max) {
 float getAspect(std::string path) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    if (obj->mNumCameras == 0) return 1.333333;
     return obj->mCameras[0]->mAspect;
 }
 
@@ -541,10 +542,12 @@ Environment startup(std::string path, int width, int height) {
     return env;
 }
 
+bool continueSaving = true;
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName, bool saveImg) {
     env.rayTrace(img_data, (float)iter);
     // Save image
-     if (iter % 64 == 0 && saveImg) {
+     if (iter % 64 == 0 && saveImg && continueSaving) {
+         if (iter == 256) continueSaving = false;
          unsigned char* img = new unsigned char[env.width * env.height * 3];
          int k = 0;
          for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
