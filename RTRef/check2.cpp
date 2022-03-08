@@ -426,9 +426,9 @@ Environment::Environment(std::string objpath, int width, int height) {
 
     //get light and set transformation matrix 
     this->lights = parseLights(rootNode, obj);
-    for (Light l : this->lights) {
-        if (l.type == l.AMBIENT) {
-            this->background = l.power;
+    for (int i = 0; i < lights.size(); ++i) {
+        if (lights[i].type == lights[i].AMBIENT) {
+            this->background = lights[i].power;
             break;
         }
     }

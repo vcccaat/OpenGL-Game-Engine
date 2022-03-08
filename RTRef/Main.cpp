@@ -41,7 +41,7 @@ public:
 
 int main() {
 	// Edittable constants
-	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/tree.glb";
+	std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
 	//std::string path = "../resources/scenes/tree.glb";  //bunnyscene
 	int height = 500;
 	std::string sceneName = "bunny";
