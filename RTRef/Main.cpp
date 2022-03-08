@@ -49,7 +49,7 @@ int main(int argc, char const* argv[]) {
 	// std::string path = "../resources/scenes/tree.glb";  //bunnyscene
 
 	if (argc > 1){
-		std::string path = std::string(argv[1]) ;
+		std::string path = std::string(argv[1]);
 		// Edittable constants
 		int height = 500;
 		bool saveImg = true;
@@ -62,8 +62,8 @@ int main(int argc, char const* argv[]) {
 		nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int)height * getAspect(path), height, sceneName, saveImg);
 		nanogui::mainloop(16);
 		nanogui::shutdown();
-	}else {
+	} else {
 		std::cout << "Please provide a file path" << std::endl;
 	}
-		return 0;
+	return 0;
 }
