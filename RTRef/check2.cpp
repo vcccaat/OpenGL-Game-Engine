@@ -325,7 +325,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     glm::vec3 firstpt = glm::vec3(radiance[0] * fr[0], radiance[1] * fr[1], radiance[2] * fr[2]);
     float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
     float bottompt = pow(glm::length(hitPos - lightpos), 2);
-    glm::vec3 out = pi * width * height * firstpt * (toppt/bottompt);
+    glm::vec3 out = pi * width * height * firstpt * (toppt/bottompt); // multiply by area again????
     
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
@@ -343,9 +343,9 @@ aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 h
 
     if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
 
-    glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]);
+    glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]); // * pi
 
-    return aiColor3D(out[0], out[1], out[2]);
+    return aiColor3D(out[0], out[1], out[2]); // why not divide by 255
 }
 
 
