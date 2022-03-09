@@ -7,20 +7,22 @@ class BunnyGUI : public RTUtil::ImgGUI {
 	int iter;
 	std::string sceneName;
 	bool saveImg;
+	int maxIter;
 
 public:
-	BunnyGUI(std::string path, int windowWidth, int windowHeight, std::string sceneName, bool saveImg, bool noDefaultCamera)
+	BunnyGUI(std::string path, int windowWidth, int windowHeight, std::string sceneName, bool saveImg, bool noDefaultCamera, int maxIter)
 		:ImgGUI(windowWidth, windowHeight) {
 		iter = 1;
 		env = startup(path, windowWidth, windowHeight);
 		this->sceneName = sceneName;
 		this->saveImg = saveImg;
+		this->maxIter = maxIter;
 		if(noDefaultCamera) env.camera.orbitCamera(0, 0);
 	}
 
 	void compute_image() {
-		updateImgData(img_data, env, iter, sceneName, saveImg);
-		iter = iter == 256 ? iter : iter + 1;
+		updateImgData(img_data, env, iter, sceneName, saveImg, maxIter);
+		iter = iter == maxIter ? iter : iter + 1;
 	}
 
 	bool mouse_motion_event(const nanogui::Vector2i& p, const nanogui::Vector2i& rel, int button, int modifiers) {
@@ -47,7 +49,7 @@ int main(int argc, char const* argv[]) {
 
 	if (!(argc > 1)){
 		//std::string path = std::string(argv[1]);
-		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
 		//bunnyscene		// bunny
 		//tree				// tree
 		//staircase			// staircase
@@ -57,6 +59,7 @@ int main(int argc, char const* argv[]) {
 		// Edittable constants
 		int height = 500;
 		bool saveImg = false;
+		int maxIter = 256;
 
 		// Start application
 		int start = path.find_last_of("/");
@@ -67,7 +70,7 @@ int main(int argc, char const* argv[]) {
 		if (aspect == 0) width = (int)1.3333 * height;
 		else width = (int)height * aspect;
 		nanogui::init();
-		nanogui::ref<BunnyGUI> app = new BunnyGUI(path, width, height, sceneName, saveImg, aspect == 0);
+		nanogui::ref<BunnyGUI> app = new BunnyGUI(path, width, height, sceneName, saveImg, aspect == 0, maxIter);
 		nanogui::mainloop(16);
 		nanogui::shutdown();
 	} else {

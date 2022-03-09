@@ -546,10 +546,10 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
             color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else if (lights[i].type == 1) {
-            //color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else {
-            //color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
     }
     return color;
@@ -572,11 +572,11 @@ Environment startup(std::string path, int width, int height) {
 }
 
 bool continueSaving = true;
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName, bool saveImg) {
+void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName, bool saveImg, int maxIter) {
     env.rayTrace(img_data, (float)iter);
     // Save image
      if (iter % 64 == 0 && saveImg && continueSaving) {
-         if (iter == 256) continueSaving = false;
+         if (iter == maxIter) continueSaving = false;
          unsigned char* img = new unsigned char[env.width * env.height * 3];
          int k = 0;
          for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
