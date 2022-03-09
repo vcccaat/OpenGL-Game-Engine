@@ -42,7 +42,7 @@ Camera::Camera(aiCamera* cam, glm::vec3 tilt) {
     this->phi = 1.3;
     this->theta = 1.8;
     this->dist = 8;
-}
+ }
 
 Camera::Camera() {
     this->pos = glm::vec3(3.f, 4.f, 5.f);
@@ -236,7 +236,7 @@ void traverseNodeHierarchy(RTCDevice device, RTCScene scene, const aiScene* aisc
     glm::mat4 transMatrix, std::vector<int>& mp) {
     // top down, compute transformation matrix while traversing down the tree
     if (cur != NULL) {
-        transMatrix = RTUtil::a2g(cur->mTransformation) * transMatrix;
+        transMatrix = transMatrix * RTUtil::a2g(cur->mTransformation) ;
         // when it reaches mesh, transform the vertices
         if (cur->mNumMeshes > 0) { //&& *cur->mMeshes == 1
             for (int i = 0; i < cur->mNumMeshes; ++i) {
@@ -277,7 +277,7 @@ aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit
     float pi = 3.1415926;
     glm::vec3 lightDir = glm::normalize(pos - hitPos);
 
-    if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
+    // if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
 
     //  wi: Incident direction from hit point to light
     //  wo: Outgoing direction from hit point to camera
@@ -305,10 +305,10 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     
     glm::vec3 u = glm::normalize(glm::cross(glm::vec3(0,1,0), areaNormal));
     glm::vec3 v = glm::normalize(glm::cross(areaNormal,u));
-    glm::vec3 lightpos = pos + v * (r1 * width - width / 2) + u * (r2 * height - height / 2);
+    glm::vec3 lightpos = pos + u * (r1 * width - width / 2) + v * (r2 * height - height / 2);
 
     glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
-    if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
+    // if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
 
     // Eval BRDF and formula
     // wi wo direction not sure
@@ -325,7 +325,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     glm::vec3 firstpt = glm::vec3(radiance[0] * fr[0], radiance[1] * fr[1], radiance[2] * fr[2]);
     float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
     float bottompt = pow(glm::length(hitPos - lightpos),2);
-    glm::vec3 out = pi *  width * height * width * height * firstpt * (toppt/bottompt );
+    glm::vec3 out = pi * width * height * width * height * firstpt * (toppt/bottompt );
 
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
@@ -339,11 +339,10 @@ aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 h
     
     nori::Frame frame = nori::Frame(normal);
     glm::vec3 globalSamp = frame.toWorld(samp);  //direction
-    // std::cout << "normal " << normal << "world sample " << globalSamp << std::endl;
 
-    if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
+    // if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
 
-    glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]) * pi;
+    glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]) ;
 
     return aiColor3D(out[0], out[1], out[2]);
 }
@@ -366,8 +365,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
-            //std::cout << "Width: " << l.width << "\nHeight: " << l.width << "\nPos: " << l.pos << "\nPower: " << l.power[0];
-        }
+                }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
             l.type = l.AMBIENT;
@@ -532,13 +530,13 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
     Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) {
         if (lights[i].type == 0) {
-            // color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else if (lights[i].type == 1) {
             color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else {
-            // color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
     }
     return color;

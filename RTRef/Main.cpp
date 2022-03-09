@@ -13,7 +13,7 @@ public:
 		:ImgGUI(windowWidth, windowHeight) {
 		iter = 1;
 		env = startup(path, windowWidth, windowHeight);
-		env.camera.orbitCamera(0, 0);
+		// env.camera.orbitCamera(0, 0);
 		this->sceneName = sceneName;
 		this->saveImg = saveImg;
 	}
@@ -52,7 +52,7 @@ int main(int argc, char const* argv[]) {
 		std::string path = std::string(argv[1]);
 		// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
 		// Edittable constants
-		int height = 500;
+		int height = 800;
 		bool saveImg = false;
 
 		// Start application
