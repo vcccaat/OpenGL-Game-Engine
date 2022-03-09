@@ -304,16 +304,8 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     
     glm::vec3 u = glm::normalize(glm::cross(glm::vec3(0,1,0), areaNormal));
-    // std::cout << "u " <<u <<std::endl;
     glm::vec3 v = glm::normalize(glm::cross(areaNormal,u));
-    // std::cout << "v " <<v <<std::endl;
     glm::vec3 lightpos = pos + v * (r1 * width - width / 2) + u * (r2 * height - height / 2);
-    // std::cout << "light " <<lightpos <<std::endl;
-
-    // float xLocal = (r1 * width) - width / 2;
-    // float yLocal = (r2 * height) - height / 2;
-    // glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
-    // lightpos = glm::vec3(transMat * glm::vec4(lightpos.x, lightpos.y, lightpos.z, 1));
 
     glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
     if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
@@ -329,10 +321,11 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
-    glm::vec3 firstpt = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]);
+    glm::vec3 radiance = glm::vec3(power[0] ,power[1] ,power[2] );
+    glm::vec3 firstpt = glm::vec3(radiance[0] * fr[0], radiance[1] * fr[1], radiance[2] * fr[2]);
     float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
-    float bottompt = pow(glm::length(hitPos - lightpos), 2);
-    glm::vec3 out = pi * width * height * firstpt * (toppt / bottompt);
+    float bottompt = pow(glm::length(hitPos - lightpos),2);
+    glm::vec3 out = pi *  width * height * width * height * firstpt * (toppt/bottompt );
 
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
