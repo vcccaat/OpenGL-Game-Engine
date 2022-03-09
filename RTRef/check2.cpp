@@ -499,6 +499,7 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
         aiColor3D col = castRay(camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
         img_data[j * width + i] = times(img_data[j * width + i], (iter - 1) / iter) + times(glm::vec3(col.r, col.g, col.b), 1 / iter);
+ 
     }
 }
 
@@ -539,7 +540,7 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
 }
 
 bool isShadowed(RTCScene scene, glm::vec3 lightDir, glm::vec3 hitPos, float maxDist) {
-    // glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
+
     glm::vec3 newOrig = hitPos + lightDir * .001f;
     RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
     struct RTCIntersectContext context;

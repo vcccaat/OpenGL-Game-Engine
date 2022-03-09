@@ -19,8 +19,8 @@ public:
 	}
 
 	void compute_image() {
-		iter = iter == 256 ? iter : iter + 1;
 		updateImgData(img_data, env, iter, sceneName, saveImg);
+		iter = iter == 256 ? iter : iter + 1;
 	}
 
 	bool mouse_motion_event(const nanogui::Vector2i& p, const nanogui::Vector2i& rel, int button, int modifiers) {
@@ -54,7 +54,7 @@ int main(int argc, char const* argv[]) {
 		// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/siamese_floor.glb";
 		// Edittable constants
 		int height = 800;
-		bool saveImg = false;
+		bool saveImg = true;
 
 		// Start application
 		int start = path.find_last_of("/");
