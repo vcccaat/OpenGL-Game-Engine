@@ -391,7 +391,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         // default arealights and ambientlight
 
         Light la = Light();
-        la.pos = glm::vec3(-14, 0, 0);
+        la.pos = glm::vec3(-14, 4, 0);
         la.power = aiColor3D(300, 150, 300);
         la.type = la.AREA;
         la.transMat = glm::mat4(1);
@@ -401,7 +401,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         lights.push_back(la);
 
         Light la2 = Light();
-        la2.pos = glm::vec3(14, 0, 0);
+        la2.pos = glm::vec3(14, 4, 0);
         la2.power = aiColor3D(225, 450, 225);
         la2.type = la2.AREA;
         la2.transMat = glm::mat4(1);
@@ -411,7 +411,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         lights.push_back(la2);
 
         Light la3 = Light();
-        la3.pos = glm::vec3(0, 0, -14);
+        la3.pos = glm::vec3(0, 4, -14);
         la3.power = aiColor3D(300, 150, 150);
         la3.type = la3.AREA;
         la3.transMat = glm::mat4(1);
@@ -421,7 +421,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         lights.push_back(la3);
 
         Light la4 = Light();
-        la4.pos = glm::vec3(0, 0, 14);
+        la4.pos = glm::vec3(0, 4, 14);
         la4.power = aiColor3D(150, 150, 300);
         la4.type = la4.AREA;
         la4.transMat = glm::mat4(1);
@@ -540,7 +540,7 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
 }
 
 bool isShadowed(RTCScene scene, glm::vec3 lightDir, glm::vec3 hitPos, float maxDist) {
-
+    
     glm::vec3 newOrig = hitPos + lightDir * .001f;
     RTCRayHit shadowRayhit = generateRay(newOrig[0], newOrig[1], newOrig[2], lightDir[0], lightDir[1], lightDir[2]);
     struct RTCIntersectContext context;
