@@ -574,7 +574,7 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
 float getAspect(std::string path) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-    if (obj->mNumCameras == 0) return NULL;
+    if (obj->mNumCameras == 0) return 0;
     return obj->mCameras[0]->mAspect;
 }
 
