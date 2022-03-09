@@ -31,7 +31,7 @@ RTC_NAMESPACE_USE
 
 /**************************************** CAMERA, OTHER CONSTRUCTORS ****************************************/
 
-
+float pi = 3.1415926;
 Camera::Camera(aiCamera* cam, glm::vec3 tilt) {
     this->pos = glm::vec3(cam->mPosition.x, cam->mPosition.y, cam->mPosition.z);
     this->target = glm::vec3(cam->mLookAt.x, cam->mLookAt.y, cam->mLookAt.z);
@@ -98,7 +98,6 @@ void Camera::recomputeSpherical() {
 void Camera::orbitCamera(float nx, float ny) {
 
     // "Sensitivity" of mouse movement
-    float pi = 3.1415926;
     float scale = .0075;
     float ep = .2;
 
@@ -274,79 +273,66 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
 
 aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
 
-    float pi = 3.1415926;
-    glm::vec3 lightDir = glm::normalize(pos - hitPos);
+    // Generate BRDF input and see if occluded
+    glm::vec3 wi = glm::normalize(-eyeRay);
+    glm::vec3 wo = glm::normalize(pos - hitPos);
+    if (isShadowed(scene, wo, hitPos)) return aiColor3D();
 
-    if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
-
-    //  wi: Incident direction from hit point to light
-    //  wo: Outgoing direction from hit point to camera
-    glm::vec3 wi = lightDir;
-    glm::vec3 wo = glm::normalize(-eyeRay);
-
-    normal = glm::normalize(normal);
-
+    // Run BRDF
     nori::Frame frame = nori::Frame(normal);
-    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi), frame.toLocal(wo));
-
+    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wo), frame.toLocal(wi));
     nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
-    glm::vec3 out = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]) * std::max(0.f, glm::dot(normal, wi));
-
-    return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
+    // Calculate resultant color
+    float divise = glm::dot(normal, wo) / pow(glm::length(pos - hitPos), 2);
+    glm::vec3 out = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]) * divise;
+    return aiColor3D(out[0], out[1], out[2]);
 }
 
 aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
-    float pi = 3.1415926;
     // Determine random position of light
     float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - .5;
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - .5;
-    
     glm::vec3 u = glm::normalize(glm::cross(glm::vec3(0,1,0), areaNormal));
     glm::vec3 v = glm::normalize(glm::cross(areaNormal,u));
     glm::vec3 lightpos = pos + u * (r1 * width) + v * (r2 * height);
 
-    glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
-    if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
-
-    // Eval BRDF and formula
-    // wi wo direction not sure
+    // Generate BRDF input and see if occluded
     glm::vec3 wi = glm::normalize(-eyeRay);
-    glm::vec3 wo = lightDir;
+    glm::vec3 wo = glm::normalize(lightpos - hitPos);
+    if (isShadowed(scene, wo, hitPos)) return aiColor3D();
 
-    normal = glm::normalize(normal);
+    // Run BRDF
     nori::Frame frame = nori::Frame(normal);
     nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi), frame.toLocal(wo));
     nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
+    // Calculate resultant color
     glm::vec3 radiance = glm::vec3(power[0] / (width * height * pi), power[1] / (width * height * pi), power[2] / (width * height * pi));
     glm::vec3 firstpt = glm::vec3(radiance[0] * fr[0], radiance[1] * fr[1], radiance[2] * fr[2]);
     float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
     float bottompt = pow(glm::length(hitPos - lightpos), 2);
-    glm::vec3 out = width * height * firstpt * (toppt/bottompt); // multiply by area again????
-    
+    glm::vec3 out = width * height * firstpt * (toppt/bottompt);
     return aiColor3D(out[0], out[1], out[2]);
 }
 
 aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
-    float pi = 3.1415926;
+    // Determine random position of light, in local coordinates
     float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     glm::vec3 samp = RTUtil::squareToCosineHemisphere(glm::vec2(r1, r2));
 
-    
+    // Transform to gloval coordinates and see if occluded
     nori::Frame frame = nori::Frame(normal);
-    glm::vec3 globalSamp = frame.toWorld(samp);  //direction
-
+    glm::vec3 globalSamp = frame.toWorld(samp);
     if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
 
-    glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]) ;
-
+    // Calculate resultant color
+    glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]);
     return aiColor3D(out[0], out[1], out[2]);
 }
-
 
 std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
@@ -531,7 +517,6 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
         glm::vec3 normal = glm::normalize(glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
         // Check if normal is facing camera
         glm::vec3 viewdir = glm::normalize(glm::vec3(dx, dy, dz));
-        float pi = 3.1415926;
         if(acos(glm::dot(normal, viewdir)) < pi/2) normal = -normal;
 
         // diffuse shading and specular reflectance
