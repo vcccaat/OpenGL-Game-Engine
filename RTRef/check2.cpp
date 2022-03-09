@@ -529,6 +529,10 @@ aiColor3D Environment::castRay(float ox, float oy, float oz, float dx, float dy,
 
     if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID && rayhit.ray.tfar != std::numeric_limits<float>::infinity()) {
         glm::vec3 normal = glm::normalize(glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z));
+        // Check if normal is facing camera
+        glm::vec3 viewdir = glm::normalize(glm::vec3(dx, dy, dz));
+        float pi = 3.1415926;
+        if(acos(glm::dot(normal, viewdir)) < pi/2) normal = -normal;
 
         // diffuse shading and specular reflectance
         glm::vec3 rayDir = glm::vec3(dx, dy, dz);
