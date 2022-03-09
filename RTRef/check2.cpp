@@ -302,10 +302,19 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     // Determine random position of light
     float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    float xLocal = (r1 * width) - width / 2;
-    float yLocal = (r2 * height) - height / 2;
-    glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
-    lightpos = glm::vec3(transMat * glm::vec4(lightpos.x, lightpos.y, lightpos.z, 1));
+    
+    glm::vec3 u = glm::normalize(glm::cross(glm::vec3(0,1,0), areaNormal));
+    // std::cout << "u " <<u <<std::endl;
+    glm::vec3 v = glm::normalize(glm::cross(areaNormal,u));
+    // std::cout << "v " <<v <<std::endl;
+    glm::vec3 lightpos = pos + v * (r1 * width - width / 2) + u * (r2 * height - height / 2);
+    // std::cout << "light " <<lightpos <<std::endl;
+
+    // float xLocal = (r1 * width) - width / 2;
+    // float yLocal = (r2 * height) - height / 2;
+    // glm::vec3 lightpos = glm::vec3(xLocal, yLocal, 0);
+    // lightpos = glm::vec3(transMat * glm::vec4(lightpos.x, lightpos.y, lightpos.z, 1));
+
     glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
     if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
 
@@ -533,10 +542,10 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
             // color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else if (lights[i].type == 1) {
-            // color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else {
-            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
+            // color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
     }
     return color;

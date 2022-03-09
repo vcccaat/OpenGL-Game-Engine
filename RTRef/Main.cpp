@@ -48,9 +48,9 @@ int main(int argc, char const* argv[]) {
 	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
 	// std::string path = "../resources/scenes/tree.glb";  //bunnyscene
 
-	if (!(argc > 1)){
-		//std::string path = std::string(argv[1]);
-		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
+	if ((argc > 1)){
+		std::string path = std::string(argv[1]);
+		// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
 		// Edittable constants
 		int height = 500;
 		bool saveImg = false;
