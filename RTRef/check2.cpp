@@ -325,7 +325,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     glm::vec3 firstpt = glm::vec3(radiance[0] * fr[0], radiance[1] * fr[1], radiance[2] * fr[2]);
     float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
     float bottompt = pow(glm::length(hitPos - lightpos),2);
-    glm::vec3 out = pi *  width * height * width * height * firstpt * (toppt/bottompt );
+    glm::vec3 out = width * height * width * height * firstpt * (toppt/bottompt );
 
     return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
 }
@@ -390,23 +390,47 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         lights.push_back(l);
     }
     if (lights.size() == 0) {
-        // default pointlight, arealight, and ambientlight
-        Light lp = Light();
-        lp.pos = glm::vec3(8, 9, 2);
-        lp.power = aiColor3D(200, 100, 300);
-        lp.type = lp.POINT;
-        lp.transMat = glm::mat4(1);
-        lights.push_back(lp);
+        // default arealights and ambientlight
 
         Light la = Light();
-        la.pos = glm::vec3(0, 0, -8);
-        la.power = aiColor3D(300, 300, 300);
+        la.pos = glm::vec3(-14, 0, 0);
+        la.power = aiColor3D(300, 150, 300);
         la.type = la.AREA;
         la.transMat = glm::mat4(1);
-        la.areaNormal = glm::vec3(0, 0, 1);
-        la.width = 3;
+        la.areaNormal = glm::vec3(-1, 0, 0);
+        la.width = 6;
         la.height = 3;
-        //lights.push_back(la);
+        lights.push_back(la);
+
+        Light la2 = Light();
+        la2.pos = glm::vec3(14, 0, 0);
+        la2.power = aiColor3D(225, 450, 225);
+        la2.type = la2.AREA;
+        la2.transMat = glm::mat4(1);
+        la2.areaNormal = glm::vec3(1, 0, 0);
+        la2.width = 6;
+        la2.height = 3;
+        lights.push_back(la2);
+
+        Light la3 = Light();
+        la3.pos = glm::vec3(0, 0, -14);
+        la3.power = aiColor3D(300, 150, 150);
+        la3.type = la3.AREA;
+        la3.transMat = glm::mat4(1);
+        la3.areaNormal = glm::vec3(0, 0, -1);
+        la3.width = 6;
+        la3.height = 3;
+        lights.push_back(la3);
+
+        Light la4 = Light();
+        la4.pos = glm::vec3(0, 0, 14);
+        la4.power = aiColor3D(150, 150, 300);
+        la4.type = la4.AREA;
+        la4.transMat = glm::mat4(1);
+        la4.areaNormal = glm::vec3(0, 0, 1);
+        la4.width = 6;
+        la4.height = 3;
+        lights.push_back(la4);
 
         Light le = Light();
         le.power = aiColor3D(.025, .015, .015);
@@ -532,13 +556,13 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
     Material material = materials[geomIdToMatInd[geomID]];
     for (int i = 0; i < lights.size(); i++) {
         if (lights[i].type == 0) {
-            // color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else if (lights[i].type == 1) {
             color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else {
-            // color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
+            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
     }
     return color;
