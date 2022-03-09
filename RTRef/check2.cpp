@@ -340,7 +340,7 @@ aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 h
     nori::Frame frame = nori::Frame(normal);
     glm::vec3 globalSamp = frame.toWorld(samp);  //direction
 
-    // if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
+    if (isShadowed(scene, globalSamp, hitPos, dist)) return aiColor3D();
 
     glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]) ;
 
