@@ -78,7 +78,6 @@ public:
     void rayTrace(std::vector<glm::vec3>& img_data, float iter);
     aiColor3D castRay(float ox, float oy, float oz, float dx, float dy, float dz);
     aiColor3D shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, int geomID);
-
 };
 
 bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxDist = std::numeric_limits<float>::infinity());

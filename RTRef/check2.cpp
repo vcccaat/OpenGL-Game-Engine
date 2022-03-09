@@ -305,7 +305,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     
     glm::vec3 u = glm::normalize(glm::cross(glm::vec3(0,1,0), areaNormal));
     glm::vec3 v = glm::normalize(glm::cross(areaNormal,u));
-    glm::vec3 lightpos = pos + u * (r1 * width - width / 2) + v * (r2 * height - height / 2);
+    glm::vec3 lightpos = pos + u * (r1 * width) + v * (r2 * height);
 
     glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
     if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
@@ -321,13 +321,13 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
-    glm::vec3 radiance = glm::vec3(power[0] / width * height * pi, power[1] / width * height * pi, power[2] / width * height * pi);
+    glm::vec3 radiance = glm::vec3(power[0] / (width * height * pi), power[1] / (width * height * pi), power[2] / (width * height * pi));
     glm::vec3 firstpt = glm::vec3(radiance[0] * fr[0], radiance[1] * fr[1], radiance[2] * fr[2]);
     float toppt = glm::dot(normal, wo) * glm::dot(areaNormal, wo);
     float bottompt = pow(glm::length(hitPos - lightpos), 2);
-    glm::vec3 out = pi * width * height * firstpt * (toppt/bottompt); // multiply by area again????
+    glm::vec3 out = width * height * firstpt * (toppt/bottompt); // multiply by area again????
     
-    return aiColor3D(out[0] / 255, out[1] / 255, out[2] / 255);
+    return aiColor3D(out[0], out[1], out[2]);
 }
 
 aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
@@ -344,7 +344,7 @@ aiColor3D Light::ambientIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 h
 
     glm::vec3 out = glm::vec3(material.diffuse[0] * power[0], material.diffuse[1] * power[1], material.diffuse[2] * power[2]) ;
 
-    return aiColor3D(out[0], out[1], out[2]); // why not divide by 255
+    return aiColor3D(out[0], out[1], out[2]);
 }
 
 
@@ -382,7 +382,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         l.pos = glm::vec3(transMat * glm::vec4(l.pos.x, l.pos.y, l.pos.z, 1));
         l.transMat = transMat;
         if (l.type == l.AREA) {
-            l.areaNormal = glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0));
+            l.areaNormal = glm::normalize(glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0)));
         }
         // Push to list
         lights.push_back(l);
@@ -499,7 +499,6 @@ void Environment::rayTrace(std::vector<glm::vec3>& img_data, float iter) {
         dir = camera.generateRay((i + .5) / width, (j + .5) / height);
         aiColor3D col = castRay(camera.pos.x, camera.pos.y, camera.pos.z, dir.x, dir.y, dir.z);
         img_data[j * width + i] = times(img_data[j * width + i], (iter - 1) / iter) + times(glm::vec3(col.r, col.g, col.b), 1 / iter);
- 
     }
 }
 
