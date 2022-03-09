@@ -280,14 +280,14 @@ aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit
 
     // Run BRDF
     nori::Frame frame = nori::Frame(normal);
-    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wo), frame.toLocal(wi));
+    nori::BSDFQueryRecord BSDFquery(frame.toLocal(wi), frame.toLocal(wo));
     nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
     glm::vec3 fr = bsdf.eval(BSDFquery);
 
     // Calculate resultant color
     float divise = glm::dot(normal, wo) / pow(glm::length(pos - hitPos), 2);
     glm::vec3 out = glm::vec3(power[0] * fr[0], power[1] * fr[1], power[2] * fr[2]) * divise;
-    return aiColor3D(out[0], out[1], out[2]);
+    return aiColor3D(out[0] / 20, out[1] / 20, out[2] / 20);
 }
 
 aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, Material material) {
@@ -546,10 +546,10 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
             color = color + lights[i].pointIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else if (lights[i].type == 1) {
-            color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
+            //color = color + lights[i].areaIlluminate(scene, eyeRay, hitPos, normal, material);
         }
         else {
-            color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
+            //color = color + lights[i].ambientIlluminate(scene, eyeRay, hitPos, normal, material);
         }
     }
     return color;
