@@ -277,7 +277,7 @@ aiColor3D Light::pointIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hit
     float pi = 3.1415926;
     glm::vec3 lightDir = glm::normalize(pos - hitPos);
 
-    // if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
+    if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
 
     //  wi: Incident direction from hit point to light
     //  wo: Outgoing direction from hit point to camera
@@ -308,7 +308,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     glm::vec3 lightpos = pos + u * (r1 * width - width / 2) + v * (r2 * height - height / 2);
 
     glm::vec3 lightDir = glm::normalize(lightpos - hitPos);
-    // if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
+    if (isShadowed(scene, lightDir, hitPos)) return aiColor3D();
 
     // Eval BRDF and formula
     // wi wo direction not sure
@@ -574,7 +574,7 @@ aiColor3D Environment::shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 norma
 float getAspect(std::string path) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-    if (obj->mNumCameras == 0) return 1.333333;
+    if (obj->mNumCameras == 0) return NULL;
     return obj->mCameras[0]->mAspect;
 }
 
