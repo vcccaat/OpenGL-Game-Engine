@@ -9,13 +9,14 @@ class BunnyGUI : public RTUtil::ImgGUI {
 	bool saveImg;
 
 public:
-	BunnyGUI(std::string path, int windowWidth, int windowHeight, std::string sceneName, bool saveImg)
+	BunnyGUI(std::string path, int windowWidth, int windowHeight, std::string sceneName, bool saveImg, bool noDefaultCamera)
 		:ImgGUI(windowWidth, windowHeight) {
 		iter = 1;
 		env = startup(path, windowWidth, windowHeight);
 		// env.camera.orbitCamera(0, 0);
 		this->sceneName = sceneName;
 		this->saveImg = saveImg;
+		if(noDefaultCamera) env.camera.orbitCamera(0, 0);
 	}
 
 	void compute_image() {
@@ -44,24 +45,30 @@ public:
 };
 
 int main(int argc, char const* argv[]) {
-	// Path
-	// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
-	// std::string path = "../resources/scenes/tree.glb";  //bunnyscene
 
 	if ((argc > 1)){
 		std::string path = std::string(argv[1]);
-		//std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/SkullCycles.glb";
-		// std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/siamese_floor.glb";
+		//std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+		//bunnyscene		// bunny
+		//tree				// tree
+		//staircase			// staircase
+		//SkullCycles		// hero image
+		//siamese_floor		// alt hero image
+		
 		// Edittable constants
-		int height = 800;
+		int height = 500;
 		bool saveImg = false;
 
 		// Start application
 		int start = path.find_last_of("/");
 		int end = path.find_first_of(".glb");
 		std::string sceneName = path.substr(start + 1, end - 3);
+		int width;
+		float aspect = getAspect(path);
+		if (aspect == NULL) width = (int)1.3333 * height;
+		else width = (int)height * aspect;
 		nanogui::init();
-		nanogui::ref<BunnyGUI> app = new BunnyGUI(path, (int)height * getAspect(path), height, sceneName, saveImg);
+		nanogui::ref<BunnyGUI> app = new BunnyGUI(path, width, height, sceneName, saveImg, aspect == NULL);
 		nanogui::mainloop(16);
 		nanogui::shutdown();
 	} else {
