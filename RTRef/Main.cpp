@@ -50,7 +50,7 @@ int main(int argc, char const* argv[]) {
 
 	if (!(argc > 1)){
 		//std::string path = std::string(argv[1]);
-		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
+		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
 		// Edittable constants
 		int height = 500;
 		bool saveImg = false;
