@@ -381,6 +381,14 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         // Push to list
         lights.push_back(l);
     }
+    if (lights.size() == 0) {
+        Light l = Light();
+        l.pos = glm::vec3(1, 5, 1);
+        l.power = aiColor3D(300, 300, 300);
+        l.type = l.POINT;
+        l.transMat = glm::mat4(1);
+        lights.push_back(l);
+    }
     return lights;
 }
 
