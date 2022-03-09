@@ -142,7 +142,7 @@ void Camera::altitudeCamera(float ny) {
 Light::Light() {}
 
 Material::Material() {
-    this->diffuse = glm::vec3(.2, .5, .8);
+    this->diffuse = glm::vec3(.0, .5, .8);
     this->roughness = .2;
     this->indexofref = 1.5;
 }
@@ -364,6 +364,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
+            //std::cout << "Width: " << l.width << "\nHeight: " << l.width << "\nPos: " << l.pos << "\nPower: " << l.power[0];
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
@@ -385,6 +386,31 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         }
         // Push to list
         lights.push_back(l);
+    }
+    if (lights.size() == 0) {
+        // default pointlight, arealight, and ambientlight
+        Light lp = Light();
+        lp.pos = glm::vec3(8, 9, 2);
+        lp.power = aiColor3D(200, 100, 300);
+        lp.type = lp.POINT;
+        lp.transMat = glm::mat4(1);
+        lights.push_back(lp);
+
+        Light la = Light();
+        la.pos = glm::vec3(0, 0, -8);
+        la.power = aiColor3D(300, 300, 300);
+        la.type = la.AREA;
+        la.transMat = glm::mat4(1);
+        la.areaNormal = glm::vec3(0, 0, 1);
+        la.width = 3;
+        la.height = 3;
+        //lights.push_back(la);
+
+        Light le = Light();
+        le.power = aiColor3D(.025, .015, .015);
+        le.type = le.AMBIENT;
+        le.dist = 600;
+        lights.push_back(le);
     }
     return lights;
 }
