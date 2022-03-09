@@ -49,7 +49,7 @@ int main(int argc, char const* argv[]) {
 
 	if (!(argc > 1)){
 		//std::string path = std::string(argv[1]);
-		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
+		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
 		//bunnyscene		// bunny
 		//tree				// tree
 		//staircase			// staircase
@@ -58,8 +58,8 @@ int main(int argc, char const* argv[]) {
 		
 		// Edittable constants
 		int height = 500;
-		bool saveImg = false;
 		int maxIter = 256;
+		bool saveImg = false;
 
 		// Start application
 		int start = path.find_last_of("/");
@@ -69,6 +69,7 @@ int main(int argc, char const* argv[]) {
 		float aspect = getAspect(path);
 		if (aspect == 0) width = (int)1.3333 * height;
 		else width = (int)height * aspect;
+		if (saveImg) std::cout << "Up to " << (int) maxIter / 64 << " images will be saved while the camera stays at a constant orientation" << "\n";
 		nanogui::init();
 		nanogui::ref<BunnyGUI> app = new BunnyGUI(path, width, height, sceneName, saveImg, aspect == 0, maxIter);
 		nanogui::mainloop(16);

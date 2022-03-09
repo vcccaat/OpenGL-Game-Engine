@@ -147,7 +147,7 @@ Material::Material() {
 }
 
 
-/**************************************** GIVEN FUNCTIONS ****************************************/
+/**************************************** HELPER FUNCTIONS ****************************************/
 
 
 void errorFunction(void* userPtr, enum RTCError error, const char* str) {
@@ -375,7 +375,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
     }
     if (lights.size() == 0) {
         // default arealights and ambientlight
-
+        // to be used in the hero image (or any basic meshes)
         Light la = Light();
         la.pos = glm::vec3(-14, 4, 0);
         la.power = aiColor3D(300, 150, 300);
@@ -575,20 +575,21 @@ bool continueSaving = true;
 void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName, bool saveImg, int maxIter) {
     env.rayTrace(img_data, (float)iter);
     // Save image
-     if (iter % 64 == 0 && saveImg && continueSaving) {
-         if (iter == maxIter) continueSaving = false;
-         unsigned char* img = new unsigned char[env.width * env.height * 3];
-         int k = 0;
-         for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
-             img[(3 * j * env.width) + (3 * i) + 0] = toSRGB(img_data[k][0]);
-             img[(3 * j * env.width) + (3 * i) + 1] = toSRGB(img_data[k][1]);
-             img[(3 * j * env.width) + (3 * i) + 2] = toSRGB(img_data[k][2]);
-             k++;
-         }
-         stbi_flip_vertically_on_write(1);
-         std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
-         stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
-         delete[] img;
-         std::cout << "Wrote " << name << "\n";
-     }
+    if (iter % 64 == 0 && saveImg && continueSaving) {
+        if (iter == maxIter) continueSaving = false;
+        unsigned char* img = new unsigned char[env.width * env.height * 3];
+        int k = 0;
+        for (int j = 0; j < env.height; ++j) for (int i = 0; i < env.width; ++i) {
+            img[(3 * j * env.width) + (3 * i) + 0] = toSRGB(img_data[k][0]);
+            img[(3 * j * env.width) + (3 * i) + 1] = toSRGB(img_data[k][1]);
+            img[(3 * j * env.width) + (3 * i) + 2] = toSRGB(img_data[k][2]);
+            k++;
+        }
+        stbi_flip_vertically_on_write(1);
+        std::string name = "render_" + sceneName + "_" + std::to_string(iter) + ".png";
+        stbi_write_png(name.c_str(), env.width, env.height, 3, img, env.width * 3);
+        delete[] img;
+        std::cout << "Saved " << name << "\n";
+        if (!continueSaving) std::cout << "Finished saving images at this orientation" << "\n";
+    }
 }
