@@ -59,12 +59,12 @@ int main(int argc, char const* argv[]) {
 		// Edittable constants
 		int height = 500;
 		int maxIter = 256;
-		bool saveImg = false;
+		bool saveImg = true;
 
 		// Start application
 		int start = path.find_last_of("/");
-		int end = path.find_first_of(".glb");
-		std::string sceneName = path.substr(start + 1, end - 3);
+		int end = path.find_last_of(".");
+		std::string sceneName = path.substr(start + 1, end - start - 1);
 		int width;
 		float aspect = getAspect(path);
 		if (aspect == 0) width = (int)1.3333 * height;
