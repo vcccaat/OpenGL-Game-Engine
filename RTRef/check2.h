@@ -20,6 +20,7 @@ public:
     std::string name;
     glm::vec3 pos;
     glm::vec3 areaNormal;
+    glm::vec3 areaTangent;
     aiColor3D power;
     int sceneindex;
     float width;

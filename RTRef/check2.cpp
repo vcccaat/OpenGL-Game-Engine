@@ -91,7 +91,6 @@ void Camera::recomputeSpherical() {
     this->pos.z = dist * sin(phi) * sin(theta);
     this->target = -this->pos;
     this->pos += glm::vec3(0, height, 0);
-    this->target += glm::vec3(0, height, 0);
 }
 
 /// nx ny is the new position of mouse after move
@@ -127,8 +126,8 @@ void Camera::altitudeCamera(float ny) {
 
     // "Sensitivity" of mouse movement
     float scale = .00275;
-    float min = -1;
-    float max = 1.5;
+    float min = -2;
+    float max = 3;
 
     height += ny * scale;
     if (height < min) height = min;
@@ -294,7 +293,7 @@ aiColor3D Light::areaIlluminate(RTCScene scene, glm::vec3 eyeRay, glm::vec3 hitP
     // Determine random position of light
     float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - .5;
     float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - .5;
-    glm::vec3 u = glm::normalize(glm::cross(glm::vec3(0,1,0), areaNormal));
+    glm::vec3 u = glm::normalize(glm::cross(areaTangent, areaNormal));
     glm::vec3 v = glm::normalize(glm::cross(areaNormal,u));
     glm::vec3 lightpos = pos + u * (r1 * width) + v * (r2 * height);
 
@@ -351,7 +350,8 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
-                }
+            l.areaTangent = glm::vec3(0, 1, 0);
+        }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
             l.power = scene->mLights[i]->mColorAmbient;
             l.type = l.AMBIENT;
@@ -382,6 +382,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         la.type = la.AREA;
         la.transMat = glm::mat4(1);
         la.areaNormal = glm::vec3(-1, 0, 0);
+        la.areaTangent = glm::vec3(0, 1, 0);
         la.width = 6;
         la.height = 3;
         lights.push_back(la);
@@ -392,6 +393,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         la2.type = la2.AREA;
         la2.transMat = glm::mat4(1);
         la2.areaNormal = glm::vec3(1, 0, 0);
+        la2.areaTangent = glm::vec3(0, 1, 0);
         la2.width = 6;
         la2.height = 3;
         lights.push_back(la2);
@@ -402,6 +404,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         la3.type = la3.AREA;
         la3.transMat = glm::mat4(1);
         la3.areaNormal = glm::vec3(0, 0, -1);
+        la3.areaTangent = glm::vec3(0, 1, 0);
         la3.width = 6;
         la3.height = 3;
         lights.push_back(la3);
@@ -412,9 +415,21 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         la4.type = la4.AREA;
         la4.transMat = glm::mat4(1);
         la4.areaNormal = glm::vec3(0, 0, 1);
+        la4.areaTangent = glm::vec3(0, 1, 0);
         la4.width = 6;
         la4.height = 3;
         lights.push_back(la4);
+
+        Light la5 = Light();
+        la5.pos = glm::vec3(0, -14, 0);
+        la5.power = aiColor3D(300, 150, 150);
+        la5.type = la5.AREA;
+        la5.transMat = glm::mat4(1);
+        la5.areaNormal = glm::vec3(0, -1, 0);
+        la5.areaTangent = glm::vec3(0, 0, 1);
+        la5.width = 6;
+        la5.height = 3;
+        lights.push_back(la5);
 
         Light le = Light();
         le.power = aiColor3D(.025, .015, .015);
