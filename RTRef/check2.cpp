@@ -201,7 +201,6 @@ float toSRGB(float c) {
 /**************************************** ILLUMINATION, PARSING, NODE HIERARCHY ****************************************/
 
 
-int id = 0;
 void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh* mesh, glm::mat4 transMatrix, std::vector<int>& mp) {
     // get vertices from aiscene meshList by mMeshes indexes
     RTCGeometry geom = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
@@ -224,8 +223,7 @@ void addMeshToScene(RTCDevice device, RTCScene scene, aiMesh* mesh, glm::mat4 tr
         indices[3 * i + 2] = mesh->mFaces[i].mIndices[2];
     }
     rtcCommitGeometry(geom);
-    rtcAttachGeometryByID(scene, geom, id);
-    id++;
+    rtcAttachGeometryByID(scene, geom, mp.size());
     mp.push_back(mesh->mMaterialIndex);
     rtcReleaseGeometry(geom);
 }
