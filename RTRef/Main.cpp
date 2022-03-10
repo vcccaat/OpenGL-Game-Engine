@@ -49,7 +49,7 @@ int main(int argc, char const* argv[]) {
 
 	if (!(argc > 1)){
 		//std::string path = std::string(argv[1]);
-		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+		std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/SkullCycles.glb";
 		//bunnyscene		// bunny
 		//tree				// tree
 		//staircase			// staircase
