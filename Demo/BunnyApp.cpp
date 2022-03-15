@@ -7,24 +7,42 @@
 
 #include <cpplocate/cpplocate.h>
 
-// Fixed screen size is awfully convenient, but you can also
-// call Screen::setSize to set the size after the Screen base
-// class is constructed.
+/* new import */
+#include <assimp/Importer.hpp> 
+#include <assimp/postprocess.h>  
+#include <assimp/scene.h> 
+
+
 const int BunnyApp::windowWidth = 800;
 const int BunnyApp::windowHeight = 600;
 
+void initScene(std::vector<glm::vec3>& positions, std::vector<uint32_t>& indices) {
+    const std::string objpath = "../resources/meshes/bunny.obj";
+    Assimp::Importer importer;
+    const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    
+    // temp:get the first mesh
+    aiMesh* mesh = obj->mMeshes[0];
+    // store mesh vertices 
+    for (int i = 0; i < mesh->mNumVertices; ++i) {
+        positions.push_back(reinterpret_cast<glm::vec3&>(mesh->mVertices[i]));
+    }
+    // store mesh indices
+    for (int i = 0; i < mesh->mNumFaces; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            indices.push_back(reinterpret_cast<uint32_t&>(mesh->mFaces[i].mIndices[j]));
+        }
+    }
 
-// Constructor runs after nanogui is initialized and the OpenGL context is current.
+}
+
 BunnyApp::BunnyApp()
 : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false),
   backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
-    // read bunny obj
-
     const std::string resourcePath =
         cpplocate::locatePath("resources", "", nullptr) + "resources/";
 
-    // Set up a simple shader program by passing the shader filenames to the convenience constructor
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
         { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.gs" },
@@ -38,34 +56,21 @@ BunnyApp::BunnyApp()
         glm::vec3(0,1,0), // up
         windowWidth / (float) windowHeight, // aspect
         0.1, 50.0, // near, far
-        20.0 * M_PI/180 // fov
+        15.0 * M_PI/180 // fov
     );
 
     cc.reset(new RTUtil::DefaultCC(cam));
 
     mesh.reset(new GLWrap::Mesh());
 
-    // Mesh was default constructed, but needs to be set up with buffer data
-    // These are the vertices of a tetrahedron that fits in the canonical view volume
-    std::vector<glm::vec3> positions = {
-        glm::vec3(1, 1/sqrt(2), 0),
-        glm::vec3(-1, 1/sqrt(2), 0),
-        glm::vec3(0, -1/sqrt(2), 1),
-        glm::vec3(0, -1/sqrt(2), -1),
-    };
+    std::vector<glm::vec3> positions;
+    std::vector<uint32_t> indices; 
+    initScene(positions, indices);
 
     mesh->setAttribute(0, positions);
 
-    std::vector<uint32_t> indices = {
-        0, 1, 2,
-        0, 2, 3,
-        0, 3, 1,
-        1, 3, 2,
-    };
-
     mesh->setIndices(indices, GL_TRIANGLES);
 
-    // NanoGUI boilerplate
     perform_layout();
     set_visible(true);
 }
