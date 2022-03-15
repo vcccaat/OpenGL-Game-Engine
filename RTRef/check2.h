@@ -5,6 +5,7 @@
 #include <assimp/postprocess.h>    // Post processing flags
 #include <assimp/scene.h>          // Output data structure
 #include <embree3/rtcore.h>
+using namespace std;
 
 class Material {
 public:
@@ -17,7 +18,7 @@ public:
 
 class Light {
 public:
-    std::string name;
+    string name;
     glm::vec3 pos;
     glm::vec3 areaNormal;
     glm::vec3 areaTangent;
@@ -70,21 +71,21 @@ public:
     RTCDevice device;
     RTCScene scene;
     aiColor3D background;
-    std::vector<Light> lights;
-    std::vector<Material> materials;
-    std::vector<int> geomIdToMatInd;
+    vector<Light> lights;
+    vector<Material> materials;
+    vector<int> geomIdToMatInd;
 
     Environment();
-    Environment(std::string objpath, int width, int height);
-    void rayTrace(std::vector<glm::vec3>& img_data, float iter);
+    Environment(string objpath, int width, int height);
+    void rayTrace(vector<glm::vec3>& img_data, float iter);
     aiColor3D castRay(float ox, float oy, float oz, float dx, float dy, float dz);
     aiColor3D shade(glm::vec3 eyeRay, glm::vec3 hitPos, glm::vec3 normal, int geomID);
 };
 
 bool isShadowed(RTCScene scene, glm::vec3 lightpos, glm::vec3 hitPos, float maxDist);
-float getAspect(std::string path);
-Environment startup(std::string path, int width, int height);
-void updateImgData(std::vector<glm::vec3>& img_data, Environment env, int iter, std::string sceneName, bool saveImg, int maxIter);
+float getAspect(string path);
+Environment startup(string path, int width, int height);
+void updateImgData(vector<glm::vec3>& img_data, Environment env, int iter, string sceneName, bool saveImg, int maxIter);
 glm::vec3 times(glm::vec3 v, float i);
 
 #endif

@@ -11,13 +11,14 @@
 #include <assimp/Importer.hpp> 
 #include <assimp/postprocess.h>  
 #include <assimp/scene.h> 
+using namespace std;
 
 
 const int BunnyApp::windowWidth = 800;
 const int BunnyApp::windowHeight = 600;
 
-void initScene(std::vector<glm::vec3>& positions, std::vector<uint32_t>& indices) {
-    const std::string objpath = "../resources/meshes/bunny.obj";
+void initScene(vector<glm::vec3>& positions, vector<uint32_t>& indices) {
+    const string objpath = "../resources/meshes/bunny.obj";
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     
@@ -36,11 +37,12 @@ void initScene(std::vector<glm::vec3>& positions, std::vector<uint32_t>& indices
 
 }
 
+
 BunnyApp::BunnyApp()
 : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false),
   backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
-    const std::string resourcePath =
+    const string resourcePath =
         cpplocate::locatePath("resources", "", nullptr) + "resources/";
 
     prog.reset(new GLWrap::Program("program", { 
@@ -50,7 +52,7 @@ BunnyApp::BunnyApp()
     }));
 
     // Create a camera in a default position, respecting the aspect ratio of the window.
-    cam = std::make_shared<RTUtil::PerspectiveCamera>(
+    cam = make_shared<RTUtil::PerspectiveCamera>(
         glm::vec3(6,2,10), // eye
         glm::vec3(0,0,0), // target
         glm::vec3(0,1,0), // up
@@ -60,17 +62,16 @@ BunnyApp::BunnyApp()
     );
 
     cc.reset(new RTUtil::DefaultCC(cam));
-
     mesh.reset(new GLWrap::Mesh());
 
-    std::vector<glm::vec3> positions;
-    std::vector<uint32_t> indices; 
-    initScene(positions, indices);
-
+    vector<glm::vec3> positions;
+    vector<uint32_t> indices;
+    initScene(positions,indices);
     mesh->setAttribute(0, positions);
-
     mesh->setIndices(indices, GL_TRIANGLES);
 
+
+    
     perform_layout();
     set_visible(true);
 }
