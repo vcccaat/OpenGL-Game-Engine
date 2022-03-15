@@ -2,6 +2,7 @@
 #include "DemoApp.hpp"
 #include "TetraApp.hpp"
 #include "SkyApp.hpp"
+#include "BunnyApp.hpp"
 
 int main(int argc, char const* argv[]) {
     nanogui::init();
@@ -15,7 +16,7 @@ int main(int argc, char const* argv[]) {
         nanogui::mainloop(16);
     }
     else {
-        nanogui::ref<DemoApp> app = new DemoApp();
+        nanogui::ref<BunnyApp> app = new BunnyApp();
         nanogui::mainloop(16);
     }
 
