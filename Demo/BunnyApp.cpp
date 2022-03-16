@@ -16,13 +16,47 @@ using namespace std;
 const int BunnyApp::windowWidth = 800;
 const int BunnyApp::windowHeight = 600;
 
-void BunnyApp::initScene() {
+
+
+void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     const string objpath = "../resources/scenes/bunnyscene.glb";
+    // const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
+    //const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     int count = 0;
     traverseNodeHierarchy(obj, obj->mRootNode,count);
+
+     // use camera
+    // if (obj->mNumCameras > 0) {
+    //     aiCamera* rawcam = obj->mCameras[0];
+    //     cam = make_shared<RTUtil::PerspectiveCamera>(
+    //         glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z), // eye
+    //         glm::vec3(0, 0, 0), // target
+    //         glm::vec3(rawcam->mUp.x, rawcam->mUp.y, rawcam->mUp.z), // up
+    //         windowWidth / windowHeight, // aspect
+    //         0.1, 50.0, // near, far
+    //         rawcam->mHorizontalFOV // fov
+    //         );
+    // }
+    
 }
+
+void BunnyApp::traverseNodeHierarchy(const aiScene* obj, aiNode* cur, int& count) {
+    if (cur != NULL) {
+        // transMatrix = transMatrix * RTUtil::a2g(cur->mTransformation);
+        if (cur->mNumMeshes > 0) {
+            for (int i = 0; i < cur->mNumMeshes; ++i) {
+                aiMesh* msh = obj->mMeshes[cur->mMeshes[i]];
+                addMeshToScene(msh, count);
+            }
+        }
+        for (int i = 0; i < cur->mNumChildren; ++i) {
+            traverseNodeHierarchy( obj, cur->mChildren[i], count);
+        }
+}
+}
+
 
 void BunnyApp::addMeshToScene(aiMesh* msh, int& count){
     // aiMesh* mesh = obj->mMeshes[0];
@@ -46,20 +80,7 @@ void BunnyApp::addMeshToScene(aiMesh* msh, int& count){
     }
 }
 
-void BunnyApp::traverseNodeHierarchy(const aiScene* obj, aiNode* cur, int& count) {
-    if (cur != NULL) {
-        // transMatrix = transMatrix * RTUtil::a2g(cur->mTransformation);
-        if (cur->mNumMeshes > 0) {
-            for (int i = 0; i < cur->mNumMeshes; ++i) {
-                aiMesh* msh = obj->mMeshes[cur->mMeshes[i]];
-                addMeshToScene(msh, count);
-            }
-        }
-        for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy( obj, cur->mChildren[i], count);
-        }
-    }
-}
+
 
 
 
@@ -68,6 +89,7 @@ BunnyApp::BunnyApp()
   backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const string resourcePath =
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
         cpplocate::locatePath("resources", "", nullptr) + "resources/";
 
     prog.reset(new GLWrap::Program("program", { 
@@ -92,7 +114,7 @@ BunnyApp::BunnyApp()
     cc.reset(new RTUtil::DefaultCC(cam));
     mesh.reset(new GLWrap::Mesh());
 
-    initScene();
+    initScene( cam,  windowWidth,  windowHeight);
 
     
     // mesh->setAttribute(0, positions);

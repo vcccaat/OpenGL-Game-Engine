@@ -19,7 +19,7 @@ public:
     virtual bool scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
 
     virtual void draw_contents() override;
-    void initScene();
+    void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
     void addMeshToScene(aiMesh* msh, int& count);
     void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, int& count);
 
@@ -27,6 +27,7 @@ private:
 
     static const int windowWidth;
     static const int windowHeight;
+    bool useDefaultCamera;
 
     std::unique_ptr<GLWrap::Program> prog;
     std::unique_ptr<GLWrap::Mesh> mesh;
