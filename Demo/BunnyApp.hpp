@@ -24,6 +24,7 @@ private:
 
     static const int windowWidth;
     static const int windowHeight;
+    bool useDefaultCamera;
 
     std::unique_ptr<GLWrap::Program> prog;
     std::unique_ptr<GLWrap::Mesh> mesh;

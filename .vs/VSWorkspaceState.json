@@ -2,11 +2,13 @@
   "ExpandedNodes": [
     "",
     "\\Demo",
+    "\\GLWrap",
     "\\resources",
     "\\resources\\meshes",
     "\\resources\\scenes",
-    "\\RTRef",
-    "\\RTUtil"
+    "\\resources\\shaders",
+    "\\RTRef"
   ],
+  "SelectedNode": "\\Demo\\BunnyApp.cpp",
   "PreviewInSolutionExplorer": false
 }

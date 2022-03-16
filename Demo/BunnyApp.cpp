@@ -17,8 +17,10 @@ using namespace std;
 const int BunnyApp::windowWidth = 800;
 const int BunnyApp::windowHeight = 600;
 
-void initScene(vector<glm::vec3>& positions, vector<uint32_t>& indices) {
-    const string objpath = "../resources/meshes/bunny.obj";
+void initScene(vector<glm::vec3>& positions, vector<uint32_t>& indices, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
+    //const string objpath = "../resources/meshes/bunny.obj";
+    const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
+    //const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     
@@ -35,6 +37,18 @@ void initScene(vector<glm::vec3>& positions, vector<uint32_t>& indices) {
         }
     }
 
+    // use camera
+    if (obj->mNumCameras > 0) {
+        aiCamera* rawcam = obj->mCameras[0];
+        cam = make_shared<RTUtil::PerspectiveCamera>(
+            glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z), // eye
+            glm::vec3(0, 0, 0), // target
+            glm::vec3(rawcam->mUp.x, rawcam->mUp.y, rawcam->mUp.z), // up
+            windowWidth / windowHeight, // aspect
+            0.1, 50.0, // near, far
+            rawcam->mHorizontalFOV // fov
+            );
+    }
 }
 
 
@@ -42,38 +56,38 @@ BunnyApp::BunnyApp()
 : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false),
   backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
-    const string resourcePath =
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+      const string resourcePath =
+          //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+          cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
-    prog.reset(new GLWrap::Program("program", { 
-        { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
-        { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.gs" },
-        { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.fs" }
-    }));
+      prog.reset(new GLWrap::Program("program", { 
+          { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
+          { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.gs" },
+          { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.fs" }
+      }));
 
-    // Create a camera in a default position, respecting the aspect ratio of the window.
-    cam = make_shared<RTUtil::PerspectiveCamera>(
-        glm::vec3(6,2,10), // eye
-        glm::vec3(0,0,0), // target
-        glm::vec3(0,1,0), // up
-        windowWidth / (float) windowHeight, // aspect
-        0.1, 50.0, // near, far
-        15.0 * M_PI/180 // fov
-    );
-
-    cc.reset(new RTUtil::DefaultCC(cam));
-    mesh.reset(new GLWrap::Mesh());
-
-    vector<glm::vec3> positions;
-    vector<uint32_t> indices;
-    initScene(positions,indices);
-    mesh->setAttribute(0, positions);
-    mesh->setIndices(indices, GL_TRIANGLES);
-
-
+      // Create a camera in a default position, respecting the aspect ratio of the window.
+      // This will be overwritten if another camera is found.
+      cam = make_shared<RTUtil::PerspectiveCamera>(
+            glm::vec3(6, 2, 10), // eye
+            glm::vec3(0, 0, 0), // target
+            glm::vec3(0, 1, 0), // up
+            windowWidth / (float)windowHeight, // aspect
+            0.1, 50.0, // near, far
+            15.0 * M_PI / 180 // fov
+            );
     
-    perform_layout();
-    set_visible(true);
+      cc.reset(new RTUtil::DefaultCC(cam));
+      mesh.reset(new GLWrap::Mesh());
+
+      vector<glm::vec3> positions;
+      vector<uint32_t> indices;
+      initScene(positions, indices, cam, windowWidth, windowHeight);
+      mesh->setAttribute(0, positions);
+      mesh->setIndices(indices, GL_TRIANGLES);
+
+      perform_layout();
+      set_visible(true);
 }
 
 
