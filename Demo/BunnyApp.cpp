@@ -15,12 +15,25 @@
 const int BunnyApp::windowWidth = 800;
 const int BunnyApp::windowHeight = 600;
 
+glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
+    // Dealing with node hierarchy
+    aiNode* tempNode = rootNode->FindNode(nodeName);
+    glm::mat4 cmt = glm::mat4(1.f);
+    glm::mat4 cur;
 
+    // Iterate through all nodes
+    while (tempNode != NULL) {
+        cur = RTUtil::a2g(tempNode->mTransformation);
+        cmt = cur * cmt;
+        tempNode = tempNode->mParent;
+    }
+    return cmt;
+}
 
 void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
-    //const string objpath = "../resources/scenes/bunnyscene.glb";
+    const string objpath = "../resources/scenes/bunnyscene.glb";
     //const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
-    const std::string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+    // const std::string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     vector<vector<glm::vec3>> positions;
@@ -45,17 +58,28 @@ void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
      // use camera
      if (obj->mNumCameras > 0) {
          aiCamera* rawcam = obj->mCameras[0];
-         //cam = make_shared<RTUtil::PerspectiveCamera>(
-         //    glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z), // eye
-         //    glm::vec3(0, 0, 0), // target
-         //    glm::vec3(rawcam->mUp.x, rawcam->mUp.y, rawcam->mUp.z), // up
-         //    windowWidth / windowHeight, // aspect
-         //    0.1, 50.0, // near, far
-         //    rawcam->mHorizontalFOV // fov
-         //    );
+         aiNode* rootNode = obj->mRootNode;
+         glm::mat4 camTransMat = getTransMatrix(rootNode, rawcam->mName);
+
+        // transform camera
+          glm::vec3 position = glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x,rawcam->mPosition.y,rawcam->mPosition.z,1));
+          glm::vec3 up = glm::vec3(camTransMat * glm::vec4(rawcam->mUp.x,rawcam->mUp.y,rawcam->mUp.z,1));
+            up = up + glm::vec3(0,0,.0975);
+
+         cam = make_shared<RTUtil::PerspectiveCamera>(
+            position, // eye
+            glm::vec3(0, 0.5, 0), // target
+            up, // up
+            rawcam->mAspect, // aspect
+            0.1, 50.0, // near, far
+            rawcam->mHorizontalFOV/rawcam->mAspect // fov
+            );
      }
     
 }
+
+
+
 
 void BunnyApp::traverseNodeHierarchy(vector<vector<glm::vec3>>& positions, vector<vector<uint32_t>>& indices,const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
     if (cur != NULL) {
@@ -103,8 +127,8 @@ BunnyApp::BunnyApp()
   backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
