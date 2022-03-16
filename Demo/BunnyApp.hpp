@@ -7,6 +7,7 @@
 #include <RTUtil/Camera.hpp>
 #include <RTUtil/CameraController.hpp>
 #include <assimp/scene.h>          // Output data structure
+using namespace std;
 
 class BunnyApp : public nanogui::Screen {
 public:
@@ -20,8 +21,8 @@ public:
 
     virtual void draw_contents() override;
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
-    void addMeshToScene(aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat);
-    void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat);
+    void addMeshToScene(vector<glm::vec3>& positions, vector<uint32_t>& indices,aiMesh* msh, int& count, std::vector<glm::mat4>& translist, glm::mat4 transmat);
+    void traverseNodeHierarchy(vector<glm::vec3>& positions, vector<uint32_t>& indices,const aiScene* obj, aiNode* cur, int& count, std::vector<glm::mat4>& translist, glm::mat4 transmat);
 
 private:
 

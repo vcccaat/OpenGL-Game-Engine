@@ -12,20 +12,26 @@
 #include <assimp/postprocess.h>  
 #include <RTUtil/conversions.hpp>
 
-
 const int BunnyApp::windowWidth = 800;
 const int BunnyApp::windowHeight = 600;
 
 
 
 void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
-    //const string objpath = "../resources/scenes/bunnyscene.glb";
+    const string objpath = "../resources/scenes/bunnyscene.glb";
     // const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
-    const std::string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+    // const std::string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    int count = 0;
+    vector<glm::vec3> positions;
+    vector<uint32_t> indices;
     std::vector<glm::mat4> transMatVec = {};
-    traverseNodeHierarchy(obj, obj->mRootNode, transMatVec, glm::mat4(1.f));
+    traverseNodeHierarchy(positions, indices, obj, obj->mRootNode,count,transMatVec, glm::mat4(1.f));
+    cout << "positions" << positions.size() << endl;
+
+    mesh->setAttribute(0, positions);
+    mesh->setIndices(indices, GL_TRIANGLES);
 
      // use camera
      if (obj->mNumCameras > 0) {
@@ -42,30 +48,32 @@ void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
     
 }
 
-void BunnyApp::traverseNodeHierarchy(const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
+void BunnyApp::traverseNodeHierarchy(vector<glm::vec3>& positions, vector<uint32_t>& indices,const aiScene* obj, aiNode* cur, int& count, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* msh = obj->mMeshes[cur->mMeshes[i]];
-                addMeshToScene(msh, translist, transmat);
+                addMeshToScene(positions, indices, msh, count, translist, transmat);
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(obj, cur->mChildren[i], translist, transmat);
+            traverseNodeHierarchy(positions, indices, obj, cur->mChildren[i], count , translist, transmat);
         }
 }
 }
 
 
-void BunnyApp::addMeshToScene(aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat){
+void BunnyApp::addMeshToScene(vector<glm::vec3>& positions, vector<uint32_t>& indices,aiMesh* msh, int& count,  std::vector<glm::mat4>& translist, glm::mat4 transmat){
     // aiMesh* mesh = obj->mMeshes[0];
-    std::vector<glm::vec3> positions;
-    std::vector<uint32_t> indices;
+    // vector<glm::vec3> positions;
+    // vector<uint32_t> indices;
 
     // store mesh vertices 
+
+    // if (count == 1) {
     for (int i = 0; i < msh->mNumVertices; ++i) {
-        positions.push_back(reinterpret_cast<glm::vec3&>(msh->mVertices[i]));
+        positions.push_back(glm::vec3(transmat*glm::vec4(reinterpret_cast<glm::vec3&>(msh->mVertices[i]),1)));
     }
     // store mesh indices
     for (int i = 0; i < msh->mNumFaces; ++i) {
@@ -73,10 +81,16 @@ void BunnyApp::addMeshToScene(aiMesh* msh, std::vector<glm::mat4>& translist, gl
             indices.push_back(reinterpret_cast<uint32_t&>(msh->mFaces[i].mIndices[j]));
         }
     }
-    std::cout << translist.size() << "\n";
-    mesh->setAttribute(translist.size(), positions);
-    mesh->setIndices(indices, GL_TRIANGLES);
+    // }
+    
+    count++;
+    cout << count << endl;
     translist.push_back(transmat);
+    // if (count == 0){
+    //     mesh->setAttribute(count, positions);
+    //     mesh->setIndices(indices, GL_TRIANGLES);
+    //     count++;
+    // }
 }
 
 
@@ -88,8 +102,8 @@ BunnyApp::BunnyApp()
   backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
@@ -113,10 +127,6 @@ BunnyApp::BunnyApp()
     mesh.reset(new GLWrap::Mesh());
 
     initScene(cam, windowWidth, windowHeight);
-
-    
-    // mesh->setAttribute(0, positions);
-    // mesh->setIndices(indices, GL_TRIANGLES);
 
     perform_layout();
     set_visible(true);
@@ -161,7 +171,6 @@ void BunnyApp::draw_contents() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
-
     prog->use();
     prog->uniform("mM", glm::mat4(1.0));
     prog->uniform("mV", cam->getViewMatrix());
