@@ -20,8 +20,8 @@ public:
 
     virtual void draw_contents() override;
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
-    void addMeshToScene(aiMesh* msh, int& count);
-    void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, int& count);
+    void addMeshToScene(aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat);
+    void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat);
 
 private:
 
