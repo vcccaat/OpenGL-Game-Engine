@@ -6,7 +6,7 @@
 #include <GLWrap/Mesh.hpp>
 #include <RTUtil/Camera.hpp>
 #include <RTUtil/CameraController.hpp>
-
+#include <assimp/scene.h>          // Output data structure
 
 class BunnyApp : public nanogui::Screen {
 public:
@@ -19,6 +19,9 @@ public:
     virtual bool scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
 
     virtual void draw_contents() override;
+    void initScene();
+    void addMeshToScene(aiMesh* msh, int& count);
+    void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, int& count);
 
 private:
 

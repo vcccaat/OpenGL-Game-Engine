@@ -10,32 +10,57 @@
 /* new import */
 #include <assimp/Importer.hpp> 
 #include <assimp/postprocess.h>  
-#include <assimp/scene.h> 
 using namespace std;
 
 
 const int BunnyApp::windowWidth = 800;
 const int BunnyApp::windowHeight = 600;
 
-void initScene(vector<glm::vec3>& positions, vector<uint32_t>& indices) {
-    const string objpath = "../resources/meshes/bunny.obj";
+void BunnyApp::initScene() {
+    const string objpath = "../resources/scenes/bunnyscene.glb";
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-    
-    // temp:get the first mesh
-    aiMesh* mesh = obj->mMeshes[0];
+    int count = 0;
+    traverseNodeHierarchy(obj, obj->mRootNode,count);
+}
+
+void BunnyApp::addMeshToScene(aiMesh* msh, int& count){
+    // aiMesh* mesh = obj->mMeshes[0];
+    vector<glm::vec3> positions;
+    vector<uint32_t> indices;
+
     // store mesh vertices 
-    for (int i = 0; i < mesh->mNumVertices; ++i) {
-        positions.push_back(reinterpret_cast<glm::vec3&>(mesh->mVertices[i]));
+    for (int i = 0; i < msh->mNumVertices; ++i) {
+        positions.push_back(reinterpret_cast<glm::vec3&>(msh->mVertices[i]));
     }
     // store mesh indices
-    for (int i = 0; i < mesh->mNumFaces; ++i) {
+    for (int i = 0; i < msh->mNumFaces; ++i) {
         for (int j = 0; j < 3; ++j) {
-            indices.push_back(reinterpret_cast<uint32_t&>(mesh->mFaces[i].mIndices[j]));
+            indices.push_back(reinterpret_cast<uint32_t&>(msh->mFaces[i].mIndices[j]));
         }
     }
-
+    if (count == 0){
+        mesh->setAttribute(count, positions);
+        mesh->setIndices(indices, GL_TRIANGLES);
+        count++;
+    }
 }
+
+void BunnyApp::traverseNodeHierarchy(const aiScene* obj, aiNode* cur, int& count) {
+    if (cur != NULL) {
+        // transMatrix = transMatrix * RTUtil::a2g(cur->mTransformation);
+        if (cur->mNumMeshes > 0) {
+            for (int i = 0; i < cur->mNumMeshes; ++i) {
+                aiMesh* msh = obj->mMeshes[cur->mMeshes[i]];
+                addMeshToScene(msh, count);
+            }
+        }
+        for (int i = 0; i < cur->mNumChildren; ++i) {
+            traverseNodeHierarchy( obj, cur->mChildren[i], count);
+        }
+    }
+}
+
 
 
 BunnyApp::BunnyApp()
@@ -51,27 +76,28 @@ BunnyApp::BunnyApp()
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.fs" }
     }));
 
+
     // Create a camera in a default position, respecting the aspect ratio of the window.
-    cam = make_shared<RTUtil::PerspectiveCamera>(
-        glm::vec3(6,2,10), // eye
-        glm::vec3(0,0,0), // target
-        glm::vec3(0,1,0), // up
-        windowWidth / (float) windowHeight, // aspect
-        0.1, 50.0, // near, far
-        15.0 * M_PI/180 // fov
-    );
+    //  if (obj->mNumCameras == 0) {
+        cam = make_shared<RTUtil::PerspectiveCamera>(
+            glm::vec3(6,2,10), // eye
+            glm::vec3(0,0,0), // target
+            glm::vec3(0,1,0), // up
+            windowWidth / (float) windowHeight, // aspect
+            0.1, 50.0, // near, far
+            15.0 * M_PI/180 // fov
+        );
+    //  }
 
     cc.reset(new RTUtil::DefaultCC(cam));
     mesh.reset(new GLWrap::Mesh());
 
-    vector<glm::vec3> positions;
-    vector<uint32_t> indices;
-    initScene(positions,indices);
-    mesh->setAttribute(0, positions);
-    mesh->setIndices(indices, GL_TRIANGLES);
-
+    initScene();
 
     
+    // mesh->setAttribute(0, positions);
+    // mesh->setIndices(indices, GL_TRIANGLES);
+
     perform_layout();
     set_visible(true);
 }
