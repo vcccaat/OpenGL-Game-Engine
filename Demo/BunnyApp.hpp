@@ -30,13 +30,14 @@ private:
     static const int windowHeight;
 
     std::unique_ptr<GLWrap::Program> prog;
-    std::unique_ptr<GLWrap::Mesh> m1;
-    std::unique_ptr<GLWrap::Mesh> m2;
+    std::vector<std::unique_ptr<GLWrap::Mesh>> meshes;
 
     std::shared_ptr<RTUtil::PerspectiveCamera> cam;
     std::unique_ptr<RTUtil::DefaultCC> cc;
 
     nanogui::Color backgroundColor;
+
+    std::vector<glm::mat4> transMatVec;
 };
 
 
