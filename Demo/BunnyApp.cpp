@@ -18,20 +18,29 @@ const int BunnyApp::windowHeight = 600;
 
 
 void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
-    const string objpath = "../resources/scenes/bunnyscene.glb";
-    // const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
-    // const std::string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
+    //const string objpath = "../resources/scenes/bunnyscene.glb";
+    //const string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
+    const std::string objpath = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(objpath, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-    int count = 0;
-    vector<glm::vec3> positions;
-    vector<uint32_t> indices;
+    vector<vector<glm::vec3>> positions;
+    vector<vector<uint32_t>> indices;
     std::vector<glm::mat4> transMatVec = {};
-    traverseNodeHierarchy(positions, indices, obj, obj->mRootNode,count,transMatVec, glm::mat4(1.f));
-    cout << "positions" << positions.size() << endl;
+    traverseNodeHierarchy(positions, indices, obj, obj->mRootNode,transMatVec, glm::mat4(1.f));
+    //cout << "positions" << positions.size() << endl;
+    /*for (int k = 0; k < 2; k++) {
+        for (int i = 0; i < 4; i++) {
+            printf("%f, %f, %f, %f\n", transMatVec[k][i][0], transMatVec[k][i][1], transMatVec[k][i][2], transMatVec[k][i][3]);
+        }
+        printf("\n");
+    }*/
 
-    mesh->setAttribute(0, positions);
-    mesh->setIndices(indices, GL_TRIANGLES);
+
+    m1->setAttribute(0, positions[0]);
+    m1->setIndices(indices[0], GL_TRIANGLES);
+
+    m2->setAttribute(0, positions[1]);
+    m2->setIndices(indices[1], GL_TRIANGLES);
 
      // use camera
      if (obj->mNumCameras > 0) {
@@ -48,49 +57,41 @@ void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
     
 }
 
-void BunnyApp::traverseNodeHierarchy(vector<glm::vec3>& positions, vector<uint32_t>& indices,const aiScene* obj, aiNode* cur, int& count, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
+void BunnyApp::traverseNodeHierarchy(vector<vector<glm::vec3>>& positions, vector<vector<uint32_t>>& indices,const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* msh = obj->mMeshes[cur->mMeshes[i]];
-                addMeshToScene(positions, indices, msh, count, translist, transmat);
+                addMeshToScene(positions, indices, msh, translist, transmat);
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(positions, indices, obj, cur->mChildren[i], count , translist, transmat);
+            traverseNodeHierarchy(positions, indices, obj, cur->mChildren[i], translist, transmat);
         }
 }
 }
 
 
-void BunnyApp::addMeshToScene(vector<glm::vec3>& positions, vector<uint32_t>& indices,aiMesh* msh, int& count,  std::vector<glm::mat4>& translist, glm::mat4 transmat){
-    // aiMesh* mesh = obj->mMeshes[0];
-    // vector<glm::vec3> positions;
-    // vector<uint32_t> indices;
+void BunnyApp::addMeshToScene(vector<vector<glm::vec3>>& positions, vector<vector<uint32_t>>& indices,aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat){
 
     // store mesh vertices 
-
-    // if (count == 1) {
+    int c = translist.size();
+    positions.push_back({});
+    indices.push_back({});
+    std::cout << c;
     for (int i = 0; i < msh->mNumVertices; ++i) {
-        positions.push_back(glm::vec3(transmat*glm::vec4(reinterpret_cast<glm::vec3&>(msh->mVertices[i]),1)));
+        glm::vec3 t = glm::vec3(transmat * glm::vec4(reinterpret_cast<glm::vec3&>(msh->mVertices[i]), 1));
+        positions[c].push_back(t);
     }
     // store mesh indices
     for (int i = 0; i < msh->mNumFaces; ++i) {
         for (int j = 0; j < 3; ++j) {
-            indices.push_back(reinterpret_cast<uint32_t&>(msh->mFaces[i].mIndices[j]));
+            indices[c].push_back(reinterpret_cast<uint32_t&>(msh->mFaces[i].mIndices[j]));
         }
     }
-    // }
     
-    count++;
-    cout << count << endl;
     translist.push_back(transmat);
-    // if (count == 0){
-    //     mesh->setAttribute(count, positions);
-    //     mesh->setIndices(indices, GL_TRIANGLES);
-    //     count++;
-    // }
 }
 
 
@@ -102,8 +103,8 @@ BunnyApp::BunnyApp()
   backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
@@ -116,7 +117,7 @@ BunnyApp::BunnyApp()
     // Will be overwritten if another camera is found.
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
         glm::vec3(6,2,10), // eye
-        glm::vec3(0,0,0), // target
+        glm::vec3(0,1,0), // target
         glm::vec3(0,1,0), // up
         windowWidth / (float) windowHeight, // aspect
         0.1, 50.0, // near, far
@@ -124,7 +125,8 @@ BunnyApp::BunnyApp()
     );
 
     cc.reset(new RTUtil::DefaultCC(cam));
-    mesh.reset(new GLWrap::Mesh());
+    m1.reset(new GLWrap::Mesh());
+    m2.reset(new GLWrap::Mesh());
 
     initScene(cam, windowWidth, windowHeight);
 
@@ -179,7 +181,8 @@ void BunnyApp::draw_contents() {
     prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
     prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
-    mesh->drawElements();
+    m1->drawElements();
+    m2->drawElements();
     prog->unuse();
 }
 

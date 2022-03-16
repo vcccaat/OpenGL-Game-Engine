@@ -21,17 +21,17 @@ public:
 
     virtual void draw_contents() override;
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
-    void addMeshToScene(vector<glm::vec3>& positions, vector<uint32_t>& indices,aiMesh* msh, int& count, std::vector<glm::mat4>& translist, glm::mat4 transmat);
-    void traverseNodeHierarchy(vector<glm::vec3>& positions, vector<uint32_t>& indices,const aiScene* obj, aiNode* cur, int& count, std::vector<glm::mat4>& translist, glm::mat4 transmat);
+    void addMeshToScene(vector<vector<glm::vec3>>& positions, vector<vector<uint32_t>>& indices,aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat);
+    void traverseNodeHierarchy(vector<vector<glm::vec3>>& positions, vector<vector<uint32_t>>& indices,const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat);
 
 private:
 
     static const int windowWidth;
     static const int windowHeight;
-    bool useDefaultCamera;
 
     std::unique_ptr<GLWrap::Program> prog;
-    std::unique_ptr<GLWrap::Mesh> mesh;
+    std::unique_ptr<GLWrap::Mesh> m1;
+    std::unique_ptr<GLWrap::Mesh> m2;
 
     std::shared_ptr<RTUtil::PerspectiveCamera> cam;
     std::unique_ptr<RTUtil::DefaultCC> cc;
