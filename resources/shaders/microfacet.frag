@@ -1,5 +1,19 @@
 #version 330
 
+// Inserted
+uniform float alpha;
+uniform float eta;
+uniform vec3 diffuseReflectance;
+
+uniform vec3 lightDir;
+uniform vec3 k_d;
+uniform vec3 k_a;
+
+in vec3 vPosition;
+in vec3 vNormal;
+
+out vec4 fragColor;
+
 // This is a shader code fragment (not a complete shader) that contains 
 // the functions to evaluate the microfacet BRDF.
 
@@ -76,4 +90,10 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
     float F = (idotm > 0.0) ? fresnel(i,m,eta) : 0.0;
     float G = G1(i,m,n,alpha) * G1(o,m,n,alpha);
     return F * G * D(m,n,alpha) / (4.0*idotn*odotn);
+}
+
+void main() {
+    vec3 normal = (gl_FrontFacing) ? vNormal : -vNormal;
+    float NdotH = max(dot(normalize(normal), normalize(lightDir)), 0.0);
+    fragColor = vec4(k_a + NdotH * k_d, 1.0);
 }

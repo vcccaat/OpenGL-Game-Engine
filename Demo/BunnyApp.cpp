@@ -217,7 +217,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
         // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
-        { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/microfacet.frag" }
     }));
 
     // Default camera, will be overwritten if camera is given in .glb
@@ -296,13 +296,11 @@ void BunnyApp::draw_contents() {
             Material material = materials[meshIndToMaterialInd[i]]; // temporarily, until we have mesh to material mapping
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             prog->uniform("mM", transMatVec[i]);
-            //prog->uniform("alpha", bsdf.alpha());
-            //prog->uniform("eta", bsdf.eta());
-            //prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
+            prog->uniform("alpha", bsdf.alpha());
+            prog->uniform("eta", bsdf.eta());
+            prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
             meshes[i]->drawElements();
-            std::cout << i << ": " << meshIndToMaterialInd[i] << "\n";
         }
-        std::cout << "\n\n";
     }
     // for OBJ files
     if (lights.size() == 0) {

@@ -10,8 +10,7 @@ layout (location = 1) in vec3 normal;
 out vec3 vPosition;  // vertex position in eye space
 out vec3 vNormal; // vertex normal in eye space
 
-void main()
-{
+void main() {
     vPosition = (mV * mM * vec4(position, 1.0)).xyz;
     gl_Position = mP * vec4(vPosition, 1.0);
     vNormal = (mV * mM * vec4(normal, .0)).xyz;
