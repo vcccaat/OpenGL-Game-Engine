@@ -19,11 +19,31 @@ public:
     Material();
 };
 
+class Light {
+public:
+    std::string name;
+    glm::vec3 pos;
+    glm::vec3 areaNormal;
+    glm::vec3 areaTangent;
+    aiColor3D power;
+    int sceneindex;
+    float width;
+    float height;
+    float dist;
+    glm::mat4 transMat;
+
+    enum Type { POINT, AREA, AMBIENT };
+    Type type;
+
+    Light();
+};
+
 class BunnyApp : public nanogui::Screen {
 public:
 
     void initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
     std::vector<Material> BunnyApp::parseMats(const aiScene* scene);
+    std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene);
     void traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat);
     void addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat);
     BunnyApp(std::string path, float windowWidth, float windowHeight);
@@ -45,6 +65,7 @@ private:
     std::unique_ptr<RTUtil::DefaultCC> cc;
 
     std::vector<Material> materials;
+    std::vector<Light> lights;
 
     nanogui::Color backgroundColor;
 

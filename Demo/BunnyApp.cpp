@@ -37,15 +37,16 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
 
 /**************************************** MATERIAL AND LIGHT CLASS ****************************************/
 
-
 Material::Material() {
     this->diffuse = glm::vec3(.0, .5, .8);
     this->roughness = .2;
     this->indexofref = 1.5;
 }
 
+Light::Light() {}
 
-/**************************************** BUNNYAPP METHODS ****************************************/
+
+/**************************************** BUNNYAPP STARTUP METHODS ****************************************/
 
 
 void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
@@ -105,6 +106,49 @@ std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
         mats.push_back(m);
     }
     return mats;
+}
+
+std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
+
+    // Initial empty list, then loop over all lights
+    std::vector<Light> lights = {};
+    for (int i = 0; i < scene->mNumLights; i++) {
+        // Construct light
+        Light l = Light();
+        l.name = scene->mLights[i]->mName.C_Str();
+        l.sceneindex = i;
+
+        // Parse area, ambient, and point
+        if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.AREA;
+            l.areaNormal = glm::vec3(0, 0, 1);
+            l.areaTangent = glm::vec3(0, 1, 0);
+        }
+        else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
+            l.power = scene->mLights[i]->mColorAmbient;
+            l.type = l.AMBIENT;
+        }
+        else {
+            aiVector3D p = scene->mLights[i]->mPosition;
+            l.pos = glm::vec3(p.x, p.y, p.z);
+            l.power = scene->mLights[i]->mColorDiffuse;
+            l.type = l.POINT;
+        }
+
+        // transform light
+        glm::mat4 transMat = getTransMatrix(rootNode, scene->mLights[i]->mName);
+        l.pos = glm::vec3(transMat * glm::vec4(l.pos.x, l.pos.y, l.pos.z, 1));
+        l.transMat = transMat;
+        if (l.type == l.AREA) {
+            l.areaNormal = glm::normalize(glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0)));
+        }
+        // Push to list
+        lights.push_back(l);
+    }
+    return lights;
 }
 
 void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
@@ -183,7 +227,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 }
 
 
-/**************************************** CONTROL METHODS FOR BUNNYAPP ****************************************/
+/**************************************** UPDATE METHODS FOR BUNNYAPP ****************************************/
 
 
 bool BunnyApp::keyboard_event(int key, int scancode, int action, int modifiers) {
