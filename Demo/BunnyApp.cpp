@@ -215,9 +215,9 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
-        { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
-        // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.gs" },
-        { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.fs" }
+        { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
+        // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
     }));
 
     // Default camera, will be overwritten if camera is given in .glb
