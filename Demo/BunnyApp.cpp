@@ -79,6 +79,7 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
          cam->setAspectRatio(rawcam->mAspect);
          cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x,rawcam->mPosition.y,rawcam->mPosition.z,1)));
          cam->setFOVY(rawcam->mHorizontalFOV/rawcam->mAspect);
+         // Find point closest to origin along target ray using projection in camera space
          glm::vec3 originInCamSpace = glm::vec3(glm::inverse(camTransMat) * glm::vec4(0, 0, 0, 1));
          glm::vec3 originVec = originInCamSpace - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
          glm::vec3 targetVec = glm::vec3(rawcam->mLookAt.x, rawcam->mLookAt.y, rawcam->mLookAt.z) - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
@@ -86,14 +87,14 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
          glm::vec3 targetCamSpace = glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z) + projVec;
          glm::vec3 targetGlobal = glm::vec3(camTransMat * glm::vec4(targetCamSpace.x, targetCamSpace.y, targetCamSpace.z, 1));
          cam->setTarget(targetGlobal);
-         std::cerr << targetGlobal.x << ", " << targetGlobal.y << ", " << targetGlobal.z << "\n";;
          //cam->setTarget(glm::vec3(0.f, 0.f, 0.f));
          //cam->setAspectRatio(windowWidth / windowHeight);
          // no setUp??
      }
 
-     // Material parsing
+     // Material and light parsing
      materials = parseMats(obj);
+     lights = parseLights(obj->mRootNode, obj); // TEMPORARY: only the first pointlight is parsed
 }
 
 std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
@@ -108,7 +109,7 @@ std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
     return mats;
 }
 
-std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
+std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene) {
 
     // Initial empty list, then loop over all lights
     std::vector<Light> lights = {};
@@ -120,22 +121,27 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
 
         // Parse area, ambient, and point
         if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
+            continue; //TEMPORARY
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.AREA;
             l.areaNormal = glm::vec3(0, 0, 1);
             l.areaTangent = glm::vec3(0, 1, 0);
+            printf("area parsed\n");
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
+            continue; //TEMPORARY
             l.power = scene->mLights[i]->mColorAmbient;
             l.type = l.AMBIENT;
+            printf("amb parsed\n");
         }
         else {
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.POINT;
+            printf("Point parsed\n");
         }
 
         // transform light
@@ -147,6 +153,7 @@ std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene) {
         }
         // Push to list
         lights.push_back(l);
+        break; //TEMPORARY
     }
     return lights;
 }
