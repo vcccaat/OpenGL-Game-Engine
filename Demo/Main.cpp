@@ -16,7 +16,14 @@ int main(int argc, char const* argv[]) {
         nanogui::mainloop(16);
     }
     else {
-        nanogui::ref<BunnyApp> app = new BunnyApp();
+        // PATHEDIT
+        //const string path = "../resources/meshes/bunny.obj";
+        //const string path = "../resources/scenes/bunnyscene.glb";
+        //const string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
+        const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
+        float aspect = getAspect(path);
+        int windowHeight = 600;
+        nanogui::ref<BunnyApp> app = new BunnyApp(path, aspect * windowHeight, windowHeight);
         nanogui::mainloop(16);
     }
 
