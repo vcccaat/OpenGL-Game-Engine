@@ -18,14 +18,13 @@ int main(int argc, char const* argv[]) {
     else {
         // PATHEDIT
         //const string path = "../resources/meshes/bunny.obj";
-        const std::string path = "../resources/scenes/bunnyscene.glb";
+        //const std::string path = "../resources/scenes/bunnyscene.glb";
         //const string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/meshes/bunny.obj";
-        // const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/staircase.glb";
+        const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene.glb";
         float aspect = getAspect(path);
-        int windowHeight = 600;
+        int windowHeight = 500;
         nanogui::ref<BunnyApp> app = new BunnyApp(path, aspect * windowHeight, windowHeight);
         nanogui::mainloop(16);
     }
-
     nanogui::shutdown();
 }
