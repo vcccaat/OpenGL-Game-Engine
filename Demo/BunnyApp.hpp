@@ -38,6 +38,8 @@ private:
     nanogui::Color backgroundColor;
 
     std::vector<glm::mat4> transMatVec;
+    glm::mat4 camTransMat;
+    
 };
 
 

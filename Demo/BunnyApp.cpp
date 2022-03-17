@@ -53,21 +53,14 @@ void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
      if (obj->mNumCameras > 0) {
          aiCamera* rawcam = obj->mCameras[0];
          aiNode* rootNode = obj->mRootNode;
-         glm::mat4 camTransMat = getTransMatrix(rootNode, rawcam->mName);
 
         // transform camera
-          glm::vec3 position = glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x,rawcam->mPosition.y,rawcam->mPosition.z,1));
-          glm::vec3 up = glm::vec3(camTransMat * glm::vec4(rawcam->mUp.x,rawcam->mUp.y,rawcam->mUp.z,1));
-            up = up + glm::vec3(0,0,.0975);
+         camTransMat = getTransMatrix(rootNode, rawcam->mName);
+         cam->setAspectRatio(rawcam->mAspect);
+         cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x,rawcam->mPosition.y,rawcam->mPosition.z,1)));
+         cam->setFOVY(rawcam->mHorizontalFOV/rawcam->mAspect);
+        // no setUp??
 
-         cam = make_shared<RTUtil::PerspectiveCamera>(
-            position, // eye
-            glm::vec3(0, 0.5, 0), // target
-            up, // up
-            rawcam->mAspect, // aspect
-            0.1, 50.0, // near, far
-            rawcam->mHorizontalFOV/rawcam->mAspect // fov
-            );
      }
 }
 
@@ -130,7 +123,7 @@ BunnyApp::BunnyApp() : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeig
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
         glm::vec3(6,2,10), // eye
-        glm::vec3(0,1,0), // target
+        glm::vec3(-0.2,0.65,0), // target
         glm::vec3(0,1,0), // up
         windowWidth / (float) windowHeight, // aspect
         0.1, 50.0, // near, far
@@ -183,6 +176,8 @@ void BunnyApp::draw_contents() {
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // cout << cam->getEye().x << " " << cam->getEye().y << " " << cam->getEye().z  << endl;
+    
     glEnable(GL_DEPTH_TEST);
     prog->use();
     prog->uniform("mM", glm::mat4(1.0));

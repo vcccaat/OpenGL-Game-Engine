@@ -106,6 +106,7 @@ public:
     this->target() = target;
   }
 
+
 protected:
   // memoized values
   mutable bool frameDirty = true;
