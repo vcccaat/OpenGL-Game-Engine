@@ -101,6 +101,7 @@ std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
         Material m = Material();
         scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
         scene->mMaterials[i]->Get(AI_MATKEY_BASE_COLOR, reinterpret_cast<aiColor3D&>(m.diffuse));
+        scene->mMaterials[i]->Get(AI_MATKEY_REFRACTI, m.indexofref);
         mats.push_back(m);
     }
     return mats;
