@@ -102,7 +102,7 @@ void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
     indices.push_back({});
     normals.push_back({});
     for (int i = 0; i < msh->mNumVertices; ++i) {
-        glm::vec3 t = glm::vec3(transmat * glm::vec4(reinterpret_cast<glm::vec3&>(msh->mVertices[i]), 1));
+        glm::vec3 t = reinterpret_cast<glm::vec3&>(msh->mVertices[i]);
         positions[curMesh].push_back(t);
 
         // access normal of each vertice
@@ -199,7 +199,7 @@ void BunnyApp::draw_contents() {
     
     glEnable(GL_DEPTH_TEST);
     prog->use();
-    prog->uniform("mM", glm::mat4(1.0));
+   
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
@@ -207,6 +207,7 @@ void BunnyApp::draw_contents() {
     prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
     for (int i = 0; i < meshes.size(); ++i) {
+        prog->uniform("mM", transMatVec[i]);
         meshes[i]->drawElements();
     }
     prog->unuse();
