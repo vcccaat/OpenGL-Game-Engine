@@ -8,6 +8,10 @@
 #include <assimp/postprocess.h>  
 #include <RTUtil/conversions.hpp>
 
+
+/**************************************** HELPER FUNCTIONS ****************************************/
+
+
 float getAspect(std::string path) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
@@ -29,6 +33,20 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     }
     return cmt;
 }
+
+
+/**************************************** MATERIAL AND LIGHT CLASS ****************************************/
+
+
+Material::Material() {
+    this->diffuse = glm::vec3(.0, .5, .8);
+    this->roughness = .2;
+    this->indexofref = 1.5;
+}
+
+
+/**************************************** BUNNYAPP METHODS ****************************************/
+
 
 void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
@@ -70,13 +88,23 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
          std::cerr << targetGlobal.x << ", " << targetGlobal.y << ", " << targetGlobal.z << "\n";;
          //cam->setTarget(glm::vec3(0.f, 0.f, 0.f));
          //cam->setAspectRatio(windowWidth / windowHeight);
-        // no setUp??
-
+         // no setUp??
      }
+
+     // Material parsing
+     materials = parseMats(obj);
 }
 
-
-
+std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
+    std::vector<Material> mats = {};
+    for (int i = 0; i < scene->mNumMaterials; ++i) {
+        Material m = Material();
+        scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
+        scene->mMaterials[i]->Get(AI_MATKEY_BASE_COLOR, reinterpret_cast<aiColor3D&>(m.diffuse));
+        mats.push_back(m);
+    }
+    return mats;
+}
 
 void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
     if (cur != NULL) {
@@ -92,7 +120,6 @@ void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positi
         }
 }
 }
-
 
 void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat){
 
@@ -124,8 +151,6 @@ void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
     translist.push_back(transmat);
 }
 
-
-
 BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false), backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
@@ -156,6 +181,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     set_visible(true);
 }
 
+
+/**************************************** CONTROL METHODS FOR BUNNYAPP ****************************************/
 
 
 bool BunnyApp::keyboard_event(int key, int scancode, int action, int modifiers) {
