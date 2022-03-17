@@ -10,7 +10,7 @@
 
 float getAspect(std::string path) {
     Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     if (obj->mNumCameras == 0) return 1.f;
     return obj->mCameras[0]->mAspect;
 }
@@ -32,19 +32,21 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
 
 void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(path , aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* obj = importer.ReadFile(path , aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
     // Mesh parsing
     std::vector<std::vector<glm::vec3>> positions;
     std::vector<std::vector<uint32_t>> indices;
+    std::vector<std::vector<glm::vec3>> normals;
     transMatVec = {};
-    traverseNodeHierarchy(positions, indices, obj, obj->mRootNode, transMatVec, glm::mat4(1.f));
+    traverseNodeHierarchy(positions, indices, normals, obj, obj->mRootNode, transMatVec, glm::mat4(1.f));
 
     // Mesh inserting
     for (int i = 0; i < positions.size(); ++i) {
         meshes.push_back(std::unique_ptr<GLWrap::Mesh>());
         meshes[i].reset(new GLWrap::Mesh());
         meshes[i]->setAttribute(0, positions[i]);
+        meshes[i]->setAttribute(1, normals[i]);
         meshes[i]->setIndices(indices[i], GL_TRIANGLES);
     }
 
@@ -67,38 +69,49 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
 
 
 
-void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices,const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
+void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* temp = obj->mMeshes[cur->mMeshes[i]];
-                addMeshToScene(positions, indices, temp, translist, transmat);
+                addMeshToScene(positions, indices, normals, temp, translist, transmat);
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(positions, indices, obj, cur->mChildren[i], translist, transmat);
+            traverseNodeHierarchy(positions, indices, normals, obj, cur->mChildren[i], translist, transmat);
         }
 }
 }
 
 
-void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices,aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat){
+void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat){
 
     // store mesh vertices 
     int curMesh = translist.size();
     positions.push_back({});
     indices.push_back({});
+    normals.push_back({});
     for (int i = 0; i < msh->mNumVertices; ++i) {
         glm::vec3 t = glm::vec3(transmat * glm::vec4(reinterpret_cast<glm::vec3&>(msh->mVertices[i]), 1));
         positions[curMesh].push_back(t);
+
+        // access normal of each vertice
+        glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
+        normals[curMesh].push_back(n);
     }
+    // access normal of each vertice
+    // for (int i = 0; i < msh->mNumVertices; ++i) {
+    //     glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
+    //     std::cout << "normal " << n.x << " " << n.y << " " << n.z << std::endl;
+    // }
     // store mesh indices
     for (int i = 0; i < msh->mNumFaces; ++i) {
         for (int j = 0; j < 3; ++j) {
             indices[curMesh].push_back(reinterpret_cast<uint32_t&>(msh->mFaces[i].mIndices[j]));
         }
     }
+
     translist.push_back(transmat);
 }
 
@@ -110,12 +123,12 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vs" },
-        { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.gs" },
+        // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.gs" },
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.fs" }
     }));
 
