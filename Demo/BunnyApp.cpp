@@ -7,6 +7,8 @@
 #include <assimp/Importer.hpp> 
 #include <assimp/postprocess.h>  
 #include <RTUtil/conversions.hpp>
+#include "RTUtil/microfacet.hpp"
+#include "RTUtil/frame.hpp"
 
 
 /**************************************** HELPER FUNCTIONS ****************************************/
@@ -58,7 +60,8 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
     std::vector<std::vector<uint32_t>> indices;
     std::vector<std::vector<glm::vec3>> normals;
     transMatVec = {};
-    traverseNodeHierarchy(positions, indices, normals, obj, obj->mRootNode, transMatVec, glm::mat4(1.f));
+    meshIndToMaterialInd = {};
+    traverseNodeHierarchy(positions, indices, normals, obj, obj->mRootNode, transMatVec, glm::mat4(1.f), meshIndToMaterialInd);
 
     // Mesh inserting
     for (int i = 0; i < positions.size(); ++i) {
@@ -158,22 +161,22 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
     return lights;
 }
 
-void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat) {
+void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* temp = obj->mMeshes[cur->mMeshes[i]];
-                addMeshToScene(positions, indices, normals, temp, translist, transmat);
+                addMeshToScene(positions, indices, normals, temp, translist, transmat, mp);
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(positions, indices, normals, obj, cur->mChildren[i], translist, transmat);
+            traverseNodeHierarchy(positions, indices, normals, obj, cur->mChildren[i], translist, transmat, mp);
         }
 }
 }
 
-void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat){
+void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp){
 
     // store mesh vertices 
     int curMesh = translist.size();
@@ -201,6 +204,7 @@ void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
     }
 
     translist.push_back(transmat);
+    mp.push_back(msh->mMaterialIndex);
 }
 
 BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false), backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
@@ -283,11 +287,32 @@ void BunnyApp::draw_contents() {
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
     prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
-    prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+    //prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
-    for (int i = 0; i < meshes.size(); ++i) {
-        prog->uniform("mM", transMatVec[i]);
-        meshes[i]->drawElements();
+    //lights.size() = 1 temporarily as we only parse one light
+    for (int k = 0; k < lights.size(); ++k) {
+        prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+        for (int i = 0; i < meshes.size(); ++i) {
+            Material material = materials[meshIndToMaterialInd[i]]; // temporarily, until we have mesh to material mapping
+            nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
+            prog->uniform("mM", transMatVec[i]);
+            //prog->uniform("alpha", bsdf.alpha());
+            //prog->uniform("eta", bsdf.eta());
+            //prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
+            meshes[i]->drawElements();
+            std::cout << i << ": " << meshIndToMaterialInd[i] << "\n";
+        }
+        std::cout << "\n\n";
     }
+    // for OBJ files
+    if (lights.size() == 0) {
+        //TODO
+        prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+        for (int i = 0; i < meshes.size(); ++i) {
+            prog->uniform("mM", transMatVec[i]);
+            meshes[i]->drawElements();
+        }
+    }
+    
     prog->unuse();
 }
