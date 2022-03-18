@@ -42,7 +42,7 @@ class BunnyApp : public nanogui::Screen {
 public:
 
     void initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
-    std::vector<Material> BunnyApp::parseMats(const aiScene* scene);
+    std::vector<Material> parseMats(const aiScene* scene);
     std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene);
     void traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp);
     void addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp);

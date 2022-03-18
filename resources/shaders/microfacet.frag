@@ -4,6 +4,8 @@
 uniform float alpha;
 uniform float eta;
 uniform vec3 diffuseReflectance;
+uniform vec3 camPos;
+uniform vec3 lightPos;
 
 uniform vec3 lightDir;
 uniform vec3 k_d;
@@ -93,7 +95,12 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 }
 
 void main() {
+    // Same as from lambert.frag for now
     vec3 normal = (gl_FrontFacing) ? vNormal : -vNormal;
-    float NdotH = max(dot(normalize(normal), normalize(lightDir)), 0.0);
-    fragColor = vec4(k_a + NdotH * k_d, 1.0);
+    //float NdotH = max(dot(normalize(normal), normalize(lightDir)), 0.0);
+    //fragColor = vec4(k_a + NdotH * k_d, 1.0);
+    vec3 wi = normalize(camPos - vPosition);
+    vec3 wo = normalize(lightPos - vPosition);
+    float bsdfOut = isotropicMicrofacet(wi, wo, normal, eta, alpha);
+    fragColor = vec4(diffuseReflectance + bsdfOut, 1.0);
 }

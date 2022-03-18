@@ -287,13 +287,15 @@ void BunnyApp::draw_contents() {
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
     prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
+    prog->uniform("camPos", cam->getEye()); // to calculate wi
     //prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
     //lights.size() = 1 temporarily as we only parse one light
     for (int k = 0; k < lights.size(); ++k) {
-        prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+        prog->uniform("lightPos", glm::normalize(lights[k].pos)); // to calculate wo
         for (int i = 0; i < meshes.size(); ++i) {
-            Material material = materials[meshIndToMaterialInd[i]]; // temporarily, until we have mesh to material mapping
+            Material material = materials[meshIndToMaterialInd[i]];
+            // TODO must use frame?
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             prog->uniform("mM", transMatVec[i]);
             prog->uniform("alpha", bsdf.alpha());
