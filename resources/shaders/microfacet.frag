@@ -7,12 +7,15 @@ uniform vec3 diffuseReflectance;
 uniform vec3 camPos;
 uniform vec3 lightPos;
 
-uniform vec3 lightDir;
-uniform vec3 k_d;
-uniform vec3 k_a;
+//uniform vec3 lightDir;
+//uniform vec3 k_d;
+//uniform vec3 k_a;
 
 in vec3 vPosition;
 in vec3 vNormal;
+
+uniform mat4 mM;  // Model matrix
+uniform mat4 mV;  // View matrix
 
 out vec4 fragColor;
 
@@ -95,12 +98,18 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 }
 
 void main() {
-    // Same as from lambert.frag for now
-    vec3 normal = (gl_FrontFacing) ? vNormal : -vNormal;
+    vec3 normal = (gl_FrontFacing) ? normalize(vNormal) : normalize(-vNormal);
+
+    // Same as from lambert.frag
     //float NdotH = max(dot(normalize(normal), normalize(lightDir)), 0.0);
     //fragColor = vec4(k_a + NdotH * k_d, 1.0);
-    vec3 wi = normalize(camPos - vPosition);
-    vec3 wo = normalize(lightPos - vPosition);
+
+    // New try
+    vec3 vLightPos = (mV * mM * vec4(lightPos, 1.0)).xyz;
+    vec3 wi = normalize(vLightPos - vPosition);
+    vec3 wo = normalize(camPos - vPosition);
     float bsdfOut = isotropicMicrofacet(wi, wo, normal, eta, alpha);
-    fragColor = vec4(diffuseReflectance + bsdfOut, 1.0);
+    float NdotH = max(dot(normalize(normal), normalize(wi)), 0.0);
+    //fragColor = vec4(diffuseReflectance + bsdfOut, 1.0); // caused very monochromatic bunny
+    fragColor = vec4(bsdfOut + NdotH * diffuseReflectance, 1.0); // a little better
 }
