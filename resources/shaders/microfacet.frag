@@ -14,7 +14,6 @@ uniform vec3 lightPos;
 in vec3 vPosition;
 in vec3 vNormal;
 
-uniform mat4 mM;  // Model matrix
 uniform mat4 mV;  // View matrix
 
 out vec4 fragColor;
@@ -105,11 +104,12 @@ void main() {
     //fragColor = vec4(k_a + NdotH * k_d, 1.0);
 
     // New try
-    vec3 vLightPos = (mV * mM * vec4(lightPos, 1.0)).xyz;
+    vec3 vLightPos = (mV * vec4(lightPos, 1.0)).xyz;
     vec3 wi = normalize(vLightPos - vPosition);
+    //vec3 vCamPos = (mV * vec4(camPos, 1.0)).xyz;
     vec3 wo = normalize(camPos - vPosition);
     float bsdfOut = isotropicMicrofacet(wi, wo, normal, eta, alpha);
     float NdotH = max(dot(normalize(normal), normalize(wi)), 0.0);
     //fragColor = vec4(diffuseReflectance + bsdfOut, 1.0); // caused very monochromatic bunny
-    fragColor = vec4(bsdfOut + NdotH * diffuseReflectance, 1.0); // a little better
+    fragColor = vec4(bsdfOut + NdotH * diffuseReflectance, 1.0) / pow(length(vLightPos - vPosition), 2); // a little better. do we need to divide by r^2?
 }
