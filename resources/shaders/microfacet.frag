@@ -1,22 +1,21 @@
 #version 330
 
-// Inserted
 uniform float alpha;
 uniform float eta;
 uniform vec3 diffuseReflectance;
-// uniform vec3 camPos;
+uniform vec3 camPos;
 uniform vec3 lightPos;
 
 //uniform vec3 lightDir;
 // uniform vec3 k_d;
 // uniform vec3 k_a;
 
-in vec3 vPosition;
-in vec3 vNormal;
-
 uniform mat4 mV;  // View matrix
 uniform mat4 mL;  // Light matrix
 uniform vec3 power;
+
+in vec3 vPosition;
+in vec3 vNormal;
 
 out vec4 fragColor;
 
@@ -132,8 +131,9 @@ void main() {
 
     // in eye space   
     vec3 vLightPos = (mV * mL * vec4(lightPos, 1.0)).xyz;
+    vec3 vCamPos = (mV * vec4(camPos, 1.0)).xyz;
     vec3 wo = normalize(vLightPos - vPosition);
-    vec3 wi = normalize(vec3(0,0,0) - vPosition);
+    vec3 wi = normalize(vCamPos - vPosition);
     float Kspecular = isotropicMicrofacet(wi, wo, normal, eta, alpha);  
     float NdotH = max(dot(normal, wi), 0.0);
 
@@ -143,4 +143,3 @@ void main() {
 
 
 }
-

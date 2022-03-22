@@ -282,7 +282,7 @@ void BunnyApp::draw_contents() {
     prog->uniform("mP", cam->getProjectionMatrix());
     // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
     // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
-    // prog->uniform("camPos", cam->getEye()); // to calculate wi
+    prog->uniform("camPos", cam->getEye()); // to calculate wi
     // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
     // lights.size() = 1 temporarily as we only parse one light
