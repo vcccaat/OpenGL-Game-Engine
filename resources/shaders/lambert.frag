@@ -13,4 +13,5 @@ void main() {
     vec3 normal = (gl_FrontFacing) ? vNormal : -vNormal;
     float NdotH = max(dot(normalize(normal), normalize(lightDir)), 0.0);
     fragColor = vec4(k_a + NdotH * k_d, 1.0);
+
 }

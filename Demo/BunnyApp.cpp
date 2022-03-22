@@ -144,7 +144,8 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.POINT;
-            printf("Point parsed\n");
+
+            printf("Point parsed, %.2f,%.2f,%.2f ", l.power[0],l.power[1],l.power[2]);
         }
 
         // transform light
@@ -191,11 +192,7 @@ void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
         glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
         normals[curMesh].push_back(n);
     }
-    // access normal of each vertice
-    // for (int i = 0; i < msh->mNumVertices; ++i) {
-    //     glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
-    //     std::cout << "normal " << n.x << " " << n.y << " " << n.z << std::endl;
-    // }
+    
     // store mesh indices
     for (int i = 0; i < msh->mNumFaces; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -211,12 +208,13 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
         // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
+        //  { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/microfacet.frag" }
     }));
 
@@ -285,25 +283,28 @@ void BunnyApp::draw_contents() {
    
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
-    //prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
-    //prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
+    prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
+    prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
     prog->uniform("camPos", cam->getEye()); // to calculate wi
-    //prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+    // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
-    //lights.size() = 1 temporarily as we only parse one light
+    // lights.size() = 1 temporarily as we only parse one light
     for (int k = 0; k < lights.size(); ++k) {
-        prog->uniform("lightPos", glm::normalize(lights[k].pos)); // to calculate wo
+        prog->uniform("lightPos", lights[k].pos); // to calculate wo
         for (int i = 0; i < meshes.size(); ++i) {
             Material material = materials[meshIndToMaterialInd[i]];
-            // TODO must use frame?
+    //         // TODO must use frame?
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
+            prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
             prog->uniform("mM", transMatVec[i]);
             prog->uniform("alpha", bsdf.alpha());
             prog->uniform("eta", bsdf.eta());
             prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
+            // std::cout << "diffuse ref" << bsdf.diffuseReflectance().x << std::endl;
             meshes[i]->drawElements();
         }
     }
+
     // for OBJ files
     if (lights.size() == 0) {
         //TODO

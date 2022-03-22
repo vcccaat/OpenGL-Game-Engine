@@ -8,13 +8,14 @@ uniform vec3 camPos;
 uniform vec3 lightPos;
 
 //uniform vec3 lightDir;
-//uniform vec3 k_d;
-//uniform vec3 k_a;
+uniform vec3 k_d;
+uniform vec3 k_a;
 
 in vec3 vPosition;
 in vec3 vNormal;
 
 uniform mat4 mV;  // View matrix
+uniform vec3 power;
 
 out vec4 fragColor;
 
@@ -104,12 +105,43 @@ void main() {
     //fragColor = vec4(k_a + NdotH * k_d, 1.0);
 
     // New try
+    // vec3 vLightPos = (mV * vec4(lightPos, 1.0)).xyz;
+    // vec3 wi = normalize(vLightPos - vPosition);
+    // //vec3 vCamPos = (mV * vec4(camPos, 1.0)).xyz;
+    // vec3 wo = normalize(camPos - vPosition);
+    // float bsdfOut = isotropicMicrofacet(wi, wo, normal, eta, alpha);
+    // float NdotH = max(dot(normalize(normal), normalize(wi)), 0.0);
+    // //fragColor = vec4(diffuseReflectance + bsdfOut, 1.0); // caused very monochromatic bunny
+    // fragColor = vec4(bsdfOut + NdotH * diffuseReflectance, 1.0) / pow(length(vLightPos - vPosition), 2); // a little better. do we need to divide by r^2?
+   
+
+    // in world space 
+    // vec3 worldPos = (inverse(mV) * vec4(vPosition,1.0)).xyz;
+    // vec3 worldNormal = (inverse(mV) * vec4(normal,1.0)).xyz;
+    // vec3 vLightPos = (vec4(lightPos, 1.0)).xyz;
+    // vec3 wo = normalize(vLightPos - worldPos);
+    // vec3 wi = normalize(camPos - worldPos);
+    // float Kspecular = 1/PI ;//isotropicMicrofacet(wi, wo, worldNormal, eta, alpha);  
+    // float NdotH = max(dot(normal, wi), 0.0);
+
+    // vec3 irradiance = vec3(2,2,2);//power / pow(length(vLightPos - vPosition), 2);
+
+    // fragColor = vec4(irradiance[0]*diffuseReflectance[0],irradiance[1]*diffuseReflectance[1],irradiance[2]*diffuseReflectance[2], 1.0) * NdotH * Kspecular;
+
+
+    // in eye space   
+    // i give up
     vec3 vLightPos = (mV * vec4(lightPos, 1.0)).xyz;
-    vec3 wi = normalize(vLightPos - vPosition);
-    //vec3 vCamPos = (mV * vec4(camPos, 1.0)).xyz;
-    vec3 wo = normalize(camPos - vPosition);
-    float bsdfOut = isotropicMicrofacet(wi, wo, normal, eta, alpha);
-    float NdotH = max(dot(normalize(normal), normalize(wi)), 0.0);
-    //fragColor = vec4(diffuseReflectance + bsdfOut, 1.0); // caused very monochromatic bunny
-    fragColor = vec4(bsdfOut + NdotH * diffuseReflectance, 1.0) / pow(length(vLightPos - vPosition), 2); // a little better. do we need to divide by r^2?
+    vec3 wo = normalize(vLightPos - vPosition);
+    vec3 wi = normalize(vec3(0,0,0) - vPosition);
+    float Kspecular = isotropicMicrofacet(wi, wo, normal, eta, alpha);  
+    float NdotH = max(dot(normal, wi), 0.0);
+
+    // the power is 1000 not 80 tho
+    vec3 irradiance = power / pow(length(vLightPos - vPosition), 2);  
+
+    fragColor = vec4(Kspecular * irradiance + NdotH * diffuseReflectance, 1.0);
+
+
 }
+
