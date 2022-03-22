@@ -288,34 +288,39 @@ void BunnyApp::forwardShade() {
     // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
     // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
+    // Plug in camera stuff
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("mC", camTransMat);
     prog->uniform("camPos", cam->getEye());
     for (int k = 0; k < lights.size(); ++k) {
+        // Plug in lights
         prog->uniform("lightPos", lights[k].pos);
+        prog->uniform("mL", lights[k].transMat);
+        prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
         for (int i = 0; i < meshes.size(); ++i) {
+            // Plug in mesh
+            prog->uniform("mM", transMatVec[i]);
+            // Plug in materials
             Material material = materials[meshIndToMaterialInd[i]];
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
-            prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
-            prog->uniform("mM", transMatVec[i]);
-            prog->uniform("mL", lights[k].transMat);
             prog->uniform("alpha", bsdf.alpha());
             prog->uniform("eta", bsdf.eta());
             prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
+            // Draw mesh
             meshes[i]->drawElements();
         }
     }
 
     // for OBJ files
-    if (lights.size() == 0) {
-        //TODO
-        prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
-        for (int i = 0; i < meshes.size(); ++i) {
-            prog->uniform("mM", transMatVec[i]);
-            meshes[i]->drawElements();
-        }
-    }
+    //if (lights.size() == 0) {
+    //    //TODO
+    //    prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+    //    for (int i = 0; i < meshes.size(); ++i) {
+    //        prog->uniform("mM", transMatVec[i]);
+    //        meshes[i]->drawElements();
+    //    }
+    //}
 
     prog->unuse();
 }
