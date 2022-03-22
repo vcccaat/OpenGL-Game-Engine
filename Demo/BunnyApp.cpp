@@ -280,6 +280,7 @@ void BunnyApp::draw_contents() {
    
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
+    prog->uniform("mC", camTransMat);
     // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
     // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
     prog->uniform("camPos", cam->getEye()); // to calculate wi

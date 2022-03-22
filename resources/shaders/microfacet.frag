@@ -12,6 +12,7 @@ uniform vec3 lightPos;
 
 uniform mat4 mV;  // View matrix
 uniform mat4 mL;  // Light matrix
+uniform mat4 mC;  // Camera matrix
 uniform vec3 power;
 
 in vec3 vPosition;
@@ -131,7 +132,7 @@ void main() {
 
     // in eye space   
     vec3 vLightPos = (mV * mL * vec4(lightPos, 1.0)).xyz;
-    vec3 vCamPos = (mV * vec4(camPos, 1.0)).xyz;
+    vec3 vCamPos = (mV * mC * vec4(camPos, 1.0)).xyz;
     vec3 wo = normalize(vLightPos - vPosition);
     vec3 wi = normalize(vCamPos - vPosition);
     float Kspecular = isotropicMicrofacet(wi, wo, normal, eta, alpha);  
