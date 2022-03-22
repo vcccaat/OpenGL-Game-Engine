@@ -205,8 +205,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -214,6 +214,37 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         //  { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/microfacet.frag" }
     }));
+
+    // Set up a simple shader program by passing the shader filenames to the convenience constructor
+    fsqProg.reset(new GLWrap::Program("program", { 
+        { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/srgb.frag" }
+    }));
+
+
+    // Upload a two-triangle mesh for drawing a full screen quad
+    std::vector<glm::vec3> fsqPos = {
+        glm::vec3(-1.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(-1.0f, 1.0f, 0.0f),
+    };
+
+    std::vector<glm::vec2> fsqTex = {
+        glm::vec2(0.0f, 0.0f),
+        glm::vec2(1.0f, 0.0f),
+        glm::vec2(1.0f, 1.0f),
+        glm::vec2(0.0f, 1.0f),
+    };
+
+    fsqMesh.reset(new GLWrap::Mesh());
+
+    fsqMesh->setAttribute(0, fsqPos);
+    fsqMesh->setAttribute(1, fsqTex);
+    // Make framebuffer
+    glm::ivec2 myFBOSize = { m_fbsize[0]/10, m_fbsize[1]/10 };
+    fbo.reset(new GLWrap::Framebuffer(myFBOSize));
+
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
@@ -275,9 +306,9 @@ void BunnyApp::draw_contents() {
 
     // cout << cam->getEye().x << " " << cam->getEye().y << " " << cam->getEye().z  << endl;
     
+    fbo->bind();
     glEnable(GL_DEPTH_TEST);
     prog->use();
-   
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("mC", camTransMat);
@@ -291,7 +322,6 @@ void BunnyApp::draw_contents() {
         prog->uniform("lightPos", lights[k].pos); // to calculate wo
         for (int i = 0; i < meshes.size(); ++i) {
             Material material = materials[meshIndToMaterialInd[i]];
-    //         // TODO must use frame?
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
             prog->uniform("mM", transMatVec[i]);
@@ -301,10 +331,10 @@ void BunnyApp::draw_contents() {
             prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
             // std::cout << "diffuse ref" << bsdf.diffuseReflectance().x << std::endl;
             meshes[i]->drawElements();
+    
         }
     }
-
-    // for OBJ files
+        // for OBJ files
     if (lights.size() == 0) {
         //TODO
         prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
@@ -313,6 +343,22 @@ void BunnyApp::draw_contents() {
             meshes[i]->drawElements();
         }
     }
+     prog->unuse();
+     fbo->unbind();
+
+    glDisable(GL_DEPTH_TEST);
+
+    fsqProg->use();
+    fbo->colorTexture().setParameters(
+        GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
+        GL_LINEAR, GL_LINEAR
+    );
+    fbo->colorTexture().bindToTextureUnit(0);
+    fsqProg->uniform("image", 0);
+    fsqProg->uniform("exposure", 1.0f);
+    // Draw the full screen quad
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    fsqProg->unuse();
     
-    prog->unuse();
+    
 }

@@ -3,6 +3,7 @@
 #include <nanogui/screen.h>
 
 #include <GLWrap/Program.hpp>
+#include <GLWrap/Framebuffer.hpp>
 #include <GLWrap/Mesh.hpp>
 #include <RTUtil/Camera.hpp>
 #include <RTUtil/CameraController.hpp>
@@ -59,8 +60,10 @@ private:
     static int windowWidth;
     static const int windowHeight;
 
-    std::unique_ptr<GLWrap::Program> prog;
+    std::unique_ptr<GLWrap::Program> prog, fsqProg;
     std::vector<std::unique_ptr<GLWrap::Mesh>> meshes;
+    std::unique_ptr<GLWrap::Mesh> fsqMesh;
+    std::unique_ptr<GLWrap::Framebuffer> fbo;
     std::shared_ptr<RTUtil::PerspectiveCamera> cam;
     std::unique_ptr<RTUtil::DefaultCC> cc;
 
