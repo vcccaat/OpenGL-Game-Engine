@@ -106,7 +106,6 @@ std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
         Material m = Material();
         scene->mMaterials[i]->Get(AI_MATKEY_ROUGHNESS_FACTOR, m.roughness);
         scene->mMaterials[i]->Get(AI_MATKEY_BASE_COLOR, reinterpret_cast<aiColor3D&>(m.diffuse));
-        scene->mMaterials[i]->Get(AI_MATKEY_REFRACTI, m.indexofref);
         mats.push_back(m);
     }
     return mats;
@@ -149,11 +148,9 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
         }
 
         // transform light
-        glm::mat4 transMat = getTransMatrix(rootNode, scene->mLights[i]->mName);
-        l.pos = glm::vec3(transMat * glm::vec4(l.pos.x, l.pos.y, l.pos.z, 1));
-        l.transMat = transMat;
+        l.transMat = getTransMatrix(rootNode, scene->mLights[i]->mName);
         if (l.type == l.AREA) {
-            l.areaNormal = glm::normalize(glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0)));
+            //l.areaNormal = glm::normalize(glm::vec3(transMat * glm::vec4(l.areaNormal.x, l.areaNormal.y, l.areaNormal.z, 0)));
         }
         // Push to list
         lights.push_back(l);
@@ -208,8 +205,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -294,9 +291,10 @@ void BunnyApp::draw_contents() {
         for (int i = 0; i < meshes.size(); ++i) {
             Material material = materials[meshIndToMaterialInd[i]];
     //         // TODO must use frame?
-            nori::Microfacet bsdf = nori::Microfacet(material.roughness, 1.5f, 1.f, material.diffuse);
+            nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
             prog->uniform("mM", transMatVec[i]);
+            prog->uniform("mL", lights[k].transMat);
             prog->uniform("alpha", bsdf.alpha());
             prog->uniform("eta", bsdf.eta());
             prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());

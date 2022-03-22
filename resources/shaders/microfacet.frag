@@ -15,6 +15,7 @@ in vec3 vPosition;
 in vec3 vNormal;
 
 uniform mat4 mV;  // View matrix
+uniform mat4 mL;  // Light matrix
 uniform vec3 power;
 
 out vec4 fragColor;
@@ -130,7 +131,7 @@ void main() {
 
 
     // in eye space   
-    vec3 vLightPos = (mV * vec4(lightPos, 1.0)).xyz;
+    vec3 vLightPos = (mV * mL * vec4(lightPos, 1.0)).xyz;
     vec3 wo = normalize(vLightPos - vPosition);
     vec3 wi = normalize(vec3(0,0,0) - vPosition);
     float Kspecular = isotropicMicrofacet(wi, wo, normal, eta, alpha);  
@@ -138,7 +139,7 @@ void main() {
 
     // the power is 1000 not 80 tho
     float divise = NdotH / (4 * PI * pow(length(vLightPos - vPosition), 2));
-    fragColor = vec4(Kspecular * power + diffuseReflectance * 1/PI * power , 1.0) * divise;
+    fragColor = vec4(Kspecular * power + diffuseReflectance * 1/PI * power, 1.0) * divise;
 
 
 }
