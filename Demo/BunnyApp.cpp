@@ -201,7 +201,7 @@ void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
     mp.push_back(msh->mMaterialIndex);
 }
 
-BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false), backgroundColor(0.25f, 0.4f, 0.5f, 1.0f) {
+BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false), backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
         // PATHEDIT
@@ -261,6 +261,9 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     initScene(path, cam, windowWidth, windowHeight);
     perform_layout();
     set_visible(true);
+
+    deferred = false;
+    toggle = true;
 }
 
 
@@ -278,6 +281,14 @@ bool BunnyApp::keyboard_event(int key, int scancode, int action, int modifiers) 
         set_visible(false);
         return true;
     }
+
+    if (key == GLFW_KEY_F && toggle) {
+        deferred = !deferred;
+        toggle = false;
+    } else {
+        toggle = true;
+    }
+    
 
     return cc->keyboard_event(key, scancode, action, modifiers);
 }
@@ -297,54 +308,55 @@ bool BunnyApp::scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f 
            cc->scroll_event(p, rel);
 }
 
-
-
-void BunnyApp::draw_contents() {
+void BunnyApp::forwardShade() {
     GLWrap::checkGLError("drawContents start");
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // cout << cam->getEye().x << " " << cam->getEye().y << " " << cam->getEye().z  << endl;
-    
     fbo->bind();
     glEnable(GL_DEPTH_TEST);
     prog->use();
+    // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
+    // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
+    // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+
+    // Plug in camera stuff
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("mC", camTransMat);
-    // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
-    // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
-    prog->uniform("camPos", cam->getEye()); // to calculate wi
-    // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
-
-    // lights.size() = 1 temporarily as we only parse one light
+    prog->uniform("camPos", cam->getEye());
     for (int k = 0; k < lights.size(); ++k) {
-        prog->uniform("lightPos", lights[k].pos); // to calculate wo
+        // Plug in lights
+        prog->uniform("lightPos", lights[k].pos);
+        prog->uniform("mL", lights[k].transMat);
+        prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
         for (int i = 0; i < meshes.size(); ++i) {
+            // Plug in mesh
+            prog->uniform("mM", transMatVec[i]);
+            // Plug in materials
             Material material = materials[meshIndToMaterialInd[i]];
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
-            prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
-            prog->uniform("mM", transMatVec[i]);
-            prog->uniform("mL", lights[k].transMat);
             prog->uniform("alpha", bsdf.alpha());
             prog->uniform("eta", bsdf.eta());
             prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
-            // std::cout << "diffuse ref" << bsdf.diffuseReflectance().x << std::endl;
+            // Draw mesh
             meshes[i]->drawElements();
     
         }
     }
-        // for OBJ files
-    if (lights.size() == 0) {
-        //TODO
-        prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
-        for (int i = 0; i < meshes.size(); ++i) {
-            prog->uniform("mM", transMatVec[i]);
-            meshes[i]->drawElements();
-        }
-    }
-     prog->unuse();
-     fbo->unbind();
+
+    // for OBJ files
+    //if (lights.size() == 0) {
+    //    //TODO
+    //    prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+    //    for (int i = 0; i < meshes.size(); ++i) {
+    //        prog->uniform("mM", transMatVec[i]);
+    //        meshes[i]->drawElements();
+    //    }
+    //}
+
+    prog->unuse();
+    fbo->unbind();
 
     glDisable(GL_DEPTH_TEST);
 
@@ -360,5 +372,17 @@ void BunnyApp::draw_contents() {
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     fsqProg->unuse();
     
-    
+}
+
+void BunnyApp::deferredShade() {
+
+}
+
+void BunnyApp::draw_contents() {
+    if (!deferred) {
+        forwardShade();
+    }
+    else {
+        deferredShade();
+    }
 }
