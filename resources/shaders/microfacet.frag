@@ -4,12 +4,12 @@
 uniform float alpha;
 uniform float eta;
 uniform vec3 diffuseReflectance;
-uniform vec3 camPos;
+// uniform vec3 camPos;
 uniform vec3 lightPos;
 
 //uniform vec3 lightDir;
-uniform vec3 k_d;
-uniform vec3 k_a;
+// uniform vec3 k_d;
+// uniform vec3 k_a;
 
 in vec3 vPosition;
 in vec3 vNormal;
@@ -130,7 +130,6 @@ void main() {
 
 
     // in eye space   
-    // i give up
     vec3 vLightPos = (mV * vec4(lightPos, 1.0)).xyz;
     vec3 wo = normalize(vLightPos - vPosition);
     vec3 wi = normalize(vec3(0,0,0) - vPosition);
@@ -138,9 +137,8 @@ void main() {
     float NdotH = max(dot(normal, wi), 0.0);
 
     // the power is 1000 not 80 tho
-    vec3 irradiance = power / pow(length(vLightPos - vPosition), 2);  
-
-    fragColor = vec4(Kspecular * irradiance + NdotH * diffuseReflectance, 1.0);
+    float divise = NdotH / (4 * PI * pow(length(vLightPos - vPosition), 2));
+    fragColor = vec4(Kspecular * power + diffuseReflectance * 1/PI * power , 1.0) * divise;
 
 
 }

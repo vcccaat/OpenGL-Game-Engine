@@ -283,9 +283,9 @@ void BunnyApp::draw_contents() {
    
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
-    prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
-    prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
-    prog->uniform("camPos", cam->getEye()); // to calculate wi
+    // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
+    // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
+    // prog->uniform("camPos", cam->getEye()); // to calculate wi
     // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
     // lights.size() = 1 temporarily as we only parse one light
@@ -294,7 +294,7 @@ void BunnyApp::draw_contents() {
         for (int i = 0; i < meshes.size(); ++i) {
             Material material = materials[meshIndToMaterialInd[i]];
     //         // TODO must use frame?
-            nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
+            nori::Microfacet bsdf = nori::Microfacet(material.roughness, 1.5f, 1.f, material.diffuse);
             prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
             prog->uniform("mM", transMatVec[i]);
             prog->uniform("alpha", bsdf.alpha());
