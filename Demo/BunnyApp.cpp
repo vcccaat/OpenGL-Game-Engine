@@ -163,6 +163,7 @@ void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positi
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
+            
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* temp = obj->mMeshes[cur->mMeshes[i]];
                 addMeshToScene(positions, indices, normals, temp, translist, transmat, mp);
@@ -242,7 +243,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(0, fsqPos);
     fsqMesh->setAttribute(1, fsqTex);
     // Make framebuffer
-    glm::ivec2 myFBOSize = { m_fbsize[0]/10, m_fbsize[1]/10 };
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
 
@@ -310,11 +311,11 @@ bool BunnyApp::scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f 
 
 void BunnyApp::forwardShade() {
     GLWrap::checkGLError("drawContents start");
-    glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     fbo->bind();
     glEnable(GL_DEPTH_TEST);
+    glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     prog->use();
     // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
     // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
