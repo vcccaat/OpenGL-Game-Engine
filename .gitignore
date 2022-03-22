@@ -4,7 +4,7 @@ xcodebuild/
 *.blend1
 debug_build/
 .vscode
-.vs
+.vs/
 cmake-build-debug/
 .idea/.name
 CMakeSettings.json

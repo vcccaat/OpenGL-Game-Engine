@@ -230,6 +230,9 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     initScene(path, cam, windowWidth, windowHeight);
     perform_layout();
     set_visible(true);
+
+    deferred = false;
+    toggle = true;
 }
 
 
@@ -247,6 +250,14 @@ bool BunnyApp::keyboard_event(int key, int scancode, int action, int modifiers) 
         set_visible(false);
         return true;
     }
+
+    if (key == GLFW_KEY_F && toggle) {
+        deferred = !deferred;
+        toggle = false;
+    } else {
+        toggle = true;
+    }
+    
 
     return cc->keyboard_event(key, scancode, action, modifiers);
 }
@@ -266,32 +277,25 @@ bool BunnyApp::scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f 
            cc->scroll_event(p, rel);
 }
 
-
-
-void BunnyApp::draw_contents() {
+void BunnyApp::forwardShade() {
     GLWrap::checkGLError("drawContents start");
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // cout << cam->getEye().x << " " << cam->getEye().y << " " << cam->getEye().z  << endl;
-    
     glEnable(GL_DEPTH_TEST);
     prog->use();
-   
+    // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
+    // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
+    // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
+
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("mC", camTransMat);
-    // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
-    // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
-    prog->uniform("camPos", cam->getEye()); // to calculate wi
-    // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
-
-    // lights.size() = 1 temporarily as we only parse one light
+    prog->uniform("camPos", cam->getEye());
     for (int k = 0; k < lights.size(); ++k) {
-        prog->uniform("lightPos", lights[k].pos); // to calculate wo
+        prog->uniform("lightPos", lights[k].pos);
         for (int i = 0; i < meshes.size(); ++i) {
             Material material = materials[meshIndToMaterialInd[i]];
-    //         // TODO must use frame?
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
             prog->uniform("mM", transMatVec[i]);
@@ -299,7 +303,6 @@ void BunnyApp::draw_contents() {
             prog->uniform("alpha", bsdf.alpha());
             prog->uniform("eta", bsdf.eta());
             prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
-            // std::cout << "diffuse ref" << bsdf.diffuseReflectance().x << std::endl;
             meshes[i]->drawElements();
         }
     }
@@ -313,6 +316,19 @@ void BunnyApp::draw_contents() {
             meshes[i]->drawElements();
         }
     }
-    
+
     prog->unuse();
+}
+
+void BunnyApp::deferredShade() {
+
+}
+
+void BunnyApp::draw_contents() {
+    if (!deferred) {
+        forwardShade();
+    }
+    else {
+        deferredShade();
+    }
 }
