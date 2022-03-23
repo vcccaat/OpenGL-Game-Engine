@@ -6,6 +6,7 @@ uniform mat4 mP;  // Projection matrix
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
+layout (location = 2) in vec3 specular;
 
 out vec3 vPosition;  // vertex position in eye space
 out vec3 vNormal; // vertex normal in eye space
