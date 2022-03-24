@@ -254,16 +254,17 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     fsqMesh->setAttribute(0, fsqPos);
     fsqMesh->setAttribute(1, fsqTex);
+
     // Make framebuffer
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5 };
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    //glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5 };
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
-    std::vector<std::pair<GLenum, GLenum>> pairs = { std::make_pair<int, int>(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT0) };
+    /*std::vector<std::pair<GLenum, GLenum>> pairs = { std::make_pair<int, int>(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT0) };
     pairs.push_back(std::make_pair<int, int>(GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT1));
     pairs.push_back(std::make_pair<int, int>(GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT2));
-    std::pair<GLenum, GLenum> depth = { std::make_pair<int, int>(4, 4) };
-    deffbo.reset(new GLWrap::Framebuffer(myFBOSize, pairs));
+    std::pair<GLenum, GLenum> depth = { std::make_pair<int, int>(4, 4) };*/
+    deffbo.reset(new GLWrap::Framebuffer(myFBOSize, 3, true));
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
