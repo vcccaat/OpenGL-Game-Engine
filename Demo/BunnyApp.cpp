@@ -206,8 +206,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -254,8 +254,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
     std::vector<std::pair<GLenum, GLenum>> pairs = { std::make_pair<GLenum, GLenum>(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1) };
@@ -417,22 +417,23 @@ void BunnyApp::deferredShade() {
             meshes[i]->drawElements();
     }
 
+    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, attachments);
+
     gProg->unuse();
     deffbo->unbind();
 
-    tempProg->use();
+    fsqProg->use();
 
     glDisable(GL_DEPTH_TEST);
 
-    // GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2 };
-    // GLenum drawBuffers1[] = {GL_COLOR_ATTACHMENT0};
-    // glDrawBuffers(1, drawBuffers1);
-
-    deffbo->colorTexture().bindToTextureUnit(1);
-    tempProg->uniform("image", 1);
+    deffbo->colorTexture(0).bindToTextureUnit(0);
+    deffbo->colorTexture(1).bindToTextureUnit(1);
+    deffbo->colorTexture(2).bindToTextureUnit(2);
+    fsqProg->uniform("image", 1);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
    
-    tempProg->unuse();
+    fsqProg->unuse();
     
 }
 
