@@ -430,7 +430,7 @@ void BunnyApp::deferredShade() {
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
     deffbo->colorTexture(2).bindToTextureUnit(2);
-    fsqProg->uniform("image", 1);
+    fsqProg->uniform("image", 1); // change the number here to change what is viewe
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
    
     fsqProg->unuse();
