@@ -206,8 +206,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -222,17 +222,15 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/srgb.frag" }
     }));
 
-    prog.reset(new GLWrap::Program("program", {
-        { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
-        // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
-        //  { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
-        { GL_FRAGMENT_SHADER, resourcePath + "shaders/microfacet.frag" }
+    // deferred shading
+    gProg.reset(new GLWrap::Program("program", {
+        { GL_VERTEX_SHADER, resourcePath + "shaders/gbuff.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/gbuffpop.frag" }
         }));
 
-    // Set up a simple shader program by passing the shader filenames to the convenience constructor
-    d1Prog.reset(new GLWrap::Program("program", {
-        { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
-        { GL_FRAGMENT_SHADER, resourcePath + "shaders/gbuffpop.frag" }
+    tempProg.reset(new GLWrap::Program("program", {
+        { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/showShade.frag" }
         }));
 
     // Upload a two-triangle mesh for drawing a full screen quad
@@ -260,10 +258,10 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     //glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5 };
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
-    /*std::vector<std::pair<GLenum, GLenum>> pairs = { std::make_pair<int, int>(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT0) };
-    pairs.push_back(std::make_pair<int, int>(GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT1));
-    pairs.push_back(std::make_pair<int, int>(GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT2));
-    std::pair<GLenum, GLenum> depth = { std::make_pair<int, int>(4, 4) };*/
+    // std::vector<std::pair<GLenum, GLenum>> pairs = { std::make_pair<int, int>(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT0) };
+    // pairs.push_back(std::make_pair<int, int>(GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT1));
+    // pairs.push_back(std::make_pair<int, int>(GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT2));
+    // std::pair<GLenum, GLenum> depth = { std::make_pair<int, int>(4, 4) };
     deffbo.reset(new GLWrap::Framebuffer(myFBOSize, 3, true));
 
     // Default camera, will be overwritten if camera is given in .glb
@@ -395,36 +393,41 @@ void BunnyApp::forwardShade() {
 }
 
 void BunnyApp::deferredShade() {
-    GLWrap::checkGLError("drawContents start");
+    GLWrap::checkGLError("deferred shading start");
+
     deffbo->bind();
+    glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
     glEnable(GL_DEPTH_TEST);
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    d1Prog->use();
-
-    prog->uniform("mV", cam->getViewMatrix());
-    prog->uniform("mP", cam->getProjectionMatrix());
+    
+    gProg->use();
+    gProg->uniform("mV", cam->getViewMatrix());
+    gProg->uniform("mP", cam->getProjectionMatrix());
     for (int i = 0; i < meshes.size(); ++i) {
-        prog->uniform("mM", transMatVec[i]);
-        Material material = materials[meshIndToMaterialInd[i]];
-        nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
-        prog->uniform("alpha", bsdf.alpha());
-        prog->uniform("eta", bsdf.eta());
-        prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
-        meshes[i]->drawElements();
+            // Plug in mesh
+            gProg->uniform("mM", transMatVec[i]);
+            // Plug in materials
+            Material material = materials[meshIndToMaterialInd[i]];
+            nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
+            gProg->uniform("alpha", bsdf.alpha());
+            gProg->uniform("eta", bsdf.eta());
+            gProg->uniform("diffuseReflectance", bsdf.diffuseReflectance());
+            // Draw mesh
+            meshes[i]->drawElements();
     }
 
-    deffbo->colorTexture().setParameters(
-        GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
-        GL_LINEAR, GL_LINEAR
-    );
-    deffbo->colorTexture(0).bindToTextureUnit(0);
-
-    //unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    //glDrawBuffers(3, attachments);
-
-    d1Prog->unuse();
+    gProg->unuse();
     deffbo->unbind();
+    tempProg->use();
+
+    tempProg->uniform("image", 0);
+    deffbo->colorTexture().bindToTextureUnit(0);
+    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, attachments);
+   
+    tempProg->unuse();
+    
 }
 
 void BunnyApp::draw_contents() {
