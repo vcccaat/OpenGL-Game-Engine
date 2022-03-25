@@ -144,7 +144,7 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.POINT;
 
-            printf("Point parsed, %.2f,%.2f,%.2f ", l.power[0],l.power[1],l.power[2]);
+            //printf("Point parsed, %.2f,%.2f,%.2f ", l.power[0],l.power[1],l.power[2]);
         }
 
         // transform light
@@ -206,8 +206,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -253,9 +253,9 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(0, fsqPos);
     fsqMesh->setAttribute(1, fsqTex);
 
-    // Make framebuffer
-    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    //glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5 };
+    // Make framebuffer PATHEDIT
+    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5 };
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
     // std::vector<std::pair<GLenum, GLenum>> pairs = { std::make_pair<int, int>(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT0) };
@@ -419,12 +419,16 @@ void BunnyApp::deferredShade() {
 
     gProg->unuse();
     deffbo->unbind();
+
     tempProg->use();
 
+    glDisable(GL_DEPTH_TEST);
+
     tempProg->uniform("image", 0);
-    deffbo->colorTexture().bindToTextureUnit(0);
-    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(3, attachments);
+    deffbo->colorTexture(0).bindToTextureUnit(0);
+    //unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    //glDrawBuffers(1, attachments);
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
    
     tempProg->unuse();
     
