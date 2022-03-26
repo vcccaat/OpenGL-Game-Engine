@@ -6,6 +6,6 @@
     "\\resources\\shaders",
     "\\RTRef"
   ],
-  "SelectedNode": "\\resources\\shaders\\vlightshade.frag",
+  "SelectedNode": "\\resources\\shaders\\lambert.frag",
   "PreviewInSolutionExplorer": false
 }
