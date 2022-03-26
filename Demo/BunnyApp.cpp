@@ -404,32 +404,37 @@ void BunnyApp::deferredShade() {
     GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
 
-    gProg->unuse();
     deffbo->unbind();
+    gProg->unuse();
 
 
 
-    lightProg->use();
     lightfbo->bind();
+    lightProg->use();
 
     glDisable(GL_DEPTH_TEST);
 
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
     deffbo->colorTexture(2).bindToTextureUnit(2);
-    fsqProg->uniform("image", 1);
+    lightProg->uniform("ipos", 0);
+    lightProg->uniform("inorm", 1);
+    lightProg->uniform("idiff", 2);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     glDrawBuffers(3, attachments);
 
-    lightfbo->unbind();
     lightProg->unuse();
+    lightfbo->unbind();
 
 
 
     fsqProg->use();
-
+    glDisable(GL_DEPTH_TEST);
+    lightfbo->colorTexture().bindToTextureUnit(0);
+    fsqProg->uniform("image", 0);
+    fsqProg->uniform("exposure", 1.0f);
+    // Draw the full screen quad
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
-
     fsqProg->unuse();
     
 }
