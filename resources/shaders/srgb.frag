@@ -42,5 +42,5 @@ void main() {
     } else {
         fragColor = color * exposure;
     }
-		// fragColor = vec4(0.4,0.2,0.5,1);
+		//fragColor = vec4(0.4,0.2,0.5,1);
 }

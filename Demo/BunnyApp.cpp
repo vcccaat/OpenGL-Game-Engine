@@ -73,27 +73,27 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
     }
 
     // Camera initialize
-     if (obj->mNumCameras > 0) {
-         aiCamera* rawcam = obj->mCameras[0];
-         aiNode* rootNode = obj->mRootNode;
+    if (obj->mNumCameras > 0) {
+        aiCamera* rawcam = obj->mCameras[0];
+        aiNode* rootNode = obj->mRootNode;
 
         // transform camera
-         camTransMat = getTransMatrix(rootNode, rawcam->mName);
-         cam->setAspectRatio(rawcam->mAspect);
-         cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x,rawcam->mPosition.y,rawcam->mPosition.z,1)));
-         cam->setFOVY(rawcam->mHorizontalFOV/rawcam->mAspect);
-         // Find point closest to origin along target ray using projection in camera space
-         glm::vec3 originInCamSpace = glm::vec3(glm::inverse(camTransMat) * glm::vec4(0, 0, 0, 1));
-         glm::vec3 originVec = originInCamSpace - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
-         glm::vec3 targetVec = glm::vec3(rawcam->mLookAt.x, rawcam->mLookAt.y, rawcam->mLookAt.z) - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
-         glm::vec3 projVec = (float) (glm::dot(originVec, targetVec) / pow(glm::length(targetVec), 2)) * targetVec;
-         glm::vec3 targetCamSpace = glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z) + projVec;
-         glm::vec3 targetGlobal = glm::vec3(camTransMat * glm::vec4(targetCamSpace.x, targetCamSpace.y, targetCamSpace.z, 1));
-         cam->setTarget(targetGlobal);
-         //cam->setTarget(glm::vec3(0.f, 0.f, 0.f));
-         //cam->setAspectRatio(windowWidth / windowHeight);
-         // no setUp??
-     }
+        camTransMat = getTransMatrix(rootNode, rawcam->mName);
+        cam->setAspectRatio(rawcam->mAspect);
+        cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x,rawcam->mPosition.y,rawcam->mPosition.z,1)));
+        cam->setFOVY(rawcam->mHorizontalFOV/rawcam->mAspect);
+        // Find point closest to origin along target ray using projection in camera space
+        glm::vec3 originInCamSpace = glm::vec3(glm::inverse(camTransMat) * glm::vec4(0, 0, 0, 1));
+        glm::vec3 originVec = originInCamSpace - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
+        glm::vec3 targetVec = glm::vec3(rawcam->mLookAt.x, rawcam->mLookAt.y, rawcam->mLookAt.z) - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
+        glm::vec3 projVec = (float) (glm::dot(originVec, targetVec) / pow(glm::length(targetVec), 2)) * targetVec;
+        glm::vec3 targetCamSpace = glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z) + projVec;
+        glm::vec3 targetGlobal = glm::vec3(camTransMat * glm::vec4(targetCamSpace.x, targetCamSpace.y, targetCamSpace.z, 1));
+        cam->setTarget(targetGlobal);
+        //cam->setTarget(glm::vec3(0.f, 0.f, 0.f));
+        //cam->setAspectRatio(windowWidth / windowHeight);
+        // no setUp??
+    }
 
      // Material and light parsing
      materials = parseMats(obj);
@@ -222,15 +222,16 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/srgb.frag" }
     }));
 
-    // deferred shading
+    // deferred shading: g-buffer
     gProg.reset(new GLWrap::Program("program", {
         { GL_VERTEX_SHADER, resourcePath + "shaders/gbuff.vert" },
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/gbuffpop.frag" }
         }));
-
-    tempProg.reset(new GLWrap::Program("program", {
-        { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
-        { GL_FRAGMENT_SHADER, resourcePath + "shaders/showShade.frag" }
+    
+    // deferred shading:" lighting pass
+    lightProg.reset(new GLWrap::Program("program", {
+        { GL_VERTEX_SHADER, resourcePath + "shaders/vlightshade.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/vlightshade.frag" }
         }));
 
     // Upload a two-triangle mesh for drawing a full screen quad
@@ -257,12 +258,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
     glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
-
-    std::vector<std::pair<GLenum, GLenum>> pairs = { std::make_pair<GLenum, GLenum>(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1) };
-    pairs.push_back(std::make_pair<GLenum, GLenum>(GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2));
-    // pairs.push_back(std::make_pair<GLenum, GLenum>(GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT2));
-    // std::pair<GLenum, GLenum> depth = { std::make_pair<int, int>(4, 4) };
     deffbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
+    lightfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
@@ -334,9 +331,6 @@ void BunnyApp::forwardShade() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     prog->use();
-    // prog->uniform("k_a", glm::vec3(0.1, 0.1, 0.1));
-    // prog->uniform("k_d", glm::vec3(0.9, 0.9, 0.9));
-    // prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
 
     // Plug in camera stuff
     prog->uniform("mV", cam->getViewMatrix());
@@ -362,16 +356,6 @@ void BunnyApp::forwardShade() {
     
         }
     }
-
-    // for OBJ files
-    //if (lights.size() == 0) {
-    //    //TODO
-    //    prog->uniform("lightDir", glm::normalize(glm::vec3(1.0, 1.0, 1.0)));
-    //    for (int i = 0; i < meshes.size(); ++i) {
-    //        prog->uniform("mM", transMatVec[i]);
-    //        meshes[i]->drawElements();
-    //    }
-    //}
 
     prog->unuse();
     fbo->unbind();
@@ -423,16 +407,29 @@ void BunnyApp::deferredShade() {
     gProg->unuse();
     deffbo->unbind();
 
-    fsqProg->use();
+
+
+    lightProg->use();
+    lightfbo->bind();
 
     glDisable(GL_DEPTH_TEST);
 
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
     deffbo->colorTexture(2).bindToTextureUnit(2);
-    fsqProg->uniform("image", 1); // change the number here to change what is viewe
+    fsqProg->uniform("image", 1);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
-   
+    glDrawBuffers(3, attachments);
+
+    lightfbo->unbind();
+    lightProg->unuse();
+
+
+
+    fsqProg->use();
+
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+
     fsqProg->unuse();
     
 }
