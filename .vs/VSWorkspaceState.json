@@ -6,6 +6,6 @@
     "\\resources\\shaders",
     "\\RTRef"
   ],
-  "SelectedNode": "\\resources\\shaders\\lambert.frag",
+  "SelectedNode": "\\resources\\shaders\\microfacet.frag",
   "PreviewInSolutionExplorer": false
 }

@@ -420,6 +420,12 @@ void BunnyApp::deferredShade() {
     lightProg->uniform("ipos", 0);
     lightProg->uniform("inorm", 1);
     lightProg->uniform("idiff", 2);
+    lightProg->uniform("mV", cam->getViewMatrix());
+    for (int k = 0; k < lights.size(); ++k) {
+        //prog->uniform("mL", lights[k].transMat);
+        //prog->uniform("lightPos", lights[k].pos);
+        //prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
+    }
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     glDrawBuffers(3, attachments);
 

@@ -135,12 +135,10 @@ void main() {
     vec3 vCamPos = (mV * mC * vec4(camPos, 1.0)).xyz;
     vec3 wo = normalize(vLightPos - vPosition);
     vec3 wi = normalize(vCamPos - vPosition);
-    float Kspecular = isotropicMicrofacet(wi, wo, normalize(normal), eta, alpha);  
+    float Kspecular = isotropicMicrofacet(wi, wo, normal, eta, alpha);  
     float NdotH = max(dot(normal, wo), 0.0);
 
     // the power is 1000 not 80 tho
     float divise = NdotH / (4 * PI * pow(length(vLightPos - vPosition), 2));
     fragColor = vec4(Kspecular * power + diffuseReflectance * 1/PI * power, 1.0) * divise;
-
-
 }
