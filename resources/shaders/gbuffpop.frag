@@ -13,6 +13,6 @@ uniform vec3 diffuseReflectance;
 
 void main() {
 	gPosition = vec4(vPosition, alpha);
-	gNormal = vec4(vNormal, eta);
+	gNormal = vec4(normalize(vNormal / 2 + .5), eta);
 	gDiffuse = vec4(diffuseReflectance, 1);
 }

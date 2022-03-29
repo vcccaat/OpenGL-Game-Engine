@@ -141,4 +141,10 @@ void main() {
     // the power is 1000 not 80 tho
     float divise = NdotH / (4 * PI * pow(length(vLightPos - vPosition), 2));
     fragColor = vec4(Kspecular * power + diffuseReflectance * 1/PI * power, 1.0) * divise;
+
+    // Fixed lighting calculation here
+    //vec3 lightDir = (vec4(1, 1, 1, 1)).xyz;
+    //NdotH = max(dot(normal, normalize(lightDir)), 0.0);
+    //fragColor = vec4(NdotH * diffuseReflectance, 1.0);
+    //fragColor = vec4(normal, 1);
 }

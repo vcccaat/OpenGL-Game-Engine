@@ -19,7 +19,7 @@ void main() {
 	vec4 rawdiff = texture(idiff, geom_texCoord);
 
 	vec3 pos = rawpos.xyz;
-	vec3 norm = rawnorm.xyz;
+	vec3 norm = normalize(rawnorm.xyz * 2 - 1);
 	vec3 diff = rawdiff.xyz;
 	float alpha = rawpos.w;
 	float eta = rawnorm.w;
@@ -27,9 +27,9 @@ void main() {
 	// Added constants
 	//vec3 lightDir = (mV * vec4(1, 1, 1, 1)).xyz;
 	vec3 lightDir = vec3(1, 1, 1);
-	float k_a = .1;
 
-	vec3 cnorm = (gl_FrontFacing) ? normalize(norm) : -normalize(norm);
-    float NdotH = max(dot(cnorm, normalize(lightDir)), 0.0);
-    color = vec4(k_a + NdotH * diff, 1.0);
+	//vec3 cnorm = (gl_FrontFacing) ? norm : -norm;
+    float NdotH = max(dot(norm, normalize(lightDir)), 0.0);
+    color = vec4(NdotH * diff, 1.0);
+    //color = vec4(cnorm, 1.0);
 }
