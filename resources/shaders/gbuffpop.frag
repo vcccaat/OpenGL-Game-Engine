@@ -12,7 +12,7 @@ uniform float eta;
 uniform vec3 diffuseReflectance;
 
 void main() {
-	gPosition = vec4(vPosition, alpha);
-	gNormal = vec4(normalize(vNormal / 2 + .5), eta);
-	gDiffuse = vec4(diffuseReflectance, 1);
+	gPosition = vec4(vPosition, 1);
+	gNormal = vec4(normalize(vNormal / 2 + .5), eta/10);
+	gDiffuse = vec4(diffuseReflectance, alpha/10);
 }

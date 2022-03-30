@@ -185,6 +185,7 @@ void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
     for (int i = 0; i < msh->mNumVertices; ++i) {
         glm::vec3 t = reinterpret_cast<glm::vec3&>(msh->mVertices[i]);
         positions[curMesh].push_back(t);
+        // std::cerr << t.x << "," << t.y << "," << t.z << std::endl;
 
         // access normal of each vertice
         glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
@@ -206,8 +207,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -255,8 +256,9 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    std::cout << m_fbsize[0] <<" "<< m_fbsize[1] << std::endl;
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
     deffbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
     lightfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
@@ -388,7 +390,7 @@ void BunnyApp::deferredShade() {
     gProg->use();
     gProg->uniform("mV", cam->getViewMatrix());
     gProg->uniform("mP", cam->getProjectionMatrix());
-    for (int i = 0; i < meshes.size(); ++i) {
+       for (int i = 0; i < meshes.size(); ++i) {
             // Plug in mesh
             gProg->uniform("mM", transMatVec[i]);
             // Plug in materials
@@ -417,6 +419,14 @@ void BunnyApp::deferredShade() {
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
     deffbo->colorTexture(2).bindToTextureUnit(2);
+    lightProg->uniform("m_fbsize",glm::vec2(m_fbsize[0],m_fbsize[1]));
+    lightProg->uniform("power", reinterpret_cast<glm::vec3&>( lights[0].power));
+       lightProg->uniform("lightPos", lights[0].pos);
+    lightProg->uniform("mV", cam->getViewMatrix());
+    lightProg->uniform("mL", lights[0].transMat);
+    lightProg->uniform("mPInverse", glm::inverse(cam->getProjectionMatrix()));
+    lightProg->uniform("mC", camTransMat);
+    lightProg->uniform("camPos", cam->getEye());
     lightProg->uniform("ipos", 0);
     lightProg->uniform("inorm", 1);
     lightProg->uniform("idiff", 2);
@@ -436,6 +446,10 @@ void BunnyApp::deferredShade() {
 
     fsqProg->use();
     glDisable(GL_DEPTH_TEST);
+    fbo->colorTexture().setParameters(
+        GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
+        GL_LINEAR, GL_LINEAR
+    );
     lightfbo->colorTexture().bindToTextureUnit(0);
     fsqProg->uniform("image", 0);
     fsqProg->uniform("exposure", 1.0f);
