@@ -101,35 +101,6 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 void main() {
     vec3 normal = (gl_FrontFacing) ? normalize(vNormal) : normalize(-vNormal);
 
-    // Same as from lambert.frag
-    //float NdotH = max(dot(normalize(normal), normalize(lightDir)), 0.0);
-    //fragColor = vec4(k_a + NdotH * k_d, 1.0);
-
-    // New try
-    // vec3 vLightPos = (mV * vec4(lightPos, 1.0)).xyz;
-    // vec3 wi = normalize(vLightPos - vPosition);
-    // //vec3 vCamPos = (mV * vec4(camPos, 1.0)).xyz;
-    // vec3 wo = normalize(camPos - vPosition);
-    // float bsdfOut = isotropicMicrofacet(wi, wo, normal, eta, alpha);
-    // float NdotH = max(dot(normalize(normal), normalize(wi)), 0.0);
-    // //fragColor = vec4(diffuseReflectance + bsdfOut, 1.0); // caused very monochromatic bunny
-    // fragColor = vec4(bsdfOut + NdotH * diffuseReflectance, 1.0) / pow(length(vLightPos - vPosition), 2); // a little better. do we need to divide by r^2?
-   
-
-    // in world space 
-    // vec3 worldPos = (inverse(mV) * vec4(vPosition,1.0)).xyz;
-    // vec3 worldNormal = (inverse(mV) * vec4(normal,1.0)).xyz;
-    // vec3 vLightPos = (vec4(lightPos, 1.0)).xyz;
-    // vec3 wo = normalize(vLightPos - worldPos);
-    // vec3 wi = normalize(camPos - worldPos);
-    // float Kspecular = 1/PI ;//isotropicMicrofacet(wi, wo, worldNormal, eta, alpha);  
-    // float NdotH = max(dot(normal, wi), 0.0);
-
-    // vec3 irradiance = vec3(2,2,2);//power / pow(length(vLightPos - vPosition), 2);
-
-    // fragColor = vec4(irradiance[0]*diffuseReflectance[0],irradiance[1]*diffuseReflectance[1],irradiance[2]*diffuseReflectance[2], 1.0) * NdotH * Kspecular;
-
-
     // in eye space   
     vec3 vLightPos = (mV * mL * vec4(lightPos, 1.0)).xyz;
     vec3 vCamPos = (mV * mC * vec4(camPos, 1.0)).xyz;
@@ -141,10 +112,5 @@ void main() {
     // the power is 1000 not 80 tho
     float divise = NdotH / (4 * PI * pow(length(vLightPos - vPosition), 2));
     fragColor = vec4(Kspecular * power + diffuseReflectance * 1/PI * power, 1.0) * divise;
-
-    // Fixed lighting calculation here
-    //vec3 lightDir = (vec4(1, 1, 1, 1)).xyz;
-    //NdotH = max(dot(normal, normalize(lightDir)), 0.0);
-    //fragColor = vec4(NdotH * diffuseReflectance, 1.0);
-    //fragColor = vec4(normal, 1);
+	//fragColor = vec4((mL * vec4(lightPos, 1.0)).xyz, 1);
 }

@@ -8,3 +8,4 @@ debug_build/
 cmake-build-debug/
 .idea/.name
 CMakeSettings.json
+Demo/TetraFBO.cpp
