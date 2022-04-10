@@ -4,9 +4,9 @@ uniform sampler2D ipos;
 uniform sampler2D inorm;
 uniform sampler2D idiff;
 
-uniform mat4 mV;  // View matrix
-uniform mat4 mL;  // Light matrix
-uniform mat4 mC;  // Camera matrix
+// uniform mat4 mV;  // View matrix
+// uniform mat4 mL;  // Light matrix
+// uniform mat4 mC;  // Camera matrix
 uniform vec3 camPos;
 uniform vec3 power;
 uniform mat4 mP;  // projection matrix
@@ -104,15 +104,15 @@ void main() {
 	float alpha = rawdiff.w*10;
 	float eta = rawnorm.w*10;
 
-	vec3 cnorm = (gl_FrontFacing) ? norm : -norm;
+	vec3 cnorm = (gl_FrontFacing) ? norm : -norm; 
 
 	//Don't know why remove mV* ? thought we need to in eye space as forward shading? 
-	vec3 vLightPos = (mL * vec4(lightPos, 1.0)).xyz;  
-	//vec4 transPos = inverse(mP) * vec4(gl_FragCoord.x/m_fbsize[0], gl_FragCoord.y/m_fbsize[1], gl_FragCoord.z*2.0-1.0, 1.0);
-	//vec3 eyeSpacePos = (transPos.xyz / transPos.w).xyz;
+	vec3 vLightPos = (vec4(lightPos, 1.0)).xyz;  
+	vec4 transPos = inverse(mP) * vec4(gl_FragCoord.x/m_fbsize[0], gl_FragCoord.y/m_fbsize[1], gl_FragCoord.z*2.0-1.0, 1.0);
+	vec3 eyeSpacePos = (transPos.xyz / transPos.w).xyz;
 
 	// also remove mV* in vCamPos
-	vec3 vCamPos = (mC * vec4(camPos, 1.0)).xyz;
+	vec3 vCamPos = (vec4(camPos, 1.0)).xyz;
 	vec3 wo = normalize(vLightPos - pos);  
 	vec3 wi = normalize(vCamPos - pos);
 	float Kspecular = isotropicMicrofacet(wi, wo, cnorm, eta, alpha);  
