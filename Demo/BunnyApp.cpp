@@ -442,7 +442,7 @@ void BunnyApp::deferredShade() {
     
     glEnable(GL_BLEND);  
     glBlendFunc(GL_ONE, GL_ONE);
-    glClearColor(0,0,0,0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
@@ -462,9 +462,10 @@ void BunnyApp::deferredShade() {
         glm::vec3 lightPos = glm::vec3( lights[k].transMat * glm::vec4(lights[k].pos,1.0));
         lightProg->uniform("lightPos", lightPos);
         lightProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
+        fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
-    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
-    glDrawBuffers(3, attachments);
+    
+    // glDrawBuffers(3, attachments);
 
     lightProg->unuse();
     lightfbo->unbind();
