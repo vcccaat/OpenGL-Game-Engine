@@ -345,7 +345,7 @@ void BunnyApp::forwardShade() {
     
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_BLEND);
+    // glEnable(GL_BLEND);
     
     prog->use();
 
@@ -357,11 +357,14 @@ void BunnyApp::forwardShade() {
 
     for (int k = 0; k < lights.size(); ++k) {
         // Plug in lights
-        prog->uniform("lightPos", lights[k].pos);
-        prog->uniform("mL", lights[k].transMat);
-        prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
-        
-
+        glm::vec3 lightpos = glm::vec3( lights[k].transMat * glm::vec4(lights[k].pos,1.0));
+        prog->uniform("lightPos"+std::to_string(k+1),  lightpos);
+        // prog->uniform("mL", lights[k].transMat);
+        prog->uniform("power"+std::to_string(k+1), reinterpret_cast<glm::vec3&>(lights[k].power));      
+    
+        // prog->uniform("lights[" + std::to_string(k) + "].Position", lights[k].pos);
+        // glUniform3fv('lights', lights.size(), reinterpret_cast(lights.data()));
+    }
         for (int i = 0; i < meshes.size(); ++i) {
             // Plug in mesh
             prog->uniform("mM", transMatVec[i]);
@@ -375,13 +378,13 @@ void BunnyApp::forwardShade() {
             meshes[i]->drawElements();
     
         }
-    }
+    // }
 
     prog->unuse();
     fbo->unbind();
 
     glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
+    // glDisable(GL_BLEND);
 
     fsqProg->use();
     fbo->colorTexture().setParameters(
@@ -403,9 +406,9 @@ void BunnyApp::deferredShade() {
     deffbo->bind();
     glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);  
 
-    glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
+    glClearColor(0,0,0,0);
+    // glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     gProg->use();
@@ -419,7 +422,7 @@ void BunnyApp::deferredShade() {
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             gProg->uniform("alpha", bsdf.alpha());
             // std::cout << bsdf.alpha() ;
-            glBlendFunc(0.5f, 1.0 - 0.5f);
+            // glBlendFunc(0.5f, 1.0 - 0.5f);
             gProg->uniform("eta", bsdf.eta());
             gProg->uniform("diffuseReflectance", bsdf.diffuseReflectance());
             // Draw mesh
@@ -436,7 +439,10 @@ void BunnyApp::deferredShade() {
     lightProg->use();
 
     glDisable(GL_DEPTH_TEST);
-    // glDisable(GL_BLEND);
+    
+    glEnable(GL_BLEND);  
+    glBlendFunc(GL_ONE, GL_ONE);
+    glClearColor(0,0,0,0);
 
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
@@ -463,11 +469,10 @@ void BunnyApp::deferredShade() {
     lightProg->unuse();
     lightfbo->unbind();
 
-
-
     fsqProg->use();
     glDisable(GL_DEPTH_TEST);
-    
+    glDisable(GL_BLEND);
+
     fbo->colorTexture().setParameters(
         GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
         GL_LINEAR, GL_LINEAR

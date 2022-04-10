@@ -4,16 +4,43 @@ uniform float alpha;
 uniform float eta;
 uniform vec3 diffuseReflectance;
 uniform vec3 camPos;
-uniform vec3 lightPos;
+// uniform vec3 lightPos;
 
 //uniform vec3 lightDir;
 // uniform vec3 k_d;
 // uniform vec3 k_a;
 
 uniform mat4 mV;  // View matrix
-uniform mat4 mL;  // Light matrix
+// uniform mat4 mL;  // Light matrix
 uniform mat4 mC;  // Camera matrix
-uniform vec3 power;
+// uniform vec3 power;
+
+uniform vec3 power1;
+uniform vec3 power2;
+vec3 pointLightPower[2] =  vec3[2](
+  power1,
+  power2
+);
+
+uniform vec3 lightPos1;
+uniform vec3 lightPos2;
+vec3 pointLightPositions[2] = vec3[2](
+  lightPos1,
+  lightPos2
+);
+
+
+// struct PointLight {
+//   vec3 pos;
+//   vec3 power;
+// }
+
+// NUM_LIGHTS = 2;
+// // uniform PointLight lights[NUM_LIGHTS];
+// PointLight lights[NUM_LIGHTS]; 
+// lights[0].pos = vec3(1,1,1);
+// light[0].power = vec3(1000,1000,1000);
+// lights[1] = PointLight(vec3(0,1,0),vec3(1000,1000,1000));
 
 in vec3 vPosition;
 in vec3 vNormal;
@@ -98,19 +125,44 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
     return F * G * D(m,n,alpha) / (4.0*idotn*odotn);
 }
 
-void main() {
+vec4 shade(vec3 lightPos, vec3 power){
+
     vec3 normal = (gl_FrontFacing) ? normalize(vNormal) : normalize(-vNormal);
 
     // in eye space   
-    vec3 vLightPos = (mV * mL * vec4(lightPos, 1.0)).xyz;
+    vec3 vLightPos = (mV * vec4(lightPos, 1.0)).xyz;
     vec3 vCamPos = (mV * mC * vec4(camPos, 1.0)).xyz;
     vec3 wo = normalize(vLightPos - vPosition);
     vec3 wi = normalize(vCamPos - vPosition);
     float Kspecular = isotropicMicrofacet(wi, wo, normal, eta, alpha);  
     float NdotH = max(dot(normal, wo), 0.0);
 
-    // the power is 1000 not 80 tho
     float divise = NdotH / (4 * PI * pow(length(vLightPos - vPosition), 2));
-    fragColor = vec4(Kspecular * power + diffuseReflectance * 1/PI * power, 1.0) * divise;
-	//fragColor = vec4((mL * vec4(lightPos, 1.0)).xyz, 1);
+    vec4 color = vec4(Kspecular * power + diffuseReflectance * 1/PI * power, 1.0) * divise;
+
+    return color;
+
+}
+
+// vec3 pointLightPositions[2] = vec3[2](
+//     vec3( 1,  1,  1),
+//     vec3( -1, -1, -1)
+// );
+ 
+//  vec3 pointLightPower[2] = vec3[2](
+//   vec3( 1000,  1000,  1000),
+//   vec3( 1000,  1000,  1000)
+// );
+ 
+
+
+
+void main() {
+  vec4 acc = vec4(0, 0, 0, 0);
+  for (int i = 0; i < 2; i++) {
+    vec3 lightPos = pointLightPositions[i];
+    vec3 power =  pointLightPower[i];
+    acc = acc + shade(lightPos, power);
+  }
+  fragColor = acc;
 }
