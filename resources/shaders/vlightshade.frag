@@ -99,7 +99,7 @@ void main() {
 	vec4 rawdiff = texture(idiff, geom_texCoord);
 
 	vec3 pos = rawpos.xyz;
-	vec3 norm = normalize(rawnorm.xyz * 2 - 1);
+	vec3 norm = normalize((rawnorm.xyz -.5) * 2);
 	vec3 diff = rawdiff.xyz;
 	float alpha = rawdiff.w*10;
 	float eta = rawnorm.w*10;
