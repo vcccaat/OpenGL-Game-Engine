@@ -70,7 +70,7 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
         meshes[i]->setAttribute(0, positions[i]);
         meshes[i]->setAttribute(1, normals[i]);
         meshes[i]->setIndices(indices[i], GL_TRIANGLES);
-    }
+        }
 
     // Camera initialize
     if (obj->mNumCameras > 0) {
@@ -123,11 +123,15 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
 
         // Parse area, ambient, and point
         if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
-            continue; //TEMPORARY
+            // continue; //TEMPORARY
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
-            l.power = scene->mLights[i]->mColorDiffuse;
+            l.power = scene->mLights[i]->mColorDiffuse*3;  // TEMP!
+            std::cout << l.power[0] << "area" << std::endl;
+
             l.type = l.POINT; // testing 2.4 Sum multiple lights
+            // l.power = reinterpret_cast<aiColor3D&>(glm::vec3(1000,1000,1000));
+
             l.areaNormal = glm::vec3(0, 0, 1);
             l.areaTangent = glm::vec3(0, 1, 0);
             printf("area parsed\n");
@@ -143,6 +147,7 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
+            std::cout << l.power[0] << std::endl;
             l.type = l.POINT;
             printf("Point parsed\n"); 
             //printf("Point parsed, %.2f,%.2f,%.2f ", l.power[0],l.power[1],l.power[2]);
@@ -337,8 +342,10 @@ void BunnyApp::forwardShade() {
 
     fbo->bind();
     glEnable(GL_DEPTH_TEST);
+    
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
     
     prog->use();
 
@@ -347,11 +354,14 @@ void BunnyApp::forwardShade() {
     prog->uniform("mP", cam->getProjectionMatrix());
     prog->uniform("mC", camTransMat);
     prog->uniform("camPos", cam->getEye());
+
     for (int k = 0; k < lights.size(); ++k) {
         // Plug in lights
         prog->uniform("lightPos", lights[k].pos);
         prog->uniform("mL", lights[k].transMat);
         prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
+        
+
         for (int i = 0; i < meshes.size(); ++i) {
             // Plug in mesh
             prog->uniform("mM", transMatVec[i]);
@@ -371,6 +381,7 @@ void BunnyApp::forwardShade() {
     fbo->unbind();
 
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
 
     fsqProg->use();
     fbo->colorTexture().setParameters(
@@ -392,6 +403,8 @@ void BunnyApp::deferredShade() {
     deffbo->bind();
     glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);  
+
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -405,6 +418,8 @@ void BunnyApp::deferredShade() {
             Material material = materials[meshIndToMaterialInd[i]];
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             gProg->uniform("alpha", bsdf.alpha());
+            // std::cout << bsdf.alpha() ;
+            glBlendFunc(0.5f, 1.0 - 0.5f);
             gProg->uniform("eta", bsdf.eta());
             gProg->uniform("diffuseReflectance", bsdf.diffuseReflectance());
             // Draw mesh
@@ -417,12 +432,11 @@ void BunnyApp::deferredShade() {
     deffbo->unbind();
     gProg->unuse();
 
-
-
     lightfbo->bind();
     lightProg->use();
 
     glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_BLEND);
 
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
@@ -444,7 +458,7 @@ void BunnyApp::deferredShade() {
         lightProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
     }
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
-    // glDrawBuffers(3, attachments);
+    glDrawBuffers(3, attachments);
 
     lightProg->unuse();
     lightfbo->unbind();
@@ -453,6 +467,7 @@ void BunnyApp::deferredShade() {
 
     fsqProg->use();
     glDisable(GL_DEPTH_TEST);
+    
     fbo->colorTexture().setParameters(
         GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
         GL_LINEAR, GL_LINEAR
@@ -462,6 +477,7 @@ void BunnyApp::deferredShade() {
     fsqProg->uniform("exposure", 1.0f);
     // Draw the full screen quad
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    
     fsqProg->unuse();
     
 }
