@@ -348,15 +348,11 @@ void BunnyApp::forwardShade() {
     // Plug in camera stuff
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
-    // prog->uniform("mC", camTransMat);
-    // prog->uniform("camPos", cam->getEye());
 
     for (int k = 0; k < lights.size(); ++k) {
         // Plug in lights
         prog->uniform("lightPos"+std::to_string(k+1),  glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
-        // prog->uniform("mL", lights[k].transMat);
         prog->uniform("power"+std::to_string(k+1), reinterpret_cast<glm::vec3&>(lights[k].power));      
-    
     }
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
@@ -410,8 +406,6 @@ void BunnyApp::deferredShade() {
             Material material = materials[meshIndToMaterialInd[i]];
             nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
             gProg->uniform("alpha", bsdf.alpha());
-            // std::cout << bsdf.alpha() ;
-            // glBlendFunc(0.5f, 1.0 - 0.5f);
             gProg->uniform("eta", bsdf.eta());
             gProg->uniform("diffuseReflectance", bsdf.diffuseReflectance());
             // Draw mesh
@@ -438,15 +432,11 @@ void BunnyApp::deferredShade() {
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     //glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
 
-    // deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
     deffbo->colorTexture(2).bindToTextureUnit(2);
     deffbo->depthTexture().bindToTextureUnit(3);
     lightProg->uniform("mV", cam->getViewMatrix());
     lightProg->uniform("mP", cam->getProjectionMatrix());
-    // lightProg->uniform("mC", camTransMat);
-    // lightProg->uniform("camPos", cam->getEye());
-    // lightProg->uniform("ipos", 0);
     lightProg->uniform("inorm", 1);
     lightProg->uniform("idiff", 2);
     lightProg->uniform("idepth", 3);

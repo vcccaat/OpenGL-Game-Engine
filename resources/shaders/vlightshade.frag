@@ -7,10 +7,8 @@ uniform sampler2D idepth;
 
 uniform mat4 mV;  // View matrix
 uniform mat4 mL;  // Light matrix
-// uniform mat4 mC;  // Camera matrix
 uniform mat4 mP;  // projection matrix
 
-// uniform vec3 camPos;
 uniform vec3 power;
 uniform vec3 lightPos;
 
@@ -101,7 +99,7 @@ void main() {
 	float Kspecular = isotropicMicrofacet(wi, wo, norm, eta, alpha);  
 	float NdotH = max(dot(norm, wo), 0.0);
 
-	float divise = NdotH / (4 * PI  * pow(length(vLightPos - eyeSpacePos), 2)); // can replace eyeSpacePos with pos and it looks the same
+	float divise = NdotH / (4 * PI  * pow(length(vLightPos - eyeSpacePos), 2)); 
 	color = vec4(Kspecular * power + diff * power * 1/PI, 1.0) * divise;
 	// color = vec4(pos); //TEMP//
 }
