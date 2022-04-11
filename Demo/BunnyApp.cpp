@@ -406,8 +406,6 @@ void BunnyApp::deferredShade() {
     glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
     glEnable(GL_DEPTH_TEST);
 
-    glClearColor(0,0,0,0);
-    // glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     gProg->use();
@@ -439,9 +437,14 @@ void BunnyApp::deferredShade() {
 
     glDisable(GL_DEPTH_TEST);
     
-    glEnable(GL_BLEND);  
+    glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
+
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    //glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
 
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
@@ -461,6 +464,9 @@ void BunnyApp::deferredShade() {
         fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
         //break; //TEMP//
     }
+
+    glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
+    glBlendFunc(GL_ZERO, GL_ZERO);
 
     lightProg->unuse();
     lightfbo->unbind();
