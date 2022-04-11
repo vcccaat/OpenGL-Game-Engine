@@ -1,20 +1,21 @@
 #version 330
 
-uniform sampler2D ipos;
+// uniform sampler2D ipos;
 uniform sampler2D inorm;
 uniform sampler2D idiff;
+uniform sampler2D idepth;
 
 uniform mat4 mV;  // View matrix
 uniform mat4 mL;  // Light matrix
-uniform mat4 mC;  // Camera matrix
+// uniform mat4 mC;  // Camera matrix
 uniform mat4 mP;  // projection matrix
 
-uniform vec3 camPos;
+// uniform vec3 camPos;
 uniform vec3 power;
 uniform vec3 lightPos;
-uniform vec2 m_fbsize;
 
 in vec2 geom_texCoord;
+
 
 out vec4 color;
 
@@ -79,29 +80,28 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 
 
 void main() {
-	vec4 rawpos = texture(ipos, geom_texCoord);
+	// vec4 rawpos = texture(ipos, geom_texCoord);
 	vec4 rawnorm = texture(inorm, geom_texCoord);
 	vec4 rawdiff = texture(idiff, geom_texCoord);
+  float rawDepth = texture(idepth, geom_texCoord).r;
 
-	vec3 pos = rawpos.xyz;
+	vec4 pos = vec4(geom_texCoord.x*2.0-1.0,geom_texCoord.y*2.0-1.0,rawDepth*2.0-1.0,1.0); 
 	vec3 norm = normalize((rawnorm.xyz -.5) * 2);
 	vec3 diff = rawdiff.xyz;
 	float alpha = rawdiff.w * 10;
 	float eta = rawnorm.w * 10;
 
-	//Don't know why remove mV* ? thought we need to in eye space as forward shading? 
-	vec3 vLightPos = (mL * vec4(lightPos, 1.0)).xyz;  
-	vec4 transPos = inverse(mP) * vec4(gl_FragCoord.x/m_fbsize[0], gl_FragCoord.y/m_fbsize[1], gl_FragCoord.z*2.0-1.0, 1.0);
-	vec3 eyeSpacePos = (transPos.xyz / transPos.w).xyz;
+	vec3 vLightPos = (mV *  mL * vec4(lightPos, 1.0)).xyz;  
+	vec4 viewSpacePos = inverse(mP) * pos;
+  vec3 eyeSpacePos = (viewSpacePos.xyz / viewSpacePos.w).xyz;
 
-	// also remove mV* in vCamPos
-	vec3 vCamPos = (mC * vec4(camPos, 1.0)).xyz;
-	vec3 wo = normalize(vLightPos - pos);  
-	vec3 wi = normalize(vCamPos - pos);
+	vec3 vCamPos = vec3(0,0,0);
+	vec3 wo = normalize(vLightPos - eyeSpacePos);  
+	vec3 wi = normalize(vCamPos - eyeSpacePos);
 	float Kspecular = isotropicMicrofacet(wi, wo, norm, eta, alpha);  
 	float NdotH = max(dot(norm, wo), 0.0);
 
-	float divise = NdotH / (4 * PI  * pow(length(vLightPos - pos), 2)); // can replace eyeSpacePos with pos and it looks the same
+	float divise = NdotH / (4 * PI  * pow(length(vLightPos - eyeSpacePos), 2)); // can replace eyeSpacePos with pos and it looks the same
 	color = vec4(Kspecular * power + diff * power * 1/PI, 1.0) * divise;
-	//color = vec4(norm, 1); //TEMP//
+	// color = vec4(pos); //TEMP//
 }

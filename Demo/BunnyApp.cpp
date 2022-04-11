@@ -213,8 +213,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -262,8 +262,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
     deffbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
     lightfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
@@ -344,7 +344,6 @@ void BunnyApp::forwardShade() {
     
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // glEnable(GL_BLEND);
     
     prog->use();
 
@@ -361,29 +360,25 @@ void BunnyApp::forwardShade() {
         // prog->uniform("mL", lights[k].transMat);
         prog->uniform("power"+std::to_string(k+1), reinterpret_cast<glm::vec3&>(lights[k].power));      
     
-        // prog->uniform("lights[" + std::to_string(k) + "].Position", lights[k].pos);
-        // glUniform3fv('lights', lights.size(), reinterpret_cast(lights.data()));
     }
-        for (int i = 0; i < meshes.size(); ++i) {
-            // Plug in mesh
-            prog->uniform("mM", transMatVec[i]);
-            // Plug in materials
-            Material material = materials[meshIndToMaterialInd[i]];
-            nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
-            prog->uniform("alpha", bsdf.alpha());
-            prog->uniform("eta", bsdf.eta());
-            prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
-            // Draw mesh
-            meshes[i]->drawElements();
-    
-        }
-    // }
+    for (int i = 0; i < meshes.size(); ++i) {
+        // Plug in mesh
+        prog->uniform("mM", transMatVec[i]);
+        // Plug in materials
+        Material material = materials[meshIndToMaterialInd[i]];
+        nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
+        prog->uniform("alpha", bsdf.alpha());
+        prog->uniform("eta", bsdf.eta());
+        prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
+        // Draw mesh
+        meshes[i]->drawElements();
+
+    }
 
     prog->unuse();
     fbo->unbind();
 
     glDisable(GL_DEPTH_TEST);
-    // glDisable(GL_BLEND);
 
     fsqProg->use();
     fbo->colorTexture().setParameters(
@@ -446,17 +441,18 @@ void BunnyApp::deferredShade() {
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     //glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
 
-    deffbo->colorTexture(0).bindToTextureUnit(0);
+    // deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
     deffbo->colorTexture(2).bindToTextureUnit(2);
-    lightProg->uniform("m_fbsize",glm::vec2(m_fbsize[0], m_fbsize[1]));
+    deffbo->depthTexture().bindToTextureUnit(3);
     lightProg->uniform("mV", cam->getViewMatrix());
     lightProg->uniform("mP", cam->getProjectionMatrix());
-    lightProg->uniform("mC", camTransMat);
-    lightProg->uniform("camPos", cam->getEye());
-    lightProg->uniform("ipos", 0);
+    // lightProg->uniform("mC", camTransMat);
+    // lightProg->uniform("camPos", cam->getEye());
+    // lightProg->uniform("ipos", 0);
     lightProg->uniform("inorm", 1);
     lightProg->uniform("idiff", 2);
+    lightProg->uniform("idepth", 3);
     for (int k = 0; k < lights.size(); ++k) {
         lightProg->uniform("mL", lights[k].transMat);
         lightProg->uniform("lightPos", lights[k].pos);

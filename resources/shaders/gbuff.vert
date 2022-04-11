@@ -21,7 +21,7 @@ uniform mat4 mV;  // View matrix
 uniform mat4 mP;  // Projection matrix
 
 void main() {
-    vPosition = (mV * mM * vec4(position, 1.0)).xyz;
+    vPosition = ( mV * mM * vec4(position, 1.0)).xyz;
     gl_Position = mP * vec4(vPosition, 1.0);
-    vNormal = (mM * vec4(normal, .0)).xyz;
+    vNormal = normalize(mV * mM * vec4(normal, .0)).xyz;
 }
