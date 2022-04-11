@@ -126,7 +126,7 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
             // continue; //TEMPORARY
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
-            l.power = scene->mLights[i]->mColorDiffuse*3;  // TEMP!
+            l.power = scene->mLights[i]->mColorDiffuse;  // TEMP!
             std::cout << l.power[0] << "area" << std::endl;
 
             l.type = l.POINT; // testing 2.4 Sum multiple lights
