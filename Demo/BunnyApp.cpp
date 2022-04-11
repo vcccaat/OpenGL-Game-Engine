@@ -213,8 +213,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
@@ -262,9 +262,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    //std::cout << m_fbsize[0] <<" "<< m_fbsize[1] << std::endl;
-    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
     deffbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
     lightfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
@@ -447,25 +446,21 @@ void BunnyApp::deferredShade() {
     deffbo->colorTexture(0).bindToTextureUnit(0);
     deffbo->colorTexture(1).bindToTextureUnit(1);
     deffbo->colorTexture(2).bindToTextureUnit(2);
-    lightProg->uniform("m_fbsize",glm::vec2(m_fbsize[0],m_fbsize[1]));
-    // lightProg->uniform("mV", cam->getViewMatrix());
-    glm::mat4 mV = cam->getViewMatrix();
+    lightProg->uniform("m_fbsize",glm::vec2(m_fbsize[0], m_fbsize[1]));
+    lightProg->uniform("mV", cam->getViewMatrix());
     lightProg->uniform("mP", cam->getProjectionMatrix());
-    // lightProg->uniform("mC", camTransMat);
-    glm::vec3 camPos = glm::vec3( camTransMat * glm::vec4(cam->getEye(),1.0));
-    lightProg->uniform("camPos", camPos);
+    lightProg->uniform("mC", camTransMat);
+    lightProg->uniform("camPos", cam->getEye());
     lightProg->uniform("ipos", 0);
     lightProg->uniform("inorm", 1);
     lightProg->uniform("idiff", 2);
     for (int k = 0; k < lights.size(); ++k) {
-        // lightProg->uniform("mL", lights[k].transMat);
-        glm::vec3 lightPos = glm::vec3( lights[k].transMat * glm::vec4(lights[k].pos,1.0));
-        lightProg->uniform("lightPos", lightPos);
+        lightProg->uniform("mL", lights[k].transMat);
+        lightProg->uniform("lightPos", lights[k].pos);
         lightProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
         fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+        //break; //TEMP//
     }
-    
-    // glDrawBuffers(3, attachments);
 
     lightProg->unuse();
     lightfbo->unbind();

@@ -140,22 +140,9 @@ vec4 shade(vec3 lightPos, vec3 power){
     float divise = NdotH / (4 * PI * pow(length(vLightPos - vPosition), 2));
     vec4 color = vec4(Kspecular * power + diffuseReflectance * 1/PI * power, 1.0) * divise;
 
+	//return vec4(normal, 1); //TEMP//
     return color;
-
 }
-
-// vec3 pointLightPositions[2] = vec3[2](
-//     vec3( 1,  1,  1),
-//     vec3( -1, -1, -1)
-// );
- 
-//  vec3 pointLightPower[2] = vec3[2](
-//   vec3( 1000,  1000,  1000),
-//   vec3( 1000,  1000,  1000)
-// );
- 
-
-
 
 void main() {
   vec4 acc = vec4(0, 0, 0, 0);
@@ -163,6 +150,8 @@ void main() {
     vec3 lightPos = pointLightPositions[i];
     vec3 power =  pointLightPower[i];
     acc = acc + shade(lightPos, power);
+	//break; //TEMP//
   }
+
   fragColor = acc;
 }

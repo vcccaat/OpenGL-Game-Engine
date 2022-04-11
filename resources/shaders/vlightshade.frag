@@ -4,12 +4,13 @@ uniform sampler2D ipos;
 uniform sampler2D inorm;
 uniform sampler2D idiff;
 
-// uniform mat4 mV;  // View matrix
-// uniform mat4 mL;  // Light matrix
-// uniform mat4 mC;  // Camera matrix
+uniform mat4 mV;  // View matrix
+uniform mat4 mL;  // Light matrix
+uniform mat4 mC;  // Camera matrix
+uniform mat4 mP;  // projection matrix
+
 uniform vec3 camPos;
 uniform vec3 power;
-uniform mat4 mP;  // projection matrix
 uniform vec3 lightPos;
 uniform vec2 m_fbsize;
 
@@ -20,9 +21,6 @@ out vec4 color;
 const float PI = 3.14159265358979323846264;
 
 // The Fresnel reflection factor
-//   i -- incoming direction
-//   m -- microsurface normal
-//   eta -- refractive index
 float fresnel(vec3 i, vec3 m, float eta) {
   float c = abs(dot(i,m));
   float g = sqrt(eta*eta - 1.0 + c*c);
@@ -35,10 +33,6 @@ float fresnel(vec3 i, vec3 m, float eta) {
 }
 
 // The one-sided Smith shadowing/masking function
-//   v -- in or out vector
-//   m -- microsurface normal
-//   n -- (macro) surface normal
-//   alpha -- surface roughness
 float G1(vec3 v, vec3 m, vec3 n, float alpha) {
   float vm = dot(v,m);
   float vn = dot(v,n);
@@ -53,9 +47,6 @@ float G1(vec3 v, vec3 m, vec3 n, float alpha) {
 }
 
 // The GGX slope distribution function
-//   m -- microsurface normal
-//   n -- (macro) surface normal
-//   alpha -- surface roughness
 float D(vec3 m, vec3 n, float alpha) {
   float mn = dot(m,n);
   if (mn > 0.0) {
@@ -70,13 +61,7 @@ float D(vec3 m, vec3 n, float alpha) {
   }
 }
 
-// Evalutate the Microfacet BRDF (GGX variant) for the paramters:
-//   i -- incoming direction (unit vector, pointing away from surface)
-//   o -- outgoing direction (unit vector, pointing away from surface)
-//   n -- outward pointing surface normal vector
-//   eta -- refractive index
-//   alpha -- surface roughness
-// return: scalar BRDF value
+// Evalutate the Microfacet BRDF (GGX variant)
 float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 
     float odotn = dot(o,n);
@@ -101,24 +86,22 @@ void main() {
 	vec3 pos = rawpos.xyz;
 	vec3 norm = normalize((rawnorm.xyz -.5) * 2);
 	vec3 diff = rawdiff.xyz;
-	float alpha = rawdiff.w*10;
-	float eta = rawnorm.w*10;
-
-	vec3 cnorm = (gl_FrontFacing) ? norm : -norm; 
+	float alpha = rawdiff.w * 10;
+	float eta = rawnorm.w * 10;
 
 	//Don't know why remove mV* ? thought we need to in eye space as forward shading? 
-	vec3 vLightPos = (vec4(lightPos, 1.0)).xyz;  
+	vec3 vLightPos = (mL * vec4(lightPos, 1.0)).xyz;  
 	vec4 transPos = inverse(mP) * vec4(gl_FragCoord.x/m_fbsize[0], gl_FragCoord.y/m_fbsize[1], gl_FragCoord.z*2.0-1.0, 1.0);
 	vec3 eyeSpacePos = (transPos.xyz / transPos.w).xyz;
 
 	// also remove mV* in vCamPos
-	vec3 vCamPos = (vec4(camPos, 1.0)).xyz;
+	vec3 vCamPos = (mC * vec4(camPos, 1.0)).xyz;
 	vec3 wo = normalize(vLightPos - pos);  
 	vec3 wi = normalize(vCamPos - pos);
-	float Kspecular = isotropicMicrofacet(wi, wo, cnorm, eta, alpha);  
-	float NdotH = max(dot(cnorm, wo), 0.0);
+	float Kspecular = isotropicMicrofacet(wi, wo, norm, eta, alpha);  
+	float NdotH = max(dot(norm, wo), 0.0);
 
 	float divise = NdotH / (4 * PI  * pow(length(vLightPos - pos), 2)); // can replace eyeSpacePos with pos and it looks the same
 	color = vec4(Kspecular * power + diff * power * 1/PI, 1.0) * divise;
-	//color = vec4(vLightPos, 1);
+	//color = vec4(norm, 1); //TEMP//
 }
