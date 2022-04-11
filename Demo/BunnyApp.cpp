@@ -126,12 +126,10 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
             // continue; //TEMPORARY
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
-            l.power = scene->mLights[i]->mColorDiffuse;  // TEMP!
+            l.power = scene->mLights[i]->mColorDiffuse; 
             std::cout << l.power[0] << "area" << std::endl;
 
             l.type = l.POINT; // testing 2.4 Sum multiple lights
-            // l.power = reinterpret_cast<aiColor3D&>(glm::vec3(1000,1000,1000));
-
             l.areaNormal = glm::vec3(0, 0, 1);
             l.areaTangent = glm::vec3(0, 1, 0);
             printf("area parsed\n");
@@ -350,13 +348,12 @@ void BunnyApp::forwardShade() {
     // Plug in camera stuff
     prog->uniform("mV", cam->getViewMatrix());
     prog->uniform("mP", cam->getProjectionMatrix());
-    prog->uniform("mC", camTransMat);
-    prog->uniform("camPos", cam->getEye());
+    // prog->uniform("mC", camTransMat);
+    // prog->uniform("camPos", cam->getEye());
 
     for (int k = 0; k < lights.size(); ++k) {
         // Plug in lights
-        glm::vec3 lightpos = glm::vec3( lights[k].transMat * glm::vec4(lights[k].pos,1.0));
-        prog->uniform("lightPos"+std::to_string(k+1),  lightpos);
+        prog->uniform("lightPos"+std::to_string(k+1),  glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
         // prog->uniform("mL", lights[k].transMat);
         prog->uniform("power"+std::to_string(k+1), reinterpret_cast<glm::vec3&>(lights[k].power));      
     

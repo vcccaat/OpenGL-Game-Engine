@@ -13,5 +13,5 @@ out vec3 vNormal; // vertex normal in eye space
 void main() {
     vPosition = (mV * mM * vec4(position, 1.0)).xyz;
     gl_Position = mP * vec4(vPosition, 1.0);
-    vNormal = (mV * mM * vec4(normal, .0)).xyz;
+    vNormal = normalize(mV * mM * vec4(normal, .0)).xyz;
 }
