@@ -282,6 +282,16 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     cc.reset(new RTUtil::DefaultCC(cam));
 
+    lightPers = std::make_shared<RTUtil::PerspectiveCamera>(
+            glm::vec4(0,0,0,0), // eye
+            glm::vec3(0,0,0), // target
+            glm::vec3(0,1,0), // up
+            1, // aspect
+            1.0, 20.0, // near, far
+            1 // fov
+        );
+
+
     initScene(path, cam, windowWidth, windowHeight);
     perform_layout();
     set_visible(true);
@@ -452,15 +462,8 @@ void BunnyApp::deferredShade() {
         glDrawBuffers(1,attachments);
 
         shadowProg->use(); // TEMP
-            lightPers = std::make_shared<RTUtil::PerspectiveCamera>(
-                lights[k].pos, // eye
-                glm::vec3(0,0,0), // target
-                glm::vec3(0,1,0), // up
-                1, // aspect
-                1.0, 20.0, // near, far
-                1 // fov
-            );
         
+        lightPers->setEye(glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
         shadowProg->uniform("mV", lightPers->getViewMatrix());
         shadowProg->uniform("mP", lightPers->getProjectionMatrix());
 
@@ -478,7 +481,8 @@ void BunnyApp::deferredShade() {
         // ---------------- light shading pass -------------------
         //
         lightfbo->bind();     
-    
+        glClearColor(0, 0, 0, 0);
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
         
@@ -489,7 +493,8 @@ void BunnyApp::deferredShade() {
 
         lightProg->use();   
         lightProg->uniform("mVlight", lightPers->getViewMatrix());
-        lightProg->uniform("mPlight", lightPers->getProjectionMatrix()); 
+        lightProg->uniform("mPlight", lightPers->getProjectionMatrix());
+        // std::cout << lightPers->getEye()[0] <<lightPers->getEye()[1] <<lightPers->getEye()[2] << std::endl; 
         lightProg->uniform("mV", cam->getViewMatrix());
         lightProg->uniform("mP", cam->getProjectionMatrix());
         lightProg->uniform("inorm", 1);
