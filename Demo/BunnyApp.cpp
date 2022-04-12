@@ -393,13 +393,19 @@ void BunnyApp::forwardShade() {
 
 void BunnyApp::deferredShade() {
     GLWrap::checkGLError("deferred shading start");
-
+    //
+    // ---------------- geometry pass -------------------
+    //
     gfbo->bind();
     glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
-    glEnable(GL_DEPTH_TEST);
-
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    glEnable(GL_DEPTH_TEST);
+
+    GLenum attachments[]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, attachments);
+
     gProg->use();
     gProg->uniform("mV", cam->getViewMatrix());
     gProg->uniform("mP", cam->getProjectionMatrix());
@@ -417,59 +423,71 @@ void BunnyApp::deferredShade() {
         meshes[i]->drawElements();
     }
 
-    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(3, attachments);
-
+    gProg->unuse();
+    glDisable(GL_DEPTH_TEST);  
     gfbo->unbind();
-    gProg->unuse();  
 
-    // shadowfbo->bind(); // TEMP
-    // shadowProg->use(); // TEMP
-
-    glDisable(GL_DEPTH_TEST);
-    
+    //
+    // ---------------- init accumulation pass -------------------
+    //
+    lightfbo->bind(); 
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+    lightfbo->unbind();
 
     // each light create a different shadow map
-    for (int k = 0; k < lights.size(); ++k) { //
+    for (int k = 0; k < lights.size(); ++k) { 
         
-        // shadow pass
-        // shadowfbo->bind();
-        // shadowProg->use();
+    //
+    // ---------------- shadow pass -------------------
+    //
+        shadowfbo->bind(); 
+    
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        lightPers = std::make_shared<RTUtil::PerspectiveCamera>(
-            lights[k].pos, // eye
-            glm::vec3(0,0,0), // target
-            glm::vec3(0,1,0), // up
-            1, // aspect
-            1.0, 20.0, // near, far
-            1 // fov
-        );
+        glEnable(GL_DEPTH_TEST);
+
+        GLenum attachments[]{ GL_COLOR_ATTACHMENT0};
+        glDrawBuffers(1,attachments);
+
+        shadowProg->use(); // TEMP
+            lightPers = std::make_shared<RTUtil::PerspectiveCamera>(
+                lights[k].pos, // eye
+                glm::vec3(0,0,0), // target
+                glm::vec3(0,1,0), // up
+                1, // aspect
+                1.0, 20.0, // near, far
+                1 // fov
+            );
         
-        // shadowProg->uniform("mV", lightPers->getViewMatrix());
-        // shadowProg->uniform("mP", lightPers->getProjectionMatrix());
+        shadowProg->uniform("mV", lightPers->getViewMatrix());
+        shadowProg->uniform("mP", lightPers->getProjectionMatrix());
 
         // each mesh has a different shadow map
-        // for (int i = 0; i < meshes.size(); ++i) {          
-        //     shadowProg->uniform("mM", transMatVec[i]);
-        //     meshes[i]->drawElements();
-        // }
-        // shadowProg->unuse();
-        // shadowfbo->unbind();
+        for (int i = 0; i < meshes.size(); ++i) {          
+            shadowProg->uniform("mM", transMatVec[i]);
+            meshes[i]->drawElements();
+        }
+        shadowProg->unuse();
+        glDisable(GL_DEPTH_TEST);
+        shadowfbo->unbind();
 
+
+        //
+        // ---------------- light shading pass -------------------
+        //
         lightfbo->bind();     
-        lightProg->use(); 
+    
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
-
-        glClearColor(0, 0, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
+        
         gfbo->colorTexture(1).bindToTextureUnit(1);
         gfbo->colorTexture(2).bindToTextureUnit(2);
         gfbo->depthTexture().bindToTextureUnit(3);
-        // shadowfbo->depthTexture().bindToTextureUnit(4);   
+        shadowfbo->depthTexture().bindToTextureUnit(4);   
 
-        // lighting pass     
+        lightProg->use();   
         lightProg->uniform("mVlight", lightPers->getViewMatrix());
         lightProg->uniform("mPlight", lightPers->getProjectionMatrix()); 
         lightProg->uniform("mV", cam->getViewMatrix());
@@ -477,27 +495,26 @@ void BunnyApp::deferredShade() {
         lightProg->uniform("inorm", 1);
         lightProg->uniform("idiff", 2);
         lightProg->uniform("idepth", 3);
-        // lightProg->uniform("ishadowmap", 4);
+        lightProg->uniform("ishadowmap", 4);
         lightProg->uniform("mL", lights[k].transMat);
         lightProg->uniform("lightPos", lights[k].pos);
         lightProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power)); 
         fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
         
         lightProg->unuse();
+        glDisable(GL_BLEND);
         lightfbo->unbind();
     }
 
+ 
+    //
+    // ---------------- draw to screen  -------------------
+    //
     fsqProg->use();
-    
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
     lightfbo->colorTexture().bindToTextureUnit(0);
     fsqProg->uniform("image", 0);
     fsqProg->uniform("exposure", 1.0f);
-    // Draw the full screen quad
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
-    
     fsqProg->unuse();
     
 }
