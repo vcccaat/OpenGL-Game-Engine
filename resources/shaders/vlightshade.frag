@@ -1,10 +1,13 @@
 #version 330
 
-// uniform sampler2D ipos;
 uniform sampler2D inorm;
 uniform sampler2D idiff;
 uniform sampler2D idepth;
+uniform sampler2D ishadowmap;
 
+
+uniform mat4 mVlight;
+uniform mat4 mPlight;
 uniform mat4 mV;  // View matrix
 uniform mat4 mL;  // Light matrix
 uniform mat4 mP;  // projection matrix
@@ -78,7 +81,6 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 
 
 void main() {
-	// vec4 rawpos = texture(ipos, geom_texCoord);
 	vec4 rawnorm = texture(inorm, geom_texCoord);
 	vec4 rawdiff = texture(idiff, geom_texCoord);
   float rawDepth = texture(idepth, geom_texCoord).r;
@@ -101,5 +103,14 @@ void main() {
 
 	float divise = NdotH / (4 * PI  * pow(length(vLightPos - eyeSpacePos), 2)); 
 	color = vec4(Kspecular * power + diff * power * 1/PI, 1.0) * divise;
-	// color = vec4(pos); //TEMP//
+	
+
+  // shadow 
+  vec4 worldSpacePos = inverse(mV) * vec4(eyeSpacePos,1.0);
+  vec2 light_texCoord = (mPlight * mVlight * worldSpacePos).xy;
+  float shadowDepth = texture(ishadowmap, vec2(light_texCoord.x/2.0+0.5,light_texCoord.y/2.0+0.5)).r;
+
+  // color = vec4(shadowDepth*20-19,0,0,1); //TEMP//
+
+  
 }

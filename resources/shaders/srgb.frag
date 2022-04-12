@@ -12,6 +12,7 @@
 uniform sampler2D image;
 uniform float exposure;
 uniform bool convertToSRGB = true;
+uniform sampler2D depthMap;
 
 in vec2 geom_texCoord;
 
@@ -37,10 +38,11 @@ vec4 sRGB(vec4 c) {
 
 void main() {		
 	vec4 color = texture(image, geom_texCoord);
+
     if (convertToSRGB) {
         fragColor = sRGB(color * exposure);
     } else {
         fragColor = color * exposure;
     }
-		//fragColor = vec4(0.4,0.2,0.5,1);
+
 }
