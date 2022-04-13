@@ -102,15 +102,22 @@ void main() {
 	float NdotH = max(dot(norm, wo), 0.0);
 
 	float divise = NdotH / (4 * PI  * pow(length(vLightPos - eyeSpacePos), 2)); 
-	// color = vec4(Kspecular * power + diff * power * 1/PI, 1.0) * divise;
 	
 
   // shadow 
   vec4 worldSpacePos = inverse(mV) * vec4(eyeSpacePos,1.0);
-  vec2 light_texCoord = (mPlight * mVlight * worldSpacePos).xy;
-  float shadowDepth = texture(ishadowmap, geom_texCoord).r;
+  vec4 lightSpacePos =  mPlight * mVlight * worldSpacePos;
+  vec3 light_texCoord =  (lightSpacePos.xyz/lightSpacePos.w) / 2 + 0.5; 
+  float closestDepth = texture(ishadowmap, light_texCoord.xy).r;
+  float currentDepth = light_texCoord.z;
 
-  // color = vec4(worldSpacePos); 
-   color = vec4(shadowDepth*20-19,0,0,1); 
+  if(currentDepth > closestDepth + 0.01){
+    color = vec4(0,0,0,1);
+  }
+  else {
+    color = vec4(Kspecular * power + diff * power * 1/PI, 1.0) * divise;
+  }
+
+  //  color = vec4(lightSpacePos); 
   
 }

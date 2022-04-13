@@ -446,7 +446,7 @@ void BunnyApp::deferredShade() {
     lightfbo->unbind();
 
     // each light create a different shadow map
-    for (int k = 0; k < 1; ++k) {  //lights.size()
+    for (int k = 0; k < lights.size(); ++k) {  
         
     //
     // ---------------- shadow pass -------------------
