@@ -107,11 +107,10 @@ void main() {
 
   // shadow 
   vec4 worldSpacePos = inverse(mV) * vec4(eyeSpacePos,1.0);
-  vec4 a = vec4((worldSpacePos.xyz / worldSpacePos.w).xyz,1.0);
-  vec2 light_texCoord = (mPlight * mVlight * a).xy;
-  float shadowDepth = texture(ishadowmap, vec2(light_texCoord.x/2.0+0.5,light_texCoord.y/2.0+0.5)).r;
+  vec2 light_texCoord = (mPlight * mVlight * worldSpacePos).xy;
+  float shadowDepth = texture(ishadowmap, geom_texCoord).r;
 
-  // color = vec4(shadowDepth*20-19, 0,0,1); 
-   color = vec4(worldSpacePos); 
+  // color = vec4(worldSpacePos); 
+   color = vec4(shadowDepth*20-19,0,0,1); 
   
 }

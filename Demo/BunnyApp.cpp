@@ -446,7 +446,7 @@ void BunnyApp::deferredShade() {
     lightfbo->unbind();
 
     // each light create a different shadow map
-    for (int k = 0; k < lights.size(); ++k) { 
+    for (int k = 0; k < 1; ++k) {  //lights.size()
         
     //
     // ---------------- shadow pass -------------------
@@ -464,8 +464,8 @@ void BunnyApp::deferredShade() {
         shadowProg->use(); // TEMP
         
         lightPers->setEye(glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
-        shadowProg->uniform("mV", lightPers->getViewMatrix());
-        shadowProg->uniform("mP", lightPers->getProjectionMatrix());
+        shadowProg->uniform("mVlight", lightPers->getViewMatrix());
+        shadowProg->uniform("mPlight", lightPers->getProjectionMatrix());
 
         // each mesh has a different shadow map
         for (int i = 0; i < meshes.size(); ++i) {          
@@ -481,7 +481,6 @@ void BunnyApp::deferredShade() {
         // ---------------- light shading pass -------------------
         //
         lightfbo->bind();     
-        glClearColor(0, 0, 0, 0);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
@@ -494,7 +493,6 @@ void BunnyApp::deferredShade() {
         lightProg->use();   
         lightProg->uniform("mVlight", lightPers->getViewMatrix());
         lightProg->uniform("mPlight", lightPers->getProjectionMatrix());
-        // std::cout << lightPers->getEye()[0] <<lightPers->getEye()[1] <<lightPers->getEye()[2] << std::endl; 
         lightProg->uniform("mV", cam->getViewMatrix());
         lightProg->uniform("mP", cam->getProjectionMatrix());
         lightProg->uniform("inorm", 1);
