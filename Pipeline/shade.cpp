@@ -67,13 +67,14 @@ void BunnyApp::forwardShade() {
 
 
 
-
 void BunnyApp::deferredShade() {
 
-    GLWrap::checkGLError("deferred shading start");
+	
     //
     // ---------------- geometry pass -------------------
     //
+
+    GLWrap::checkGLError("deferred shading start");
     gfbo->bind();
     glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
     glClearColor(0, 0, 0, 0);
@@ -112,9 +113,11 @@ void BunnyApp::deferredShade() {
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
     // lightfbo->unbind();
+    
     //
     // ---------------- ambient pass -------------------
     //
+    
     // lightfbo->bind();
     // glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -144,6 +147,7 @@ void BunnyApp::deferredShade() {
       //
       // ---------------- shadow pass -------------------
       //
+		
         shadowfbo->bind(); 
     
         glClearColor(0, 0, 0, 0);
@@ -169,10 +173,10 @@ void BunnyApp::deferredShade() {
         glDisable(GL_DEPTH_TEST);
         shadowfbo->unbind();
 
-
         //
         // ---------------- light shading pass -------------------
         //
+		
         lightfbo->bind();     
 
         glEnable(GL_BLEND);
@@ -201,19 +205,20 @@ void BunnyApp::deferredShade() {
         glDisable(GL_BLEND);
         lightfbo->unbind();
     }    
-
- 
+     
     //
     // ---------------- draw to screen  -------------------
     //
+	
     fsqProg->use();
     lightfbo->colorTexture().bindToTextureUnit(0);
     fsqProg->uniform("image", 0);
     fsqProg->uniform("exposure", 1.0f);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     fsqProg->unuse();
-    
 }
+
+
 
 void BunnyApp::draw_contents() {
     if (!deferred) {

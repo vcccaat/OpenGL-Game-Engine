@@ -61,6 +61,7 @@ void main() {
 	// Compute eyeSpacePos
 	vec4 viewSpacePos = inverse(mP) * pos;
     vec3 eyeSpacePos = (viewSpacePos.xyz / viewSpacePos.w).xyz;
+    vec4 worldSpacePos = inverse(mV) * vec4(eyeSpacePos, 1);
 
 	// Compute tangents
 	float smallest = min(min(norm.x, norm.y), norm.z);
@@ -73,9 +74,10 @@ void main() {
 	mat3 mN = mat3(tang1, tang2, norm);
 
 	// Testing for occlusion - 3.1.3
-	/*vec3 randPt = vec3(0, 0, 0.1);
-	vec3 globalPt = eyeSpacePos.xyz + mN * randPt ; 
-	vec4 screenPt = mP * vec4(globalPt, 1);
+	/*
+	vec3 randPt = vec3(0, 0, 0.1);
+	vec3 globalPt = worldSpacePos.xyz + mN * randPt; 
+	vec4 screenPt = mP * mV * vec4(globalPt, 1);
 	vec3 outPt = (screenPt.xyz / screenPt.w) * .5 + .5;
 	float sampleDepth = texture(idepth, outPt.xy).r;
 	if(sampleDepth < outPt.z - .00001) {
@@ -83,11 +85,16 @@ void main() {
 	} else {
 		color = vec4(diff * power * pi, rawdiff.a);
 	}
+	//color = vec4(normalize(eyeSpacePos - globalPt), 1);
+	//color = vec4(norm, 1);
+	//color = viewSpacePos;
+	//color = screenPt;
 	*/
 	
 
 	// Testing for occlusion - 3.1.4
 	// First part: generate random points
+	
 	vec3 randPts[numPts];
 	// These seeds are different for each fragment
 	vec2 seed1 = vec2(pos.x, pos.y);
@@ -105,8 +112,8 @@ void main() {
 	float occlusion = 0;
 	for(int i = 0; i < numPts; i++) {
 		vec3 randPt = randPts[i];
-		vec3 globalPt = eyeSpacePos + mN * randPt;
-		vec4 screenPt = mP * vec4(globalPt, 1);
+		vec3 globalPt = worldSpacePos.xyz + mN * randPt;
+		vec4 screenPt = mP * mV * vec4(globalPt, 1);
 		vec3 outPt = (screenPt.xyz / screenPt.w) * .5 + .5;
 		float sampleDepth = texture(idepth, outPt.xy).r;
 		if(sampleDepth < outPt.z - .00001) {
@@ -123,4 +130,5 @@ void main() {
 	occlusion /= numPts;
 	color = vec4(diff * power * pi * (1 - occlusion), rawdiff.a);
 	//color = vec4(outPt, 1);
+	
 }
