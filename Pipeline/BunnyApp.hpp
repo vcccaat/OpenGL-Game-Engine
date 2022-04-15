@@ -64,7 +64,7 @@ private:
     bool deferred;
     bool toggle;
 
-    std::unique_ptr<GLWrap::Program> prog, fsqProg, gProg, lightProg, shadowProg;
+    std::unique_ptr<GLWrap::Program> prog, fsqProg, gProg, lightProg, shadowProg, ambProg;
     std::vector<std::unique_ptr<GLWrap::Mesh>> meshes;
     std::unique_ptr<GLWrap::Mesh> fsqMesh;
     std::unique_ptr<GLWrap::Framebuffer> fbo, gfbo, lightfbo, shadowfbo;

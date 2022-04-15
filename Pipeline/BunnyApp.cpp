@@ -230,6 +230,12 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/gbuff.frag" }
         }));
     
+    // ambient pass
+    ambProg.reset(new GLWrap::Program("program", {
+        { GL_VERTEX_SHADER, resourcePath + "shaders/ambient.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/ambient.frag" }
+        }));
+
     // deferred shading: lighting pass
     lightProg.reset(new GLWrap::Program("program", {
         { GL_VERTEX_SHADER, resourcePath + "shaders/vlightshade.vert" },
