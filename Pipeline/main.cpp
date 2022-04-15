@@ -5,10 +5,10 @@ int main(int argc, char const* argv[]) {
     nanogui::init();
 
     // PATHEDIT
-    const std::string path = "../resources/scenes/bunnyscene2.glb";
+    //const std::string path = "../resources/scenes/bunnyscene2.glb";
     //const std::string path = "../resources/scenes/smoothbunny.glb";
     
-    // const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene2.glb";
+    const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene2.glb";
     //const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/smoothbunny.glb";
 	
     float aspect = getAspect(path);

@@ -51,7 +51,7 @@ void main() {
 	// Take relevant data
 	vec4 rawnorm = texture(inorm, geom_texCoord);
 	vec4 rawdiff = texture(idiff, geom_texCoord);
-   float rawDepth = texture(idepth, geom_texCoord).r;
+    float rawDepth = texture(idepth, geom_texCoord).r;
 	vec4 pos = vec4(geom_texCoord.x*2.0-1.0, geom_texCoord.y*2.0-1.0, rawDepth*2.0-1.0,1.0); 
 	vec3 norm = normalize((rawnorm.xyz -.5) * 2);
 	vec3 diff = rawdiff.xyz;
@@ -105,7 +105,7 @@ void main() {
 	float occlusion = 0;
 	for(int i = 0; i < numPts; i++) {
 		vec3 randPt = randPts[i];
-		vec3 globalPt = eyeSpacePos.xyz + mN * randPt;
+		vec3 globalPt = eyeSpacePos + mN * randPt;
 		vec4 screenPt = mP * vec4(globalPt, 1);
 		vec3 outPt = (screenPt.xyz / screenPt.w) * .5 + .5;
 		float sampleDepth = texture(idepth, outPt.xy).r;
@@ -113,13 +113,14 @@ void main() {
 			occlusion += 1.0;
 			// If larger than multiple, do not count
 			// TEMP
-			//if(abs(sampleDepth - outPt.z) > 4 * range) {
-			//	occlusion -= 1.0;
-			//}
+			
+			if(distance(pos.xyz, outPt) > 4 * range) {
+				occlusion -= 1.0;
+			}
 		}
 		
 	}
 	occlusion /= numPts;
 	color = vec4(diff * power * pi * (1 - occlusion), rawdiff.a);
-	// color = vec4(1 - occlusion);
+	//color = vec4(outPt, 1);
 }

@@ -195,7 +195,7 @@ void BunnyApp::deferredShade() {
         lightProg->uniform("mL", lights[k].transMat);
         lightProg->uniform("lightPos", lights[k].pos);
         lightProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power)); 
-        fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+        //fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
         
         lightProg->unuse();
         glDisable(GL_BLEND);
