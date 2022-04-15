@@ -93,7 +93,7 @@ void main() {
 
 	vec3 vLightPos = (mV *  mL * vec4(lightPos, 1.0)).xyz;  
 	vec4 viewSpacePos = inverse(mP) * pos;
-  vec3 eyeSpacePos = (viewSpacePos.xyz / viewSpacePos.w).xyz;
+    vec3 eyeSpacePos = (viewSpacePos.xyz / viewSpacePos.w).xyz;
 
 	vec3 vCamPos = vec3(0,0,0);
 	vec3 wo = normalize(vLightPos - eyeSpacePos);  

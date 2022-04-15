@@ -62,5 +62,9 @@ void main() {
 	float alpha = rawdiff.w * 10;
 	float eta = rawnorm.w * 10;
 	
-    color = vec4(norm, 1);
+	vec4 viewSpacePos = inverse(mP) * pos;
+    vec3 eyeSpacePos = (viewSpacePos.xyz / viewSpacePos.w).xyz;
+    vec4 worldSpacePos = inverse(mV) * vec4(eyeSpacePos, 1);
+
+    color = vec4(sunskyRadiance(-worldSpacePos.xyz), 1);
 }
