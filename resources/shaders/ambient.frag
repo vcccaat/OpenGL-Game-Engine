@@ -97,8 +97,8 @@ void main() {
 	
 	vec3 randPts[numPts];
 	// These seeds are different for each fragment
-	vec2 seed1 = vec2(pos.x, pos.y);
-	vec2 seed2 = vec2(pos.z, pos.x);
+	vec2 seed1 = vec2(pos.x, pos.y * pos.z);
+	vec2 seed2 = vec2(pos.z, pos.x * pos.y);
 	for(int i = 0; i < numPts; i++) {
 		// Changes seeds based on iteration, does not multiply by 0
 		float r1 = random(seed1 * (i + 1));

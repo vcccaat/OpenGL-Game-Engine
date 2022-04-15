@@ -229,6 +229,12 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/gbuff.frag" }
         }));
     
+    // sunsky pass
+    sunskyProg.reset(new GLWrap::Program("program", {
+        { GL_VERTEX_SHADER, resourcePath + "shaders/ambient.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/sunsky.frag" }
+        }));
+
     // ambient pass
     ambProg.reset(new GLWrap::Program("program", {
         { GL_VERTEX_SHADER, resourcePath + "shaders/ambient.vert" },

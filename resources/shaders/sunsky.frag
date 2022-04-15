@@ -9,6 +9,17 @@ const vec3 solarDiscRadiance = vec3(10000);
 const vec3 groundRadiance = vec3(0.5);
 const float skyScale = 0.06;
 
+uniform sampler2D inorm;
+uniform sampler2D idiff;
+uniform sampler2D idepth;
+
+uniform mat4 mV;
+uniform mat4 mP;
+
+in vec2 geom_texCoord;
+
+out vec4 color;
+
 vec3 perez(float theta, float gamma) {
     return (1 + A * exp(B / cos(theta))) * (1 + C * exp(D * gamma) + E * pow(cos(gamma), 2.0));
 }
@@ -40,3 +51,16 @@ vec3 sunskyRadiance(vec3 dir) {
     return sunRadiance(dir) + skyRadiance(dir);
 }
 
+void main() {
+    // Take relevant data
+	vec4 rawnorm = texture(inorm, geom_texCoord);
+	vec4 rawdiff = texture(idiff, geom_texCoord);
+    float rawDepth = texture(idepth, geom_texCoord).r;
+	vec4 pos = vec4(geom_texCoord.x*2.0-1.0, geom_texCoord.y*2.0-1.0, rawDepth*2.0-1.0,1.0); 
+	vec3 norm = normalize((rawnorm.xyz -.5) * 2);
+	vec3 diff = rawdiff.xyz;
+	float alpha = rawdiff.w * 10;
+	float eta = rawnorm.w * 10;
+	
+    color = vec4(norm, 1);
+}

@@ -133,9 +133,25 @@ void BunnyApp::deferredShade() {
         ambProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
         ambProg->uniform("range", lights[k].dist);
     }
-    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    //fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     ambProg->unuse();
+    
+    //
+    // ---------------- sunsky pass -------------------
+    //
+
+    sunskyProg->use();
+
+    sunskyProg->uniform("mP", cam->getProjectionMatrix());
+    sunskyProg->uniform("mV", cam->getViewMatrix());
+    sunskyProg->uniform("inorm", 1);
+    sunskyProg->uniform("idiff", 2);
+    sunskyProg->uniform("idepth", 3);
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    sunskyProg->unuse();
+
     // glDisable(GL_BLEND);
     lightfbo->unbind();
 
