@@ -180,6 +180,7 @@ void BunnyApp::deferredShade() {
     lightfbo->bind();
 
     ambProg->use();
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     ambProg->uniform("mP", cam->getProjectionMatrix());
@@ -196,6 +197,7 @@ void BunnyApp::deferredShade() {
 
     ambProg->unuse();
     lightfbo->unbind();
+    glDisable(GL_BLEND);
 
  
     //
