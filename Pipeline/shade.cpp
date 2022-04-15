@@ -115,6 +115,7 @@ void BunnyApp::deferredShade() {
 
     // each light create a different shadow map
     for (int k = 0; k < lights.size(); ++k) {  
+        if (lights[k].type == lights[k].AMBIENT) continue;
         
       //
       // ---------------- shadow pass -------------------
@@ -176,6 +177,25 @@ void BunnyApp::deferredShade() {
         glDisable(GL_BLEND);
         lightfbo->unbind();
     }
+    lightfbo->bind();
+
+    ambProg->use();
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    ambProg->uniform("mP", cam->getProjectionMatrix());
+    ambProg->uniform("mV", cam->getViewMatrix());
+    ambProg->uniform("inorm", 1);
+    ambProg->uniform("idiff", 2);
+    ambProg->uniform("idepth", 3);
+    for (int k = 0; k < lights.size(); ++k) {
+        if (lights[k].type != lights[k].AMBIENT) continue;
+        ambProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
+        ambProg->uniform("range", lights[k].dist);
+    }
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    ambProg->unuse();
+    lightfbo->unbind();
 
  
     //

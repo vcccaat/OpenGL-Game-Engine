@@ -134,7 +134,6 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
             printf("area parsed\n");
         }
         else if (RTUtil::parseAmbientLight(l.name, l.dist)) {
-            continue; //TEMPORARY
             l.power = scene->mLights[i]->mColorAmbient;
             l.type = l.AMBIENT;
             printf("amb parsed\n");
