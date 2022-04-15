@@ -83,7 +83,7 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 void main() {
 	vec4 rawnorm = texture(inorm, geom_texCoord);
 	vec4 rawdiff = texture(idiff, geom_texCoord);
-  float rawDepth = texture(idepth, geom_texCoord).r;
+    float rawDepth = texture(idepth, geom_texCoord).r;
 
 	vec4 pos = vec4(geom_texCoord.x*2.0-1.0,geom_texCoord.y*2.0-1.0,rawDepth*2.0-1.0,1.0); 
 	vec3 norm = normalize((rawnorm.xyz -.5) * 2);

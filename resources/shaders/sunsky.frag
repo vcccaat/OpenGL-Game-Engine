@@ -62,9 +62,24 @@ void main() {
 	float alpha = rawdiff.w * 10;
 	float eta = rawnorm.w * 10;
 	
+    // If not background, assign no color
+    if(rawdiff.a != 0) {
+	    color = vec4(0, .5, 0, 1);
+        return;
+	}
+	
+    // Transform position and camera to world space
 	vec4 viewSpacePos = inverse(mP) * pos;
     vec3 eyeSpacePos = (viewSpacePos.xyz / viewSpacePos.w).xyz;
     vec4 worldSpacePos = inverse(mV) * vec4(eyeSpacePos, 1);
-
-    color = vec4(sunskyRadiance(-worldSpacePos.xyz), 1);
+	
+    vec3 campos = vec3(0,0,0);
+	
+	vec4 viewSpaceCam = inverse(mP) * vec4(campos, 1);
+	vec3 eyeSpaceCam = (viewSpaceCam.xyz / viewSpaceCam.w).xyz;
+	vec4 worldSpaceCam = inverse(mV) * vec4(eyeSpaceCam, 1);
+	
+    // Compute view direction
+    vec4 wi = normalize(worldSpaceCam - worldSpacePos);
+    color = vec4(sunskyRadiance(wi.xyz), 1);
 }
