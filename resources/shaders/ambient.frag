@@ -121,4 +121,5 @@ void main() {
 	}
 	occlusion /= numPts;
 	color = vec4(diff * power * pi * (1 - occlusion), rawdiff.a);
+	// color = vec4(1 - occlusion);
 }
