@@ -9,6 +9,7 @@
 #include <RTUtil/conversions.hpp>
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
+#include <RTUtil\Sky.hpp>
 
 
 
@@ -133,7 +134,7 @@ void BunnyApp::deferredShade() {
         ambProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
         ambProg->uniform("range", lights[k].dist);
     }
-    //fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     ambProg->unuse();
     
@@ -143,11 +144,18 @@ void BunnyApp::deferredShade() {
 
     sunskyProg->use();
 
+    const float PI = 3.14159265358979323846264;
+
+    RTUtil::Sky sky(85 * PI / 180, 3.0);
+    sky.setUniforms(*sunskyProg);
+
     sunskyProg->uniform("mP", cam->getProjectionMatrix());
     sunskyProg->uniform("mV", cam->getViewMatrix());
     sunskyProg->uniform("inorm", 1);
     sunskyProg->uniform("idiff", 2);
     sunskyProg->uniform("idepth", 3);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     sunskyProg->unuse();

@@ -64,7 +64,7 @@ void main() {
 	
     // If not background, assign no color
     if(rawdiff.a != 0) {
-	    color = vec4(0, .5, 0, 1);
+	    color = vec4(0, 0, 0, 0);
         return;
 	}
 	
@@ -81,5 +81,5 @@ void main() {
 	
     // Compute view direction
     vec4 wi = normalize(worldSpaceCam - worldSpacePos);
-    color = vec4(sunskyRadiance(wi.xyz), 1);
+    color = vec4(sunskyRadiance(-wi.xyz), 1);
 }
