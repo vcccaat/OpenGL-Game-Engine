@@ -26,4 +26,5 @@ void main() {
         s += w * textureLod(image, geom_texCoord + d * i * dir, level).rgb;
     }
     fragColor = vec4(s, 1.0);
+    if(stdev == -1) fragColor = texture(image, geom_texCoord);
 }

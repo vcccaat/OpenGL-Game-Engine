@@ -207,8 +207,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -248,11 +248,17 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/shadow.frag" }
         }));
 
-    // accumulation pass + blur 
-    fsqProg.reset(new GLWrap::Program("program", { 
+    // accumulation pass
+    accProg.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/blur.frag" }
     }));
+
+    // blur and srgb
+    fsqProg.reset(new GLWrap::Program("program", {
+        { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/srgb.frag" }
+        }));
 
     // Upload a two-triangle mesh for drawing a full screen quad
     std::vector<glm::vec3> fsqPos = {
@@ -275,8 +281,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
     gfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
     lightfbo.reset(new GLWrap::Framebuffer(myFBOSize));
