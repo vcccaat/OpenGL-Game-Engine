@@ -276,17 +276,17 @@ void BunnyApp::deferredShade() {
 
     mergefbo->bind();
 
-    blurVerfbo->colorTexture(0).bindToTextureUnit(0);
-    blurVerfbo->colorTexture(1).bindToTextureUnit(1);
-    blurVerfbo->colorTexture(2).bindToTextureUnit(2);
-    blurVerfbo->colorTexture(3).bindToTextureUnit(3);
-    blurVerfbo->colorTexture(4).bindToTextureUnit(4);
+    blurVerfbo->colorTexture(0).bindToTextureUnit(10);
+    blurVerfbo->colorTexture(1).bindToTextureUnit(11);
+    blurVerfbo->colorTexture(2).bindToTextureUnit(12);
+    blurVerfbo->colorTexture(3).bindToTextureUnit(13);
+    blurVerfbo->colorTexture(4).bindToTextureUnit(14);
     mergeProg->use();
-    mergeProg->uniform("b0", 0);
-    mergeProg->uniform("b1", 1);
-    mergeProg->uniform("b2", 2);
-    mergeProg->uniform("b3", 3);
-    mergeProg->uniform("b4", 4);
+    mergeProg->uniform("b0", 10);
+    mergeProg->uniform("b1", 11);
+    mergeProg->uniform("b2", 12);
+    mergeProg->uniform("b3", 13);
+    mergeProg->uniform("b4", 14);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     mergeProg->unuse();
     mergefbo->unbind();

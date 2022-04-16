@@ -17,17 +17,19 @@ out vec4 fragColor;
 
 void main() {
 	// Get each texture
-	//vec4 blurs[nBlur] = vec4[nBlur]( texture(b0, geom_texCoord), texture(b1, geom_texCoord), texture(b2, geom_texCoord), texture(b3, geom_texCoord), texture(b4, geom_texCoord) );
+	vec4 blurs[nBlur] = vec4[nBlur]( texture(b0, geom_texCoord), texture(b1, geom_texCoord), texture(b2, geom_texCoord), texture(b3, geom_texCoord), texture(b4, geom_texCoord) );
 
 	// Sum the textures
-	//vec4 color = vec4(0, 0, 0, 0);
-	//for(int i = 0; i < nBlur; i++) {
-	//	color = color + ks[i] * blurs[i];
-	//}
+	vec4 color = vec4(0, 0, 0, 0);
+	for(int i = 0; i < nBlur; i++) {
+		color = color + ks[i] * blurs[i];
+	}
+	color.a = 1;
 	
-	vec4 color1 = texture(b1, geom_texCoord);
-	vec4 color2 = texture(b2, geom_texCoord);
-	vec4 color3 = texture(b3, geom_texCoord);
-	vec4 color4 = texture(b4, geom_texCoord);
-	fragColor = texture(b0, geom_texCoord);
+	//vec4 color0 = texture(b0, geom_texCoord);
+	//vec4 color1 = texture(b1, geom_texCoord);
+	//vec4 color2 = texture(b2, geom_texCoord);
+	//vec4 color3 = texture(b3, geom_texCoord);
+	//vec4 color4 = texture(b4, geom_texCoord);
+	fragColor = color;
 }
