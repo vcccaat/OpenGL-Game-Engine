@@ -281,7 +281,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     gfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
     lightfbo.reset(new GLWrap::Framebuffer(myFBOSize));
     shadowfbo.reset(new GLWrap::Framebuffer(myFBOSize,0,true));
-    blurfbo.reset(new GLWrap::Framebuffer(myFBOSize));
+    blurHorfbo.reset(new GLWrap::Framebuffer(myFBOSize));
+    blurVerfbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(

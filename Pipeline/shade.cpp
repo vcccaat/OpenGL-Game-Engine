@@ -231,39 +231,51 @@ void BunnyApp::deferredShade() {
     }    
      
     //  
-    // ---------------- blur and draw to screen  -------------------
+    // ---------------- blur pass -------------------
     //
-	
-    blurfbo->bind();
+    std::vector<float> stdList{6.2,24.9,81.0,263.0};
+    // now only show the last blur
+    for (int i = 0; i < 1; ++i) {  //stdList.size()
+        blurHorfbo->bind();
+        fsqProg->use();
+        lightfbo->colorTexture().bindToTextureUnit(0);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST_MIPMAP_NEAREST);
+        fsqProg->uniform("image", 0);
+        fsqProg->uniform("level", i);
+        // const float stdev = 205.0f;
+        fsqProg->uniform("stdev", stdList[i]);
+        fsqProg->uniform("radius", (int) std::ceil(3*stdList[i]));
+        fsqProg->uniform("dir", glm::vec2(0.0, 1.0)); 
+        fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+        fsqProg->unuse();
+        blurHorfbo->unbind(); 
+
+        blurVerfbo->bind();
+        fsqProg->use();
+        blurHorfbo->colorTexture().bindToTextureUnit(0);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST_MIPMAP_NEAREST);
+        fsqProg->uniform("image", 0);
+        fsqProg->uniform("level", i);
+        fsqProg->uniform("stdev", stdList[i]);
+        fsqProg->uniform("radius", (int) std::ceil(3*stdList[i]));
+        fsqProg->uniform("dir", glm::vec2(1.0, 0.0));
+        fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+        fsqProg->unuse();
+        blurVerfbo->unbind();
+    }
+
+
+    //  
+    // ---------------- merge pass  -------------------
+    //
     fsqProg->use();
-    lightfbo->colorTexture().bindToTextureUnit(0);
+    blurVerfbo->colorTexture().bindToTextureUnit(0);
     fsqProg->uniform("image", 0);
-    const float stdev = 8.f;
-    fsqProg->uniform("stdev", stdev);
-    fsqProg->uniform("radius", (int) std::ceil(3*stdev));
-    fsqProg->uniform("dir", glm::vec2(0.0, 1.0));
-    // fsqProg->uniform("exposure", 1.0f);
+    fsqProg->uniform("exposure", 1.0f);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     fsqProg->unuse();
-    blurfbo->unbind(); 
-
-    fsqProg->use();
-    blurfbo->colorTexture().bindToTextureUnit(0);
-    fsqProg->uniform("image", 0);
-    fsqProg->uniform("stdev", stdev);
-    fsqProg->uniform("radius", (int) std::ceil(3*stdev));
-    fsqProg->uniform("dir", glm::vec2(1.0, 0.0));
-    // fsqProg->uniform("exposure", 1.0f);
-    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
-    fsqProg->unuse();
-
-
-    // fsqProg->use();
-    // lightfbo->colorTexture().bindToTextureUnit(0);
-    // fsqProg->uniform("image", 0);
-    // fsqProg->uniform("exposure", 1.0f);
-    // fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
-    // fsqProg->unuse();
 }
 
 
