@@ -9,7 +9,7 @@
 #include <RTUtil/conversions.hpp>
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
-#include <RTUtil\Sky.hpp>
+#include "RTUtil/Sky.hpp"
 
 
 
