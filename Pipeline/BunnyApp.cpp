@@ -254,10 +254,16 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/blur.frag" }
     }));
 
-    // blur and srgb
+    // srgb
     fsqProg.reset(new GLWrap::Program("program", {
         { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/srgb.frag" }
+        }));
+
+    // merge pass
+    mergeProg.reset(new GLWrap::Program("program", {
+        { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/merge.frag" }
         }));
 
     // Upload a two-triangle mesh for drawing a full screen quad
@@ -289,6 +295,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     shadowfbo.reset(new GLWrap::Framebuffer(myFBOSize,0,true));
     blurHorfbo.reset(new GLWrap::Framebuffer(myFBOSize));
     blurVerfbo.reset(new GLWrap::Framebuffer(myFBOSize, 5));
+    mergefbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(

@@ -106,6 +106,7 @@ void main() {
 		
 		randPts[i].xy = squareToUniformDiskConcentric(r1, r2);
 		randPts[i].z = sqrt(max(0, 1.0f - pow(randPts[i].x, 2) - pow(randPts[i].y, 2)));
+		randPts[i] *= .1;
 	}
 
 	// Second part: check the fraction of all random points that are occluded

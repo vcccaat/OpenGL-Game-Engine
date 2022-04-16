@@ -234,7 +234,6 @@ void BunnyApp::deferredShade() {
     // ---------------- blur pass -------------------
     //
     std::vector<float> stdList{-1, 6.2,24.9,81.0,263.0};
-    std::vector<float> ks = {.8843, .1, .012, .0027, .001};
     GLenum afive[]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
     // now only show the last blur
     for (int i = 0; i < stdList.size(); ++i) {  //stdList.size()
@@ -242,7 +241,7 @@ void BunnyApp::deferredShade() {
         accProg->use();
         lightfbo->colorTexture().bindToTextureUnit(0);
         glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
         accProg->uniform("image", 0);
         accProg->uniform("level", 0);
         // const float stdev = 205.0f;
@@ -258,7 +257,7 @@ void BunnyApp::deferredShade() {
         accProg->use();
         blurHorfbo->colorTexture().bindToTextureUnit(0);
         glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         accProg->uniform("image", 0);
         accProg->uniform("level", 0);
         accProg->uniform("stdev", stdList[i]);
@@ -274,10 +273,33 @@ void BunnyApp::deferredShade() {
     //  
     // ---------------- merge pass  -------------------
     //
-    fsqProg->use();
+
+    mergefbo->bind();
+
     blurVerfbo->colorTexture(0).bindToTextureUnit(0);
+    blurVerfbo->colorTexture(1).bindToTextureUnit(1);
+    blurVerfbo->colorTexture(2).bindToTextureUnit(2);
+    blurVerfbo->colorTexture(3).bindToTextureUnit(3);
+    blurVerfbo->colorTexture(4).bindToTextureUnit(4);
+    mergeProg->use();
+    mergeProg->uniform("b0", 0);
+    mergeProg->uniform("b1", 1);
+    mergeProg->uniform("b2", 2);
+    mergeProg->uniform("b3", 3);
+    mergeProg->uniform("b4", 4);
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    mergeProg->unuse();
+    mergefbo->unbind();
+
+    //  
+    // ---------------- fsq pass  -------------------
+    //
+	
+    fsqProg->use();
+    mergefbo->colorTexture().bindToTextureUnit(0);
     fsqProg->uniform("image", 0);
     fsqProg->uniform("exposure", 1.0f);
+    // Draw the full screen quad
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     fsqProg->unuse();
 }

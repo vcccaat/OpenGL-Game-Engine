@@ -64,10 +64,10 @@ private:
     bool deferred;
     bool toggle;
 
-    std::unique_ptr<GLWrap::Program> prog, fsqProg, gProg, lightProg, shadowProg, ambProg, sunskyProg, accProg;
+    std::unique_ptr<GLWrap::Program> prog, fsqProg, gProg, lightProg, shadowProg, ambProg, sunskyProg, accProg, mergeProg;
     std::vector<std::unique_ptr<GLWrap::Mesh>> meshes;
     std::unique_ptr<GLWrap::Mesh> fsqMesh;
-    std::unique_ptr<GLWrap::Framebuffer> fbo, gfbo, lightfbo, shadowfbo, blurHorfbo, blurVerfbo;
+    std::unique_ptr<GLWrap::Framebuffer> fbo, gfbo, lightfbo, shadowfbo, blurHorfbo, blurVerfbo, mergefbo;
     std::shared_ptr<RTUtil::PerspectiveCamera> cam;
     std::shared_ptr<RTUtil::PerspectiveCamera> lightPers;
     std::unique_ptr<RTUtil::DefaultCC> cc;
