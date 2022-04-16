@@ -234,8 +234,10 @@ void BunnyApp::deferredShade() {
     // ---------------- blur pass -------------------
     //
     std::vector<float> stdList{-1, 6.2,24.9,81.0,263.0};
+    std::vector<float> ks = {.8843, .1, .012, .0027, .001};
+    GLenum afive[]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
     // now only show the last blur
-    for (int i = 2; i < 3; ++i) {  //stdList.size()
+    for (int i = 0; i < stdList.size(); ++i) {  //stdList.size()
         blurHorfbo->bind();
         accProg->use();
         lightfbo->colorTexture().bindToTextureUnit(0);
@@ -247,9 +249,10 @@ void BunnyApp::deferredShade() {
         accProg->uniform("stdev", stdList[i]);
         accProg->uniform("radius", (int) std::ceil(3*stdList[i]));
         accProg->uniform("dir", glm::vec2(0.0, 1.0));
+        glDrawBuffer(afive[0]);
         fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
         accProg->unuse();
-        blurHorfbo->unbind(); 
+        blurHorfbo->unbind();
 
         blurVerfbo->bind();
         accProg->use();
@@ -261,6 +264,7 @@ void BunnyApp::deferredShade() {
         accProg->uniform("stdev", stdList[i]);
         accProg->uniform("radius", (int) std::ceil(3*stdList[i]));
         accProg->uniform("dir", glm::vec2(1.0, 0.0));
+        glDrawBuffer(afive[i]);
         fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
         accProg->unuse();
         blurVerfbo->unbind();
@@ -271,7 +275,7 @@ void BunnyApp::deferredShade() {
     // ---------------- merge pass  -------------------
     //
     fsqProg->use();
-    blurVerfbo->colorTexture().bindToTextureUnit(0);
+    blurVerfbo->colorTexture(0).bindToTextureUnit(0);
     fsqProg->uniform("image", 0);
     fsqProg->uniform("exposure", 1.0f);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
