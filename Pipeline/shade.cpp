@@ -230,16 +230,40 @@ void BunnyApp::deferredShade() {
         lightfbo->unbind();
     }    
      
-    //
-    // ---------------- draw to screen  -------------------
+    //  
+    // ---------------- blur and draw to screen  -------------------
     //
 	
+    blurfbo->bind();
     fsqProg->use();
     lightfbo->colorTexture().bindToTextureUnit(0);
     fsqProg->uniform("image", 0);
-    fsqProg->uniform("exposure", 1.0f);
+    const float stdev = 8.f;
+    fsqProg->uniform("stdev", stdev);
+    fsqProg->uniform("radius", (int) std::ceil(3*stdev));
+    fsqProg->uniform("dir", glm::vec2(0.0, 1.0));
+    // fsqProg->uniform("exposure", 1.0f);
     fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
     fsqProg->unuse();
+    blurfbo->unbind(); 
+
+    fsqProg->use();
+    blurfbo->colorTexture().bindToTextureUnit(0);
+    fsqProg->uniform("image", 0);
+    fsqProg->uniform("stdev", stdev);
+    fsqProg->uniform("radius", (int) std::ceil(3*stdev));
+    fsqProg->uniform("dir", glm::vec2(1.0, 0.0));
+    // fsqProg->uniform("exposure", 1.0f);
+    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    fsqProg->unuse();
+
+
+    // fsqProg->use();
+    // lightfbo->colorTexture().bindToTextureUnit(0);
+    // fsqProg->uniform("image", 0);
+    // fsqProg->uniform("exposure", 1.0f);
+    // fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    // fsqProg->unuse();
 }
 
 

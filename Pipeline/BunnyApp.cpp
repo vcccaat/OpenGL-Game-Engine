@@ -207,20 +207,15 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
+    // forward shading
     prog.reset(new GLWrap::Program("program", { 
         { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
         // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
         //  { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/microfacet.frag" }
-    }));
-
-    // Set up a simple shader program by passing the shader filenames to the convenience constructor
-    fsqProg.reset(new GLWrap::Program("program", { 
-        { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
-        { GL_FRAGMENT_SHADER, resourcePath + "shaders/srgb.frag" }
     }));
 
     // deferred shading: g-buffer
@@ -241,7 +236,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/ambient.frag" }
         }));
 
-    // deferred shading: lighting pass
+    // lighting pass
     lightProg.reset(new GLWrap::Program("program", {
         { GL_VERTEX_SHADER, resourcePath + "shaders/vlightshade.vert" },
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/vlightshade.frag" }
@@ -252,6 +247,12 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         { GL_VERTEX_SHADER, resourcePath + "shaders/shadow.vert" },
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/shadow.frag" }
         }));
+
+    // accumulation pass + blur 
+    fsqProg.reset(new GLWrap::Program("program", { 
+        { GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert" },
+        { GL_FRAGMENT_SHADER, resourcePath + "shaders/blur.frag" }
+    }));
 
     // Upload a two-triangle mesh for drawing a full screen quad
     std::vector<glm::vec3> fsqPos = {
@@ -274,12 +275,13 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
     gfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
     lightfbo.reset(new GLWrap::Framebuffer(myFBOSize));
     shadowfbo.reset(new GLWrap::Framebuffer(myFBOSize,0,true));
+    blurfbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
