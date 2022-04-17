@@ -202,7 +202,7 @@ void BunnyApp::deferredShade() {
         //
 		
         lightfbo->bind();     
-
+    
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
         
@@ -238,12 +238,15 @@ void BunnyApp::deferredShade() {
     // now only show the last blur
     for (int i = 0; i < stdList.size(); ++i) { 
         blurHorfbo->bind();
-        lightfbo->colorTexture().bindToTextureUnit(0);
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         lightfbo->colorTexture().generateMipmap();
         lightfbo->colorTexture().parameter(GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+        lightfbo->colorTexture().bindToTextureUnit(0);
         accProg->use();
         accProg->uniform("image", 0);
-        accProg->uniform("level", 0);
+        accProg->uniform("level", 3);
         accProg->uniform("stdev", stdList[i]);
         accProg->uniform("radius", (int) std::ceil(3*stdList[i]));
         accProg->uniform("dir", glm::vec2(0.0, 1.0));
@@ -253,12 +256,12 @@ void BunnyApp::deferredShade() {
         blurHorfbo->unbind();
 
         blurVerfbo->bind();
-        blurHorfbo->colorTexture().bindToTextureUnit(0);
         blurHorfbo->colorTexture().generateMipmap();
         blurHorfbo->colorTexture().parameter(GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+        blurHorfbo->colorTexture().bindToTextureUnit(0);
         accProg->use();
         accProg->uniform("image", 0);
-        accProg->uniform("level", 0);
+        accProg->uniform("level", 3);
         accProg->uniform("stdev", stdList[i]);
         accProg->uniform("radius", (int) std::ceil(3*stdList[i]));
         accProg->uniform("dir", glm::vec2(1.0, 0.0));
@@ -274,7 +277,6 @@ void BunnyApp::deferredShade() {
     //
 
     mergefbo->bind();
-
     blurVerfbo->colorTexture(0).bindToTextureUnit(10);
     blurVerfbo->colorTexture(1).bindToTextureUnit(11);
     blurVerfbo->colorTexture(2).bindToTextureUnit(12);
