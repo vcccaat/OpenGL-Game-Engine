@@ -25,7 +25,7 @@ void main() {
 		color = color + ks[i] * blurs[i];
 	}
 	color.a = 1;
-	
+	// color = texture(b4, geom_texCoord);
 	//vec4 color0 = texture(b0, geom_texCoord);
 	//vec4 color1 = texture(b1, geom_texCoord);
 	//vec4 color2 = texture(b2, geom_texCoord);

@@ -236,15 +236,15 @@ void BunnyApp::deferredShade() {
     std::vector<float> stdList{-1, 6.2,24.9,81.0,263.0};
     GLenum afive[]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
     // now only show the last blur
-    for (int i = 0; i < stdList.size(); ++i) {  //stdList.size()
+    for (int i = 0; i < stdList.size(); ++i) { 
         blurHorfbo->bind();
-        accProg->use();
+        lightfbo->colorTexture().generateMipmap();
+        lightfbo->colorTexture().parameter(GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
         lightfbo->colorTexture().bindToTextureUnit(0);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+
+        accProg->use();
         accProg->uniform("image", 0);
         accProg->uniform("level", 0);
-        // const float stdev = 205.0f;
         accProg->uniform("stdev", stdList[i]);
         accProg->uniform("radius", (int) std::ceil(3*stdList[i]));
         accProg->uniform("dir", glm::vec2(0.0, 1.0));
@@ -254,10 +254,11 @@ void BunnyApp::deferredShade() {
         blurHorfbo->unbind();
 
         blurVerfbo->bind();
-        accProg->use();
+        blurHorfbo->colorTexture().generateMipmap();
+        blurHorfbo->colorTexture().parameter(GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
         blurHorfbo->colorTexture().bindToTextureUnit(0);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+        accProg->use();
         accProg->uniform("image", 0);
         accProg->uniform("level", 0);
         accProg->uniform("stdev", stdList[i]);
