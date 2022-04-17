@@ -238,10 +238,9 @@ void BunnyApp::deferredShade() {
     // now only show the last blur
     for (int i = 0; i < stdList.size(); ++i) { 
         blurHorfbo->bind();
+        lightfbo->colorTexture().bindToTextureUnit(0);
         lightfbo->colorTexture().generateMipmap();
         lightfbo->colorTexture().parameter(GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-        lightfbo->colorTexture().bindToTextureUnit(0);
-
         accProg->use();
         accProg->uniform("image", 0);
         accProg->uniform("level", 0);
@@ -254,10 +253,9 @@ void BunnyApp::deferredShade() {
         blurHorfbo->unbind();
 
         blurVerfbo->bind();
+        blurHorfbo->colorTexture().bindToTextureUnit(0);
         blurHorfbo->colorTexture().generateMipmap();
         blurHorfbo->colorTexture().parameter(GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-        blurHorfbo->colorTexture().bindToTextureUnit(0);
-
         accProg->use();
         accProg->uniform("image", 0);
         accProg->uniform("level", 0);

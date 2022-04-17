@@ -290,13 +290,16 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
     // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
-    floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));
+    for (int i =0; i< 5; ++i){
+        floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));
+    }
+    
     fbo.reset(new GLWrap::Framebuffer(myFBOSize));
     gfbo.reset(new GLWrap::Framebuffer(myFBOSize, 3));
     lightfbo.reset(new GLWrap::Framebuffer(myFBOSize));
     shadowfbo.reset(new GLWrap::Framebuffer(myFBOSize,0,true));
     blurHorfbo.reset(new GLWrap::Framebuffer(myFBOSize));
-    blurVerfbo.reset(new GLWrap::Framebuffer(myFBOSize, 5));
+    blurVerfbo.reset(new GLWrap::Framebuffer(myFBOSize, floatFormat));
     mergefbo.reset(new GLWrap::Framebuffer(myFBOSize));
 
     // Default camera, will be overwritten if camera is given in .glb
