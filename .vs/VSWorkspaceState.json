@@ -2,10 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\Demo",
+    "\\Pipeline",
     "\\resources",
     "\\resources\\shaders",
-    "\\RTRef"
+    "\\RTUtil"
   ],
-  "SelectedNode": "\\CMakeLists.txt",
+  "SelectedNode": "\\resources\\shaders\\vlightshade.frag",
   "PreviewInSolutionExplorer": false
 }
