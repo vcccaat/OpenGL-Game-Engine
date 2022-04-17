@@ -27,7 +27,8 @@ vec2 squareToUniformDiskConcentric(float r1, float r2) {
 	r1 = 2.0 * r1 - 1.0;
 	r2 = 2.0 * r2 - 1.0;
 	
-	float phi, r;
+	float phi;
+	float r;
     if (r1 == 0 && r2 == 0) {
         r = 0;
 		phi = 0;
@@ -98,15 +99,17 @@ void main() {
 	vec3 randPts[numPts];
 	// These seeds are different for each fragment
 	vec2 seed1 = vec2(pos.x, pos.y * pos.z);
+	vec2 seed3 = vec2(pos.y, pos.x * pos.z);
 	vec2 seed2 = vec2(pos.z, pos.x * pos.y);
 	for(int i = 0; i < numPts; i++) {
 		// Changes seeds based on iteration, does not multiply by 0
 		float r1 = random(seed1 * (i + 1));
 		float r2 = random(seed2 * (i + 1));
+		float r3 = random(seed3 * (i + 1));
 		
 		randPts[i].xy = squareToUniformDiskConcentric(r1, r2);
-		randPts[i].z = sqrt(max(0, 1.0f - pow(randPts[i].x, 2) - pow(randPts[i].y, 2)));
-		randPts[i] *= .1;
+		randPts[i].z = sqrt(1.0f - randPts[i].x);
+		randPts[i] *= (range * r3);
 	}
 
 	// Second part: check the fraction of all random points that are occluded
@@ -116,20 +119,17 @@ void main() {
 		vec3 globalPt = worldSpacePos.xyz + mN * randPt;
 		vec4 screenPt = mP * mV * vec4(globalPt, 1);
 		vec3 outPt = (screenPt.xyz / screenPt.w) * .5 + .5;
-		float sampleDepth = texture(idepth, outPt.xy).r;
-		if(sampleDepth < outPt.z - .00001) {
+		float sampleDepth = texture(idepth, outPt.xy).r * 2 - 1;
+		vec4 a = inverse(mP) * vec4(outPt.xy, sampleDepth, 1);
+		vec3 b = (a.xyz / a.w).xyz;
+		vec3 c = (inverse(mV) * vec4(b, 1)).xyz;	
+		// If larger than multiple, do not count
+		if(length(c) < length(outPt) - .00001 && distance(c, outPt) < 4 * range) {
 			occlusion += 1.0;
-			// If larger than multiple, do not count
-			// TEMP
-			
-			if(distance(pos.xyz, outPt) > 4 * range) {
-				occlusion -= 1.0;
-			}
 		}
 		
 	}
 	occlusion /= numPts;
-	color = vec4(diff * power * pi * (1 - occlusion), rawdiff.a);
-	//color = vec4(outPt, 1);
-	
+	float scale = .1; // decreasing contribution to 10% to improve visual look
+	color = vec4(diff * power * pi * (1 - occlusion) * scale, rawdiff.a);
 }

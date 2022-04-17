@@ -107,7 +107,7 @@ void main() {
   // shadow 
   vec4 worldSpacePos = inverse(mV) * vec4(eyeSpacePos,1.0);
   vec4 lightSpacePos =  mPlight * mVlight * worldSpacePos;
-  vec3 light_texCoord =  (lightSpacePos.xyz/lightSpacePos.w) / 2 + 0.5; 
+  vec3 light_texCoord = (lightSpacePos.xyz/lightSpacePos.w) / 2 + 0.5; 
   float closestDepth = texture(ishadowmap, light_texCoord.xy).r;
   float currentDepth = light_texCoord.z;
 
