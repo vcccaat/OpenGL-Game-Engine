@@ -87,9 +87,6 @@ void main() {
 
 	vec4 pos = vec4(geom_texCoord.x*2.0-1.0,geom_texCoord.y*2.0-1.0,rawDepth*2.0-1.0,1.0); 
 	vec3 norm = normalize((rawnorm.xyz -.5) * 2);
-    if(gl_FrontFacing) {
-		norm = -norm;
-	}
 	vec3 diff = rawdiff.xyz;
 	float alpha = rawdiff.w * 10;
 	float eta = rawnorm.w * 10;
