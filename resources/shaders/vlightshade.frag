@@ -111,7 +111,7 @@ void main() {
   float closestDepth = texture(ishadowmap, light_texCoord.xy).r;
   float currentDepth = light_texCoord.z;
 
-  if(currentDepth > closestDepth + 0.01){
+  if(closestDepth < currentDepth - 0.0001){
     color = vec4(0,0,0,1);
   }
   else {

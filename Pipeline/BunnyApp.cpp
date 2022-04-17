@@ -319,7 +319,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
             glm::vec3(0,0,0), // target
             glm::vec3(0,1,0), // up
             1, // aspect
-            1.0, 20.0, // near, far
+            1.0, 40.0, // near, far
             1 // fov
         );
 
