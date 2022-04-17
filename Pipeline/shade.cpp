@@ -134,7 +134,7 @@ void BunnyApp::deferredShade() {
         ambProg->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
         ambProg->uniform("range", lights[k].dist);
     }
-    fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+    //fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     ambProg->unuse();
     
