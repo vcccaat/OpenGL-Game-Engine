@@ -2,10 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\Demo",
+    "\\Pipeline",
     "\\resources",
-    "\\resources\\shaders",
-    "\\RTRef"
+    "\\resources\\shaders"
   ],
-  "SelectedNode": "\\CMakeLists.txt",
+  "SelectedNode": "\\Pipeline\\BunnyApp.cpp",
   "PreviewInSolutionExplorer": false
 }
