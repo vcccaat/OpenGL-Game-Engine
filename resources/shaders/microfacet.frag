@@ -4,7 +4,7 @@ uniform float alpha;
 uniform float eta;
 uniform vec3 diffuseReflectance;
 uniform vec3 camPos;
-// uniform vec3 lightPos;
+uniform vec3 lightPos;
 
 //uniform vec3 lightDir;
 // uniform vec3 k_d;
@@ -13,34 +13,25 @@ uniform vec3 camPos;
 uniform mat4 mV;  // View matrix
 // uniform mat4 mL;  // Light matrix
 uniform mat4 mC;  // Camera matrix
-// uniform vec3 power;
+uniform vec3 power;
 
-uniform vec3 power1;
-uniform vec3 power2;
-vec3 pointLightPower[2] =  vec3[2](
-  power1,
-  power2
-);
+// test multiple light sources
+// uniform vec3 power1;
+// uniform vec3 power2;
+// vec3 pointLightPower[2] =  vec3[2](
+//   power1,
+//   power2
+// );
 
-uniform vec3 lightPos1;
-uniform vec3 lightPos2;
-vec3 pointLightPositions[2] = vec3[2](
-  lightPos1,
-  lightPos2
-);
+// uniform vec3 lightPos1;
+// uniform vec3 lightPos2;
+// vec3 pointLightPositions[2] = vec3[2](
+//   lightPos1,
+//   lightPos2
+// );
 
 
-// struct PointLight {
-//   vec3 pos;
-//   vec3 power;
-// }
 
-// NUM_LIGHTS = 2;
-// // uniform PointLight lights[NUM_LIGHTS];
-// PointLight lights[NUM_LIGHTS]; 
-// lights[0].pos = vec3(1,1,1);
-// light[0].power = vec3(1000,1000,1000);
-// lights[1] = PointLight(vec3(0,1,0),vec3(1000,1000,1000));
 
 in vec3 vPosition;
 in vec3 vNormal;
@@ -147,8 +138,8 @@ vec4 shade(vec3 lightPos, vec3 power){
 void main() {
   vec4 acc = vec4(0, 0, 0, 0);
   for (int i = 0; i < 2; i++) {
-    vec3 lightPos = pointLightPositions[i];
-    vec3 power =  pointLightPower[i];
+    // vec3 lightPos = pointLightPositions[i];
+    // vec3 power =  pointLightPower[i];
     acc = acc + shade(lightPos, power);
 	//break; //TEMP//
   }
