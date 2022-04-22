@@ -70,8 +70,9 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
     std::vector<std::vector<uint32_t>> indices;
     std::vector<std::vector<glm::vec3>> normals;
     transMatVec = {};
+    idToName = {};
     meshIndToMaterialInd = {};
-    traverseNodeHierarchy(positions, indices, normals, obj, obj->mRootNode, transMatVec, glm::mat4(1.f), meshIndToMaterialInd);
+    traverseNodeHierarchy(positions, indices, normals, obj, obj->mRootNode, transMatVec, glm::mat4(1.f), meshIndToMaterialInd, idToName);
 
     // Mesh inserting
     for (int i = 0; i < positions.size(); ++i) {
@@ -210,7 +211,7 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
     return lights;
 }
 
-void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp) {
+void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
@@ -218,10 +219,11 @@ void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positi
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* temp = obj->mMeshes[cur->mMeshes[i]];
                 addMeshToScene(positions, indices, normals, temp, translist, transmat, mp);
+                itn.push_back(cur->mName.C_Str());
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(positions, indices, normals, obj, cur->mChildren[i], translist, transmat, mp);
+            traverseNodeHierarchy(positions, indices, normals, obj, cur->mChildren[i], translist, transmat, mp, itn);
         }
 }
 }
