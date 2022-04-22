@@ -309,12 +309,51 @@ void BunnyApp::deferredShade() {
     fsqProg->unuse();
 }
 
+glm::mat4 interpolatePosition(glm::mat4 m1, glm::mat4 m2, float t) {
+	glm::mat4 m = glm::mat4(1.0f);
+	/*m[0] = glm::vec4(m1[0] + t * (m2[0] - m1[0]), 1.0f);
+	m[1] = glm::vec4(m1[1] + t * (m2[1] - m1[1]), 1.0f);
+	m[2] = glm::vec4(m1[2] + t * (m2[2] - m1[2]), 1.0f);
+    m[3] = glm::vec4(m1[3] + t * (m2[3] - m1[3]), 1.0f);*/
+	return m;
+}
 
+glm::mat4 interpolateRotation(glm::mat4 m1, glm::mat4 m2, float t) {
+    glm::mat4 m = glm::mat4(1.0f);
+    return m;
+}
+
+glm::mat4 interpolateScaling(glm::mat4 m1, glm::mat4 m2, float t) {
+    glm::mat4 m = glm::mat4(1.0f);
+    return m;
+}
+
+glm::mat4 getInterpolateMat(std::map<float, Keyframe> kfs, float t) {
+    // FIrst, find matrices to interpolate on (see which two times t falls in-between
+    //TODO
+    glm::mat4 m1 = glm::mat4(1.f);
+    glm::mat4 m2 = glm::mat4(1.f);
+    
+	// Then, interpolate between these matrices	
+    glm::mat4 translation = interpolatePosition(m1, m2, t);
+    glm::mat4 rotation = interpolateRotation(m1, m2, t);
+    glm::mat4 scale = interpolateScaling(m1, m2, t);
+    return translation * rotation * scale;
+}
 
 void BunnyApp::draw_contents() {
     // Update current time
     curTime = getSecondsSinceEpoch();
     float t = std::fmod(curTime - startTime, totalTime);
+    for (int i = 0; i < idToName.size(); i++) {
+        std::string name = idToName[i];
+        if (animationOfName.find(name) != animationOfName.end()) {
+            glm::mat4 thisTrans = transMatVec[i];
+            NodeAnimate na = animationOfName.at(name);
+            thisTrans *= getInterpolateMat(na.keyframes, t);
+			transMatVec[i] = thisTrans;
+        }
+    }
 
     forwardShade();
     return;
