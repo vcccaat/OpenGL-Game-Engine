@@ -16,7 +16,11 @@
 
 float getAspect(std::string path) {
     Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    // const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* obj = importer.ReadFile(path,
+    aiProcess_LimitBoneWeights |
+    aiProcess_Triangulate |
+    aiProcess_SortByPType);
     if (obj->mNumCameras == 0) return 1.f;
     return obj->mCameras[0]->mAspect;
 }
