@@ -100,8 +100,19 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
     }
 
      // Material and light parsing
-     materials = parseMats(obj);
+    //  materials = parseMats(obj);
      lights = parseLights(obj->mRootNode, obj); // TEMPORARY: only the first pointlight is parsed
+
+     // Add default light for animation
+     Light defaultLight = Light();
+     defaultLight.pos = glm::vec3(0,0,1);
+     defaultLight.type = defaultLight.POINT;
+     defaultLight.power = aiColor3D(300);
+     lights.push_back(defaultLight);
+
+    //  // Add default material for animation
+     Material m = Material();
+     materials.push_back(m);
 }
 
 std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
@@ -127,12 +138,12 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
 
         // Parse area, ambient, and point
         if (RTUtil::parseAreaLight(l.name, l.width, l.height)) {
-            // continue; //TEMPORARY
+            continue; //TEMPORARY
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse; 
 
-            l.type = l.POINT; // testing 2.4 Sum multiple lights
+            l.type = l.AREA; // testing 2.4 Sum multiple lights
             l.areaNormal = glm::vec3(0, 0, 1);
             l.areaTangent = glm::vec3(0, 1, 0);
             printf("area parsed\n");
@@ -211,8 +222,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -291,8 +302,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));
@@ -308,7 +319,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
-        glm::vec3(6,2,10), // eye
+        glm::vec3(6,6,10), // eye  6,2,10
         glm::vec3(-0.2,0.65,0), // target
         glm::vec3(0,1,0), // up
         windowWidth / (float) windowHeight, // aspect
