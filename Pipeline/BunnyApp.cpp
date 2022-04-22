@@ -40,6 +40,11 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     return cmt;
 }
 
+double getSecondsSinceEpoch() {
+    auto now = std::chrono::system_clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(now).count() / ((double) 1000);
+}
+
 
 /**************************************** MATERIAL AND LIGHT CLASS ****************************************/
 
@@ -50,7 +55,6 @@ Material::Material() {
 }
 
 Light::Light() {}
-
 
 
 
@@ -139,6 +143,13 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
         }
         animationOfName.insert({ nodeName, na });
     }
+
+    // Animation metadata
+    startTime = getSecondsSinceEpoch();
+    curTime = startTime;
+    int ticksPerSec = obj->mAnimations[0]->mTicksPerSecond;
+    int totalTicks = obj->mAnimations[0]->mDuration;
+    totalTime = (double) totalTicks / (double) ticksPerSec;
 }
 
 std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {

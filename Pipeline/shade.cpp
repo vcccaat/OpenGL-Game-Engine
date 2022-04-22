@@ -312,10 +312,17 @@ void BunnyApp::deferredShade() {
 
 
 void BunnyApp::draw_contents() {
-    if (!deferred) {
-        forwardShade();
-    }
-    else {
-        forwardShade();  //deferredShade   // TEMP: only use forward shading for animation
-    }
+    // Update current time
+    curTime = getSecondsSinceEpoch();
+    float t = std::fmod(curTime - startTime, totalTime);
+    std::cout << t << "\n";
+
+    forwardShade();
+    return;
+    //if (!deferred) {
+    //    forwardShade();
+    //}
+    //else {
+    //    deferredShade();  //deferredShade   // TEMP: only use forward shading for animation
+    //}
 }

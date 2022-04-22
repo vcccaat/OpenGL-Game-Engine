@@ -9,8 +9,12 @@
 #include <RTUtil/CameraController.hpp>
 #include <assimp/scene.h>          // Output data structure
 #include <map>
+#include <chrono>
+#include <ctime>   
+#include <cmath>   
 
 float getAspect(std::string path);
+double getSecondsSinceEpoch();
 
 class Material {
 public:
@@ -71,7 +75,8 @@ public:
     virtual void forwardShade();
     virtual void deferredShade();
     virtual void draw_contents() override;
-    
+
+		
 private:
 
     static int windowWidth;
@@ -89,13 +94,17 @@ private:
 
     std::vector<Material> materials;
     std::vector<Light> lights;
-    std::map<std::string, NodeAnimate> animationOfName;
 
     nanogui::Color backgroundColor;
 
     std::vector<glm::mat4> transMatVec;
     glm::mat4 camTransMat;
     std::vector<int> meshIndToMaterialInd;
+
+    std::map<std::string, NodeAnimate> animationOfName;
+    double curTime;
+    double startTime;
+    double totalTime;
 };
 
 
