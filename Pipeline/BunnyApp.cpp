@@ -52,6 +52,8 @@ Material::Material() {
 Light::Light() {}
 
 
+
+
 /**************************************** BUNNYAPP STARTUP METHODS ****************************************/
 
 
@@ -105,14 +107,38 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
 
      // Add default light for animation
      Light defaultLight = Light();
-     defaultLight.pos = glm::vec3(0,0,1);
+     defaultLight.pos = glm::vec3(0,5,0);
      defaultLight.type = defaultLight.POINT;
      defaultLight.power = aiColor3D(300);
+     defaultLight.transMat = glm::mat4(1.f);
      lights.push_back(defaultLight);
 
     //  // Add default material for animation
-     Material m = Material();
-     materials.push_back(m);
+     Material m1 = Material();
+     Material m2 = Material();
+     materials.push_back(m1);
+     materials.push_back(m2);
+
+	// Animation
+    std::map<std::string, NodeAnimate> animationOfName = {};
+    for (int i = 0; i < obj->mAnimations[0]->mNumChannels; ++i) {
+		NodeAnimate na = NodeAnimate();
+        na.keyframes = {};
+		aiNodeAnim* curChannel = obj->mAnimations[0]->mChannels[i];
+		std::string nodeName = curChannel->mNodeName.C_Str();
+        na.name = nodeName;
+        assert (curChannel->mNumPositionKeys == curChannel->mNumRotationKeys && curChannel->mNumPositionKeys == curChannel->mNumScalingKeys);
+        for (int j = 0; j < curChannel->mNumPositionKeys; ++j) {
+            Keyframe k = {};
+            assert(curChannel->mNumPositionKeys[j].mTime == curChannel->mNumRotationKeys[j].mTime && curChannel->mNumPositionKeys[j].mTime == curChannel->mNumScalingKeys[j].mTime);
+			k.time = curChannel->mPositionKeys[j].mTime;
+            k.pos = reinterpret_cast<glm::vec3&>(curChannel->mPositionKeys[j].mValue);
+            k.rot = curChannel->mRotationKeys[j].mValue;
+            k.scale = reinterpret_cast<glm::vec3&>(curChannel->mScalingKeys[j].mValue);
+			na.keyframes.insert({k.time, k});
+        }
+        animationOfName.insert({ nodeName, na });
+    }
 }
 
 std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
@@ -222,8 +248,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -302,8 +328,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));

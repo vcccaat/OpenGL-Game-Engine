@@ -8,6 +8,7 @@
 #include <RTUtil/Camera.hpp>
 #include <RTUtil/CameraController.hpp>
 #include <assimp/scene.h>          // Output data structure
+#include <map>
 
 float getAspect(std::string path);
 
@@ -37,6 +38,20 @@ public:
     Type type;
 
     Light();
+};
+
+struct Keyframe {
+public:
+	float time;
+	glm::vec3 pos;
+	aiQuaternion rot;
+	glm::vec3 scale;
+};
+
+struct NodeAnimate {
+public:
+	std::string name;
+    std::map<float, Keyframe> keyframes;	
 };
 
 class BunnyApp : public nanogui::Screen {
