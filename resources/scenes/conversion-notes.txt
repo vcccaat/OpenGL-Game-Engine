@@ -1,0 +1,10 @@
+Process for converting/fixing FBX files from SMPL project
+
+In Blender 3.0
+
+1. Import FBX file
+2. Set scale factors on the topmost "group" node to 1
+3. Select mesh, edit mode, select all, Mesh > Normals > Set from faces
+4. Make floor with 4x4x0.2 cube
+5. Set time range
+6. Export to glTF 2.0

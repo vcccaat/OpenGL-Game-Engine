@@ -7,10 +7,10 @@ int main(int argc, char const* argv[]) {
     // PATHEDIT
     const std::string path = "../resources/scenes/BoxAnimated.glb";  //CesiumMan.glb, RiggedFigure.glb, mosh_cmu_*.glb
     // const std::string path = "../resources/scenes/tree.glb";
-    // const std::string path = "../resources/scenes/bunnyscene2.glb";
+    //const std::string path = "../resources/scenes/bunnyscene2.glb";
     //const std::string path = "../resources/scenes/smoothbunny.glb";
     
-    // const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene2.glb";
+    const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene2.glb";
     //const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/smoothbunny.glb";
 	
     float aspect = getAspect(path);
