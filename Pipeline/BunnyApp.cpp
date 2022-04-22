@@ -120,7 +120,7 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
      materials.push_back(m2);
 
 	// Animation
-    std::map<std::string, NodeAnimate> animationOfName = {};
+    animationOfName = {};
     for (int i = 0; i < obj->mAnimations[0]->mNumChannels; ++i) {
 		NodeAnimate na = NodeAnimate();
         na.keyframes = {};

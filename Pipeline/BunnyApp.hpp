@@ -89,6 +89,7 @@ private:
 
     std::vector<Material> materials;
     std::vector<Light> lights;
+    std::map<std::string, NodeAnimate> animationOfName;
 
     nanogui::Color backgroundColor;
 
