@@ -315,7 +315,6 @@ void BunnyApp::draw_contents() {
     // Update current time
     curTime = getSecondsSinceEpoch();
     float t = std::fmod(curTime - startTime, totalTime);
-    std::cout << t << "\n";
 
     forwardShade();
     return;

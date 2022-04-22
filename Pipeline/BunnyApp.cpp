@@ -135,7 +135,7 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
         for (int j = 0; j < curChannel->mNumPositionKeys; ++j) {
             Keyframe k = {};
             assert(curChannel->mNumPositionKeys[j].mTime == curChannel->mNumRotationKeys[j].mTime && curChannel->mNumPositionKeys[j].mTime == curChannel->mNumScalingKeys[j].mTime);
-			k.time = curChannel->mPositionKeys[j].mTime;
+			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
             k.pos = reinterpret_cast<glm::vec3&>(curChannel->mPositionKeys[j].mValue);
             k.rot = curChannel->mRotationKeys[j].mValue;
             k.scale = reinterpret_cast<glm::vec3&>(curChannel->mScalingKeys[j].mValue);
