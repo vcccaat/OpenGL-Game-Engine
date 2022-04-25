@@ -340,9 +340,9 @@ glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
 }
 
 glm::mat4 interpolateRotation(glm::quat r1, glm::quat r2, float tPortion) {
-    glm::quat r = glm::mix(r1,r2,tPortion);
+    glm::quat r = glm::mix(glm::quat(-1,0,0,0),glm::quat(0,1,0,0),tPortion);
     glm::mat4 m = glm::toMat4(r);
-    // printm(m);
+    printm(m);
     return m;
 }
 
@@ -383,8 +383,8 @@ glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<fl
         // printf("%f%f%f%f\n" , keyframe2.rot.x , keyframe2.rot.y , keyframe2.rot.z,keyframe2.rot.w  ) ;
         glm::quat r1 = glm::quat( keyframe1.rot.w,  keyframe1.rot.x, keyframe1.rot.y, keyframe1.rot.z);
         glm::quat r2 = glm::quat(keyframe2.rot.w, keyframe2.rot.x, keyframe2.rot.y, keyframe2.rot.z);
-        printf("r1: %f%f%f%f\n" , r2.x , r2.y , r2.z,r2.w ) ;
-        printf("r2: %f%f%f%f\n" , r1.x , r1.y , r1.z,r1.w ) ;
+        // printf("r1: %f,%f, %f, %f, %f\n" ,tPortion, r2.x , r2.y , r2.z,r2.w ) ;
+        // printf("r2: %f, %f, %f, %f, %f\n" ,tPortion, r1.x , r1.y , r1.z,r1.w ) ;
         rotation = interpolateRotation(r1, r2, tPortion);
     // }
     // glm::mat4 scale = interpolateScaling(m1, m2, t);
@@ -396,6 +396,7 @@ void BunnyApp::draw_contents() {
     // Update current time
     curTime = getSecondsSinceEpoch();
     float t = std::fmod(curTime - startTime, totalTime);
+
     for (int i = 0; i < idToName.size(); i++) {
         std::string name = idToName[i];
         // std::cout << name << "\n";
@@ -407,10 +408,10 @@ void BunnyApp::draw_contents() {
     }
 
     forwardShade();
-    if (!deferred) {
-        _CrtDumpMemoryLeaks();
-        deferred = true;
-    }
+    // if (!deferred) {
+    //     _CrtDumpMemoryLeaks();
+    //     deferred = true;
+    // }
     return;
     //if (!deferred) {
     //    forwardShade();
