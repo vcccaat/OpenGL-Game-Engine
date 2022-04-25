@@ -331,7 +331,7 @@ glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
     m[0][3] = v[0];
     m[1][3] = v[1];
     m[2][3] = v[2];
-    printm(m);
+    // printm(m);
 
 	// m[0] = glm::vec4(m1[0] + t * (m2[0] - m1[0]), 1.0f);
 	// m[1] = glm::vec4(m1[1] + t * (m2[1] - m1[1]), 1.0f);
@@ -397,11 +397,18 @@ void BunnyApp::draw_contents() {
         std::string name = idToName[i];
         // std::cout << name << "\n";
         if ( name == "nodes[0]") { // TEMP   animationOfName.find(name) != animationOfName.end() &&
-            glm::mat4 thisTrans = transMatVec[i]; 
+            glm::mat4 thisTrans = transMatVec[1]; 
             NodeAnimate na = animationOfName.at(name);
-            thisTrans *= getInterpolateMat(na.keyframes, t);
+            // thisTrans *= getInterpolateMat(na.keyframes, t);
             // printm(thisTrans);
-			transMatVec[i] = thisTrans;
+            glm::mat4 t(
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f,  2.0f,  0.0f,  1.0f );
+            transMatVec[1] = thisTrans + t;  // getInterpolateMat(na.keyframes, t);
+            // printm(transMatVec[i]);
+			// transMatVec[i] = thisTrans;
         }
     }
 
