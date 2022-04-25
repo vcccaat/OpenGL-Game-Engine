@@ -10,7 +10,7 @@
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
 #include "RTUtil/Sky.hpp"
-
+#include <glm/gtx/quaternion.hpp>
 
 
 void BunnyApp::forwardShade() {
@@ -331,22 +331,15 @@ glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
     m[3][0] = v[0];
     m[3][1] = v[1];
     m[3][2] = v[2];
-    printm(m);
-
-	// m[0] = glm::vec4(m1[0] + t * (m2[0] - m1[0]), 1.0f);
-	// m[1] = glm::vec4(m1[1] + t * (m2[1] - m1[1]), 1.0f);
-	// m[2] = glm::vec4(m1[2] + t * (m2[2] - m1[2]), 1.0f);
-    // m[3] = glm::vec4(m1[3] + t * (m2[3] - m1[3]), 1.0f);
-    // std::cout << "start" << "\n";
-    // print(v1);
-    // print(v2);
-    // std::cout << tGap << "gap \n";
-    // print(v);
+    // printm(m);
 	return m;
 }
 
-glm::mat4 interpolateRotation(glm::mat4 m1, glm::mat4 m2, float t) {
-    glm::mat4 m = glm::mat4(1.0f);
+glm::mat4 interpolateRotation(aiQuaternion r1, aiQuaternion r2, float tPortion) {
+    glm::mat4 m( 1.0f );
+    glm::quat r = glm::mix(reinterpret_cast<glm::quat&>(r1),reinterpret_cast<glm::quat&>(r2),tPortion);
+    m = glm::toMat4(r);
+    printm(m);
     return m;
 }
 
@@ -364,28 +357,24 @@ glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<fl
     glm::mat4 scale = m1;
     glm::mat4 translation;
 
-    Keyframe keyframe1= kfs[0];
-    Keyframe keyframe2= kfs[1];
-    if (t < kfs[1].time){
-        float tPortion= (t - kfs[0].time)/(kfs[1].time- kfs[0].time);
+    Keyframe keyframe1;
+    Keyframe keyframe2;
+    float tPortion;
+    for (int i = 0; i < kfs.size(); ++i){
+        if (t < kfs[i].time){
+            keyframe1 = kfs[i-1];
+            keyframe2 = kfs[i];
+            tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
+            break;
+        }
+    }
     
-    
-    // for (int i = 0; i < kfs.size(); ++i){
-    //     std::cout << kfs[i].time << " " << t << std::endl;
-    //     if (t > kfs[i].time){
-    //         keyframe1 = kfs[i];
-    //         keyframe2 = kfs[i+1];
-    //         tGap = t - kfs[i].time; 
-    //         break;
-    //     }
-    // }
 
-    
 	// Then, interpolate between these matrices	
     translation = interpolatePosition(keyframe1.pos, keyframe2.pos, tPortion);
-    // glm::mat4 rotation = interpolateRotation(m1, m2, t);
+    // rotation = interpolateRotation(keyframe1.rot, keyframe2.rot, tPortion);
     // glm::mat4 scale = interpolateScaling(m1, m2, t);
-    }
+    
     return translation * rotation * scale;
 }
 
