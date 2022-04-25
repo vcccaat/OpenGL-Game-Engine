@@ -407,6 +407,10 @@ void BunnyApp::draw_contents() {
     }
 
     forwardShade();
+    if (!deferred) {
+        _CrtDumpMemoryLeaks();
+        deferred = true;
+    }
     return;
     //if (!deferred) {
     //    forwardShade();

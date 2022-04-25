@@ -139,8 +139,20 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
             // assert(curChannel->mNumPositionKeys[j].mTime == curChannel->mNumRotationKeys[j].mTime && curChannel->mNumPositionKeys[j].mTime == curChannel->mNumScalingKeys[j].mTime);
 			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
             k.pos = reinterpret_cast<glm::vec3&>(curChannel->mPositionKeys[j].mValue);
-            k.rot = curChannel->mRotationKeys[j].mValue;
+            if (k.pos.x > 10000) k.pos.x = 0;
+            if (k.pos.y > 10000) k.pos.y = 0;
+            if (k.pos.z > 10000) k.pos.z = 0;
+            int jj = j + 1;
+            if (jj == curChannel->mNumPositionKeys) jj = 0;
+            k.rot = curChannel->mRotationKeys[jj].mValue;
+            if (k.rot.w > 10000) k.rot.w = 0;
+            if (k.rot.x > 10000) k.rot.x = 0;
+            if (k.rot.y > 10000) k.rot.y = 0;
+            if (k.rot.z > 10000) k.rot.z = 0;
             k.scale = reinterpret_cast<glm::vec3&>(curChannel->mScalingKeys[j].mValue);
+            if (k.scale.x > 10000) k.scale.x = 0;
+            if (k.scale.y > 10000) k.scale.y = 0;
+            if (k.scale.z > 10000) k.scale.z = 0;
 			// na.keyframes.insert({k.time, k});
             na.keyframes.push_back(k);
 
