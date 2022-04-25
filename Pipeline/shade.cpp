@@ -335,10 +335,10 @@ glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
 	return m;
 }
 
-glm::mat4 interpolateRotation(aiQuaternion r1, aiQuaternion r2, float tPortion) {
+glm::mat4 interpolateRotation(aiQuaternion r1, aiQuaternion r2, float tPortion) {;
     glm::quat r = glm::mix(reinterpret_cast<glm::quat&>(r1),reinterpret_cast<glm::quat&>(r2),tPortion);
     glm::mat4 m = glm::toMat4(r);
-    printm(m);
+    // printm(m);
     return m;
 }
 
@@ -371,7 +371,6 @@ glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<fl
 
 	// Then, interpolate between these matrices	
     translation = interpolatePosition(keyframe1.pos, keyframe2.pos, tPortion);
-    // std::cout << keyframe1.rot.x << " " << keyframe1.rot.y << " " << keyframe1.rot.z << " " << keyframe1.rot.w;
     // if keyframe has no rotation, skip 
     if (keyframe1.rot.x == 0 && keyframe1.rot.y == 0 && keyframe1.rot.z == 0) {
         rotation = m1;
@@ -393,16 +392,7 @@ void BunnyApp::draw_contents() {
         if ( name == "nodes[0]") { // TEMP   animationOfName.find(name) != animationOfName.end() &&
             glm::mat4 thisTrans = transMatVec[1]; 
             NodeAnimate na = animationOfName.at(name);
-            // thisTrans *= getInterpolateMat(na.keyframes, t);
-            // printm(thisTrans);
-            // glm::mat4 t(
-            // 1.0f, 0.0f, 0.0f, 0.0f,
-            // 0.0f, 1.0f, 0.0f, 0.0f,
-            // 0.0f, 0.0f, 1.0f, 0.0f,
-            // 0.0f,  2.0f,  0.0f,  1.0f );
-            transMatVec[1] *= getInterpolateMat(na.keyframes, t);
-            // printm(transMatVec[i]);
-			// transMatVec[i] = thisTrans;
+            transMatVec[1] = getInterpolateMat(na.keyframes, t);
         }
     }
 
