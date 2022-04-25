@@ -132,15 +132,18 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
 		aiNodeAnim* curChannel = obj->mAnimations[0]->mChannels[i];
 		std::string nodeName = curChannel->mNodeName.C_Str();
         na.name = nodeName;
-        assert (curChannel->mNumPositionKeys == curChannel->mNumRotationKeys && curChannel->mNumPositionKeys == curChannel->mNumScalingKeys);
+        // assert (curChannel->mNumPositionKeys == curChannel->mNumRotationKeys && curChannel->mNumPositionKeys == curChannel->mNumScalingKeys);
         for (int j = 0; j < curChannel->mNumPositionKeys; ++j) {
+            // std::cout << "channel" << i << "positionkey" << j << '\n';
             Keyframe k = {};
-            assert(curChannel->mNumPositionKeys[j].mTime == curChannel->mNumRotationKeys[j].mTime && curChannel->mNumPositionKeys[j].mTime == curChannel->mNumScalingKeys[j].mTime);
+            // assert(curChannel->mNumPositionKeys[j].mTime == curChannel->mNumRotationKeys[j].mTime && curChannel->mNumPositionKeys[j].mTime == curChannel->mNumScalingKeys[j].mTime);
 			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
             k.pos = reinterpret_cast<glm::vec3&>(curChannel->mPositionKeys[j].mValue);
             k.rot = curChannel->mRotationKeys[j].mValue;
             k.scale = reinterpret_cast<glm::vec3&>(curChannel->mScalingKeys[j].mValue);
-			na.keyframes.insert({k.time, k});
+			// na.keyframes.insert({k.time, k});
+            na.keyframes.push_back(k);
+
         }
         animationOfName.insert({ nodeName, na });
     }
@@ -214,12 +217,13 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
 void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
+        itn.push_back(cur->mName.C_Str());
+        // std::cout << cur->mName.C_Str() << std::endl;
         if (cur->mNumMeshes > 0) {
-            
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* temp = obj->mMeshes[cur->mMeshes[i]];
                 addMeshToScene(positions, indices, normals, temp, translist, transmat, mp);
-                itn.push_back(cur->mName.C_Str());
+                
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
@@ -261,8 +265,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -341,8 +345,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));

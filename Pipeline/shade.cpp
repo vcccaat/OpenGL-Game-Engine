@@ -309,12 +309,39 @@ void BunnyApp::deferredShade() {
     fsqProg->unuse();
 }
 
-glm::mat4 interpolatePosition(glm::mat4 m1, glm::mat4 m2, float t) {
-	glm::mat4 m = glm::mat4(1.0f);
-	/*m[0] = glm::vec4(m1[0] + t * (m2[0] - m1[0]), 1.0f);
-	m[1] = glm::vec4(m1[1] + t * (m2[1] - m1[1]), 1.0f);
-	m[2] = glm::vec4(m1[2] + t * (m2[2] - m1[2]), 1.0f);
-    m[3] = glm::vec4(m1[3] + t * (m2[3] - m1[3]), 1.0f);*/
+void print(glm::vec3 v){
+    std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<"]\n";
+}
+void printv4(glm::vec4 v){
+    std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<","<<v[3]<<"]\n";
+}
+
+void printm(glm::mat4 m){
+    std::cout << "[\n";
+    printv4(m[0]);
+    printv4(m[1]);
+    printv4(m[2]);
+    printv4(m[3]);
+    std::cout << "]\n";
+}
+
+glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
+	glm::mat4 m( 1.0f );
+    glm::vec3 v = v1 + tPortion * (v2 - v1);
+    m[0][3] = v[0];
+    m[1][3] = v[1];
+    m[2][3] = v[2];
+    printm(m);
+
+	// m[0] = glm::vec4(m1[0] + t * (m2[0] - m1[0]), 1.0f);
+	// m[1] = glm::vec4(m1[1] + t * (m2[1] - m1[1]), 1.0f);
+	// m[2] = glm::vec4(m1[2] + t * (m2[2] - m1[2]), 1.0f);
+    // m[3] = glm::vec4(m1[3] + t * (m2[3] - m1[3]), 1.0f);
+    // std::cout << "start" << "\n";
+    // print(v1);
+    // print(v2);
+    // std::cout << tGap << "gap \n";
+    // print(v);
 	return m;
 }
 
@@ -328,16 +355,37 @@ glm::mat4 interpolateScaling(glm::mat4 m1, glm::mat4 m2, float t) {
     return m;
 }
 
-glm::mat4 getInterpolateMat(std::map<float, Keyframe> kfs, float t) {
+glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<float, Keyframe> kfs
     // FIrst, find matrices to interpolate on (see which two times t falls in-between
     //TODO
     glm::mat4 m1 = glm::mat4(1.f);
     glm::mat4 m2 = glm::mat4(1.f);
+    glm::mat4 rotation = m1;
+    glm::mat4 scale = m1;
+    glm::mat4 translation;
+
+    Keyframe keyframe1= kfs[0];
+    Keyframe keyframe2= kfs[1];
+    if (t < kfs[1].time){
+        float tPortion= (t - kfs[0].time)/(kfs[1].time- kfs[0].time);
+    
+    
+    // for (int i = 0; i < kfs.size(); ++i){
+    //     std::cout << kfs[i].time << " " << t << std::endl;
+    //     if (t > kfs[i].time){
+    //         keyframe1 = kfs[i];
+    //         keyframe2 = kfs[i+1];
+    //         tGap = t - kfs[i].time; 
+    //         break;
+    //     }
+    // }
+
     
 	// Then, interpolate between these matrices	
-    glm::mat4 translation = interpolatePosition(m1, m2, t);
-    glm::mat4 rotation = interpolateRotation(m1, m2, t);
-    glm::mat4 scale = interpolateScaling(m1, m2, t);
+    translation = interpolatePosition(keyframe1.pos, keyframe2.pos, tPortion);
+    // glm::mat4 rotation = interpolateRotation(m1, m2, t);
+    // glm::mat4 scale = interpolateScaling(m1, m2, t);
+    }
     return translation * rotation * scale;
 }
 
@@ -347,10 +395,12 @@ void BunnyApp::draw_contents() {
     float t = std::fmod(curTime - startTime, totalTime);
     for (int i = 0; i < idToName.size(); i++) {
         std::string name = idToName[i];
-        if (animationOfName.find(name) != animationOfName.end()) {
-            glm::mat4 thisTrans = transMatVec[i];
+        // std::cout << name << "\n";
+        if ( name == "nodes[0]") { // TEMP   animationOfName.find(name) != animationOfName.end() &&
+            glm::mat4 thisTrans = transMatVec[i]; 
             NodeAnimate na = animationOfName.at(name);
             thisTrans *= getInterpolateMat(na.keyframes, t);
+            // printm(thisTrans);
 			transMatVec[i] = thisTrans;
         }
     }

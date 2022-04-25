@@ -55,7 +55,8 @@ public:
 struct NodeAnimate {
 public:
 	std::string name;
-    std::map<float, Keyframe> keyframes;	
+    std::vector<Keyframe> keyframes;
+    // std::map<float, Keyframe> keyframes;	
 };
 
 class BunnyApp : public nanogui::Screen {
