@@ -339,8 +339,8 @@ glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
 	return m;
 }
 
-glm::mat4 interpolateRotation(aiQuaternion r1, aiQuaternion r2, float tPortion) {
-    glm::quat r = glm::mix(reinterpret_cast<glm::quat&>(r1),reinterpret_cast<glm::quat&>(r2),tPortion);
+glm::mat4 interpolateRotation(glm::quat r1, glm::quat r2, float tPortion) {
+    glm::quat r = glm::mix(r1,r2,tPortion);
     glm::mat4 m = glm::toMat4(r);
     // printm(m);
     return m;
@@ -356,7 +356,7 @@ glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<fl
     //TODO
     glm::mat4 m1 = glm::mat4(1.f);
     glm::mat4 m2 = glm::mat4(1.f);
-    glm::mat4 rotation;
+    glm::mat4 rotation = m1;
     glm::mat4 scale = m1;
     glm::mat4 translation = m1;
 
@@ -376,15 +376,17 @@ glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<fl
 	// Then, interpolate between these matrices	
     translation = interpolatePosition(keyframe1.pos, keyframe2.pos, tPortion);
     // if keyframe has no rotation, skip 
-    if (keyframe1.rot.x == 0 && keyframe1.rot.y == 0 && keyframe1.rot.z == 0) {
-        rotation = m1;
-    } else {
-        rotation = interpolateRotation(keyframe1.rot, keyframe2.rot, tPortion);
-    }
-    rotation = interpolateRotation(keyframe1.rot, keyframe2.rot, tPortion);
-    std::cout << tPortion << "\n";
-    printm(rotation);
-    std::cout << "\n";
+    // if (keyframe2.rot.x == 0 && keyframe2.rot.y == 0 && keyframe2.rot.z == 0 && keyframe2.rot.w == 0) {
+    //     rotation = m1;
+    // } else {
+        // printf("%f%f%f%f\n" , keyframe1.rot.x , keyframe1.rot.y , keyframe1.rot.z,keyframe1.rot.w ) ;
+        // printf("%f%f%f%f\n" , keyframe2.rot.x , keyframe2.rot.y , keyframe2.rot.z,keyframe2.rot.w  ) ;
+        glm::quat r1 = glm::quat( keyframe1.rot.w,  keyframe1.rot.x, keyframe1.rot.y, keyframe1.rot.z);
+        glm::quat r2 = glm::quat(keyframe2.rot.w, keyframe2.rot.x, keyframe2.rot.y, keyframe2.rot.z);
+        printf("r1: %f%f%f%f\n" , r2.x , r2.y , r2.z,r2.w ) ;
+        printf("r2: %f%f%f%f\n" , r1.x , r1.y , r1.z,r1.w ) ;
+        rotation = interpolateRotation(r1, r2, tPortion);
+    // }
     // glm::mat4 scale = interpolateScaling(m1, m2, t);
     
     return translation * rotation * scale;
