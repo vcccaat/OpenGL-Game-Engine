@@ -313,6 +313,10 @@ void print(glm::vec3 v){
     std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<"]\n";
 }
 void printv4(glm::vec4 v){
+    if (v[0] < .0000001) v[0] = 0;
+    if (v[1] < .0000001) v[1] = 0;
+    if (v[2] < .0000001) v[2] = 0;
+    if (v[3] < .0000001) v[3] = 0;
     std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<","<<v[3]<<"]\n";
 }
 
@@ -335,7 +339,7 @@ glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
 	return m;
 }
 
-glm::mat4 interpolateRotation(aiQuaternion r1, aiQuaternion r2, float tPortion) {;
+glm::mat4 interpolateRotation(aiQuaternion r1, aiQuaternion r2, float tPortion) {
     glm::quat r = glm::mix(reinterpret_cast<glm::quat&>(r1),reinterpret_cast<glm::quat&>(r2),tPortion);
     glm::mat4 m = glm::toMat4(r);
     // printm(m);
@@ -374,9 +378,13 @@ glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<fl
     // if keyframe has no rotation, skip 
     if (keyframe1.rot.x == 0 && keyframe1.rot.y == 0 && keyframe1.rot.z == 0) {
         rotation = m1;
-    }else {
+    } else {
         rotation = interpolateRotation(keyframe1.rot, keyframe2.rot, tPortion);
     }
+    rotation = interpolateRotation(keyframe1.rot, keyframe2.rot, tPortion);
+    std::cout << tPortion << "\n";
+    printm(rotation);
+    std::cout << "\n";
     // glm::mat4 scale = interpolateScaling(m1, m2, t);
     
     return translation * rotation * scale;
