@@ -44,18 +44,29 @@ public:
     Light();
 };
 
-struct Keyframe {
+struct KeyframePos {
 public:
 	float time;
 	glm::vec3 pos;
+};
+struct KeyframeRot {
+public:
+	float time;
 	aiQuaternion rot;
+};
+struct KeyframeScale {
+public:
+	float time;
 	glm::vec3 scale;
 };
+	
 
 struct NodeAnimate {
 public:
 	std::string name;
-    std::vector<Keyframe> keyframes;
+    std::vector<KeyframePos> keyframePos;
+    std::vector<KeyframeRot> keyframeRot;
+    std::vector<KeyframeScale> keyframeScale;
     // std::map<float, Keyframe> keyframes;	
 };
 

@@ -128,37 +128,31 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
     animationOfName = {};
     for (int i = 0; i < obj->mAnimations[0]->mNumChannels; ++i) {
 		NodeAnimate na = NodeAnimate();
-        na.keyframes = {};
+        na.keyframePos = {};
+        na.keyframeRot = {};
+        na.keyframeScale = {};
 		aiNodeAnim* curChannel = obj->mAnimations[0]->mChannels[i];
 		std::string nodeName = curChannel->mNodeName.C_Str();
         na.name = nodeName;
-        // assert (curChannel->mNumPositionKeys == curChannel->mNumRotationKeys && curChannel->mNumPositionKeys == curChannel->mNumScalingKeys);
+  
         for (int j = 0; j < curChannel->mNumPositionKeys; ++j) {
-            // std::cout << "channel" << i << "positionkey" << j << '\n';
-            Keyframe k = {};
-            // assert(curChannel->mNumPositionKeys[j].mTime == curChannel->mNumRotationKeys[j].mTime && curChannel->mNumPositionKeys[j].mTime == curChannel->mNumScalingKeys[j].mTime);
+            KeyframePos k;
 			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
-            k.pos = reinterpret_cast<glm::vec3&>(curChannel->mPositionKeys[j].mValue);
-            if (k.pos.x > 10000) k.pos.x = 0;
-            if (k.pos.y > 10000) k.pos.y = 0;
-            if (k.pos.z > 10000) k.pos.z = 0;/*
-            int jj = j + 1;
-            if (jj == curChannel->mNumPositionKeys) jj = 0;*/
+            k.pos = RTUtil::a2g(curChannel->mPositionKeys[j].mValue);
+            na.keyframePos.push_back(k);
+        }
+        for (int j = 0; j < curChannel->mNumRotationKeys; ++j) {
+            KeyframeRot k;
+			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
             k.rot = curChannel->mRotationKeys[j].mValue;
-            if (k.rot.w > 100 || k.rot.w < -100) k.rot.w = 0;
-            if (k.rot.x > 100 || k.rot.x < -100) k.rot.x = 0;
-            if (k.rot.y > 100 || k.rot.y < -100) k.rot.y = 0;
-            if (k.rot.z > 100 || k.rot.z < -100) k.rot.z = 0;
-            printf("%s\n", na.name);
-            printf("(%f, %f, %f, %f)\n", k.rot.w, k.rot.x, k.rot.y, k.rot.z);
-            k.scale = reinterpret_cast<glm::vec3&>(curChannel->mScalingKeys[j].mValue);
-            if (k.scale.x > 10000) k.scale.x = 0;
-            if (k.scale.y > 10000) k.scale.y = 0;
-            if (k.scale.z > 10000) k.scale.z = 0;
-			// na.keyframes.insert({k.time, k});
-            na.keyframes.push_back(k);
-            std::cout << "\n\n";
-
+            printf(": %f, %f, %f, %f\n" , k.rot.x , k.rot.y , k.rot.z,k.rot.w ) ;
+            na.keyframeRot.push_back(k);
+        }        
+        for (int j = 0; j < curChannel->mNumScalingKeys; ++j) {
+            KeyframeScale k;
+			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
+            k.scale = RTUtil::a2g(curChannel->mScalingKeys[j].mValue);
+            na.keyframeScale.push_back(k);
         }
         animationOfName.insert({ nodeName, na });
     }
@@ -280,8 +274,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 
     const std::string resourcePath =
         // PATHEDIT
-        // cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -360,8 +354,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));

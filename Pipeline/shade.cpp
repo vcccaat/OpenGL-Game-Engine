@@ -329,39 +329,9 @@ void printm(glm::mat4 m){
     std::cout << "]\n";
 }
 
-glm::mat4 interpolatePosition(glm::vec3 v1, glm::vec3 v2, float tPortion) {
-	glm::mat4 m( 1.0f );
-    glm::vec3 v = v1 + tPortion * (v2 - v1);
-    m[3][0] = v[0];
-    m[3][1] = v[1];
-    m[3][2] = v[2];
-    // printm(m);
-	return m;
-}
-
-glm::mat4 interpolateRotation(glm::quat r1, glm::quat r2, float tPortion) {
-    glm::quat r = glm::mix(glm::quat(-1,0,0,0),glm::quat(0,1,0,0),tPortion);
-    glm::mat4 m = glm::toMat4(r);
-    //printm(m);
-    return m;
-}
-
-glm::mat4 interpolateScaling(glm::mat4 m1, glm::mat4 m2, float t) {
-    glm::mat4 m = glm::mat4(1.0f);
-    return m;
-}
-
-glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<float, Keyframe> kfs
-    // FIrst, find matrices to interpolate on (see which two times t falls in-between
-    //TODO
-    glm::mat4 m1 = glm::mat4(1.f);
-    glm::mat4 m2 = glm::mat4(1.f);
-    glm::mat4 rotation = m1;
-    glm::mat4 scale = m1;
-    glm::mat4 translation = m1;
-
-    Keyframe keyframe1;
-    Keyframe keyframe2;
+glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
+    KeyframePos keyframe1;
+    KeyframePos keyframe2;
     float tPortion;
     for (int i = 0; i < kfs.size(); ++i){
         if (t < kfs[i].time){
@@ -371,21 +341,49 @@ glm::mat4 getInterpolateMat(std::vector<Keyframe> kfs, float t) {  //std::map<fl
             break;
         }
     }
-    
+
+	glm::mat4 m( 1.0f );
+    glm::vec3 v = keyframe1.pos + tPortion * (keyframe2.pos - keyframe1.pos);
+    m[3][0] = v[0];
+    m[3][1] = v[1];
+    m[3][2] = v[2];
+    // printm(m);
+	return m;
+}
+
+glm::mat4 interpolateRotation(glm::quat r1, glm::quat r2, float tPortion) {
+
+    glm::quat r = glm::mix(r1,r2,tPortion);
+    glm::mat4 m = glm::toMat4(r);
+    // printm(m);
+    return m;
+}
+
+glm::mat4 interpolateScaling(glm::mat4 m1, glm::mat4 m2, float t) {
+    glm::mat4 m = glm::mat4(1.0f);
+    return m;
+}
+
+glm::mat4 getInterpolateMat(NodeAnimate node, float t) {  //std::map<float, Keyframe> kfs
+    // FIrst, find matrices to interpolate on (see which two times t falls in-between
+    //TODO
+    glm::mat4 m1 = glm::mat4(1.f);
+    glm::mat4 m2 = glm::mat4(1.f);
+    glm::mat4 rotation = m1;
+    glm::mat4 scale = m1;
+    glm::mat4 translation = m1;
+
 
 	// Then, interpolate between these matrices	
-    translation = interpolatePosition(keyframe1.pos, keyframe2.pos, tPortion);
+    translation = interpolatePosition(node.keyframePos, t);
     // if keyframe has no rotation, skip 
     // if (keyframe2.rot.x == 0 && keyframe2.rot.y == 0 && keyframe2.rot.z == 0 && keyframe2.rot.w == 0) {
     //     rotation = m1;
     // } else {
-        // printf("%f%f%f%f\n" , keyframe1.rot.x , keyframe1.rot.y , keyframe1.rot.z,keyframe1.rot.w ) ;
-        // printf("%f%f%f%f\n" , keyframe2.rot.x , keyframe2.rot.y , keyframe2.rot.z,keyframe2.rot.w  ) ;
-        glm::quat r1 = glm::quat(keyframe1.rot.w,  keyframe1.rot.x, keyframe1.rot.y, keyframe1.rot.z);
-        glm::quat r2 = glm::quat(keyframe2.rot.w, keyframe2.rot.x, keyframe2.rot.y, keyframe2.rot.z);
-        // printf("r1: %f,%f, %f, %f, %f\n" ,tPortion, r2.x , r2.y , r2.z,r2.w ) ;
-        // printf("r2: %f, %f, %f, %f, %f\n" ,tPortion, r1.x , r1.y , r1.z,r1.w ) ;
-        rotation = interpolateRotation(r1, r2, tPortion);
+    //     glm::quat r1 = glm::quat( keyframe1.rot.w,  keyframe1.rot.x, keyframe1.rot.y, keyframe1.rot.z);
+    //     glm::quat r2 = glm::quat(keyframe2.rot.w, keyframe2.rot.x, keyframe2.rot.y, keyframe2.rot.z);
+        
+    //     rotation = interpolateRotation(r1, r2, tPortion);
     // }
     // glm::mat4 scale = interpolateScaling(m1, m2, t);
     
@@ -403,7 +401,7 @@ void BunnyApp::draw_contents() {
         if ( name == "nodes[0]") { // TEMP   animationOfName.find(name) != animationOfName.end() &&
             glm::mat4 thisTrans = transMatVec[1]; 
             NodeAnimate na = animationOfName.at(name);
-            transMatVec[1] = getInterpolateMat(na.keyframes, t);
+            transMatVec[1] = getInterpolateMat(na, t);
         }
     }
 
