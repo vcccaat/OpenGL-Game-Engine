@@ -63,7 +63,7 @@ Light::Light() {}
 
 void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
     // Mesh parsing
     std::vector<std::vector<glm::vec3>> positions;
@@ -72,7 +72,7 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
     transMatVec = {};
     idToName = {};
     meshIndToMaterialInd = {};
-    traverseNodeHierarchy(positions, indices, normals, obj, obj->mRootNode, transMatVec, glm::mat4(1.f), meshIndToMaterialInd, idToName);
+    traverseNodeHierarchy(positions, indices, normals, obj->mRootNode, transMatVec, glm::mat4(1.f), meshIndToMaterialInd, idToName);
 
     // Mesh inserting
     for (int i = 0; i < positions.size(); ++i) {
@@ -224,7 +224,7 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
     return lights;
 }
 
-void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
+void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         itn.push_back(cur->mName.C_Str());
@@ -237,7 +237,7 @@ void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positi
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(positions, indices, normals, obj, cur->mChildren[i], translist, transmat, mp, itn);
+            traverseNodeHierarchy(positions, indices, normals, cur->mChildren[i], translist, transmat, mp, itn);
         }
 }
 }

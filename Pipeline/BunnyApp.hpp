@@ -76,7 +76,7 @@ public:
     void initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
     std::vector<Material> parseMats(const aiScene* scene);
     std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene);
-    void traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn);
+    void traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiNode* cur, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn);
     void addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::vector<glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp);
     BunnyApp(std::string path, float windowWidth, float windowHeight);
 
@@ -95,6 +95,8 @@ private:
     static const int windowHeight;
     bool deferred;
     bool toggle;
+
+    const aiScene* obj;
 
     std::unique_ptr<GLWrap::Program> prog, fsqProg, gProg, lightProg, shadowProg, ambProg, sunskyProg, accProg, mergeProg;
     std::vector<std::unique_ptr<GLWrap::Mesh>> meshes;
@@ -118,6 +120,7 @@ private:
     double startTime;
     double totalTime;
     std::vector<std::string> idToName;
+    
 };
 
 

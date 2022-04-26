@@ -402,11 +402,16 @@ glm::mat4 getInterpolateMat(NodeAnimate node, float t) {
     return translation * rotation * scale;
 }
 
+void traverseTree(aiNode* node ) {
+
+}
+
 void BunnyApp::draw_contents() {
     // Update current time
     curTime = getSecondsSinceEpoch();
     float t = std::fmod(curTime - startTime, totalTime);
 
+    traverseTree(obj->mRootNode);
     for (int i = 0; i < idToName.size(); i++) {
         std::string name = idToName[i];
         // std::cout << name << "\n";
