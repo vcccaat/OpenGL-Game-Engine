@@ -145,7 +145,8 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
             KeyframeRot k;
 			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
             k.rot = curChannel->mRotationKeys[j].mValue;
-            printf(": %f, %f, %f, %f\n" , k.rot.x , k.rot.y , k.rot.z,k.rot.w ) ;
+            std::cout << nodeName<< "\n";
+            printf(": %f, %f, %f, %f\n" ,k.rot.w,  k.rot.x , k.rot.y , k.rot.z) ;
             na.keyframeRot.push_back(k);
         }        
         for (int j = 0; j < curChannel->mNumScalingKeys; ++j) {

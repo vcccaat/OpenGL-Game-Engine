@@ -351,8 +351,23 @@ glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
 	return m;
 }
 
-glm::mat4 interpolateRotation(glm::quat r1, glm::quat r2, float tPortion) {
-
+glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
+    KeyframeRot keyframe1;
+    KeyframeRot keyframe2;
+    float tPortion;
+    for (int i = 0; i < kfs.size(); ++i){
+        if (t < kfs[i].time){
+            keyframe1 = kfs[i-1];
+            keyframe2 = kfs[i];
+            tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
+            break;
+        }
+    }
+    
+    glm::quat r1 = glm::quat(keyframe1.rot.w,keyframe1.rot.x,keyframe1.rot.y,keyframe1.rot.z );
+    glm::quat r2 = glm::quat(keyframe2.rot.w,keyframe2.rot.x,keyframe2.rot.y,keyframe2.rot.z );
+    // printf(": %f, %f, %f, %f\n" , r1.x , r1.y , r1.z,r1.w ) ;
+    // printf(": %f, %f, %f, %f\n" , r2.x , r2.y , r2.z,r2.w ) ;
     glm::quat r = glm::mix(r1,r2,tPortion);
     glm::mat4 m = glm::toMat4(r);
     // printm(m);
@@ -364,9 +379,7 @@ glm::mat4 interpolateScaling(glm::mat4 m1, glm::mat4 m2, float t) {
     return m;
 }
 
-glm::mat4 getInterpolateMat(NodeAnimate node, float t) {  //std::map<float, Keyframe> kfs
-    // FIrst, find matrices to interpolate on (see which two times t falls in-between
-    //TODO
+glm::mat4 getInterpolateMat(NodeAnimate node, float t) {  
     glm::mat4 m1 = glm::mat4(1.f);
     glm::mat4 m2 = glm::mat4(1.f);
     glm::mat4 rotation = m1;
@@ -374,7 +387,6 @@ glm::mat4 getInterpolateMat(NodeAnimate node, float t) {  //std::map<float, Keyf
     glm::mat4 translation = m1;
 
 
-	// Then, interpolate between these matrices	
     translation = interpolatePosition(node.keyframePos, t);
     // if keyframe has no rotation, skip 
     // if (keyframe2.rot.x == 0 && keyframe2.rot.y == 0 && keyframe2.rot.z == 0 && keyframe2.rot.w == 0) {
@@ -383,7 +395,7 @@ glm::mat4 getInterpolateMat(NodeAnimate node, float t) {  //std::map<float, Keyf
     //     glm::quat r1 = glm::quat( keyframe1.rot.w,  keyframe1.rot.x, keyframe1.rot.y, keyframe1.rot.z);
     //     glm::quat r2 = glm::quat(keyframe2.rot.w, keyframe2.rot.x, keyframe2.rot.y, keyframe2.rot.z);
         
-    //     rotation = interpolateRotation(r1, r2, tPortion);
+    rotation = interpolateRotation(node.keyframeRot, t);
     // }
     // glm::mat4 scale = interpolateScaling(m1, m2, t);
     
@@ -398,7 +410,7 @@ void BunnyApp::draw_contents() {
     for (int i = 0; i < idToName.size(); i++) {
         std::string name = idToName[i];
         // std::cout << name << "\n";
-        if ( name == "nodes[0]") { // TEMP   animationOfName.find(name) != animationOfName.end() &&
+        if ( name == "nodes[0]" ) { // TEMP  animationOfName.find(name) != animationOfName.end() 
             glm::mat4 thisTrans = transMatVec[1]; 
             NodeAnimate na = animationOfName.at(name);
             transMatVec[1] = getInterpolateMat(na, t);
