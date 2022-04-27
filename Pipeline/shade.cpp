@@ -1,6 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "BunnyApp.hpp"
+#include "Pipeline.hpp"
 #include <nanogui/window.h>
 #include <nanogui/layout.h>
 #include <cpplocate/cpplocate.h>
@@ -13,7 +13,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 
-void BunnyApp::forwardShade() {
+void Pipeline::forwardShade() {
     GLWrap::checkGLError("drawContents start");
 
     fbo->bind();
@@ -72,7 +72,7 @@ void BunnyApp::forwardShade() {
 
 
 
-void BunnyApp::deferredShade() {
+void Pipeline::deferredShade() {
 
 	
     //
@@ -309,28 +309,3 @@ void BunnyApp::deferredShade() {
     fsqProg->unuse();
 }
 
-
-
-void BunnyApp::draw_contents() {
-    // Update current time
-    curTime = getSecondsSinceEpoch();
-    float t = std::fmod(curTime - startTime, totalTime);
-    Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-
-    traverseTree(obj->mRootNode, glm::mat4(1.f), 0, t);
-
-
-    forwardShade();
-    // if (!deferred) {
-    //     _CrtDumpMemoryLeaks();
-    //     deferred = true;
-    // }
-    return;
-    //if (!deferred) {
-    //    forwardShade();
-    //}
-    //else {
-    //    deferredShade();  //deferredShade   // TEMP: only use forward shading for animation
-    //}
-}

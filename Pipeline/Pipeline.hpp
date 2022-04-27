@@ -13,6 +13,7 @@
 #include <ctime>   
 #include <cmath>   
 
+
 float getAspect(std::string path);
 double getSecondsSinceEpoch();
 
@@ -77,15 +78,16 @@ public:
 //     std::String mName;
 // };
 
-class BunnyApp : public nanogui::Screen {
+class Pipeline : public nanogui::Screen {
 public:
+    Pipeline(std::string path, float windowWidth, float windowHeight);
+
     std::string GlobalPath;
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
     std::vector<Material> parseMats(const aiScene* scene);
     std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene);
     void traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals,const aiScene* obj, aiNode* cur, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn);
     void addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp);
-    BunnyApp(std::string path, float windowWidth, float windowHeight);
 
     void traverseTree(aiNode* node, glm::mat4 transMat, int counter, float t);
 

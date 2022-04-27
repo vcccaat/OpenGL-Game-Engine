@@ -1,27 +1,9 @@
 
 #define _USE_MATH_DEFINES
-#include "BunnyApp.hpp"
+#include "Pipeline.hpp"
 #include <glm/gtx/quaternion.hpp>
+#include "Helper.hpp"
 
-void print(glm::vec3 v){
-    std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<"]\n";
-}
-void printv4(glm::vec4 v){
-    if (v[0] < .0000001) v[0] = 0;
-    if (v[1] < .0000001) v[1] = 0;
-    if (v[2] < .0000001) v[2] = 0;
-    if (v[3] < .0000001) v[3] = 0;
-    std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<","<<v[3]<<"]\n";
-}
-
-void printm(glm::mat4 m){
-    std::cout << "[\n";
-    printv4(glm::vec4(m[0][0], m[1][0], m[2][0],m[3][0]));
-    printv4(glm::vec4(m[0][1], m[1][1], m[2][1],m[3][1]));
-    printv4(glm::vec4(m[0][2], m[1][2], m[2][2],m[3][2]));
-    printv4(glm::vec4(m[0][3], m[1][3], m[2][3],m[3][3]));
-    std::cout << "]\n";
-}
 
 glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
     KeyframePos keyframe1;
@@ -108,27 +90,26 @@ glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
     return m;
 }
 
-glm::mat4 interpolateScaling(glm::mat4 m1, glm::mat4 m2, float t) {
+glm::mat4 interpolateScaling(std::vector<KeyframeScale> kfs, float t) {
+  // TODO
     glm::mat4 m = glm::mat4(1.0f);
     return m;
 }
 
 glm::mat4 getInterpolateMat(NodeAnimate node, float t) {  
     glm::mat4 m1 = glm::mat4(1.f);
-    glm::mat4 m2 = glm::mat4(1.f);
     glm::mat4 rotation = m1;
     glm::mat4 scale = m1;
     glm::mat4 translation = m1;
 
-
     translation = interpolatePosition(node.keyframePos, t);
     rotation = interpolateRotation(node.keyframeRot, t);
-    // scale = interpolateScaling(m1, m2, t);
+    scale = interpolateScaling(node.keyframeScale, t);
     
     return translation * rotation * scale;
 }
 
-void BunnyApp::traverseTree(aiNode* node, glm::mat4 transMat, int counter, float t) {
+void Pipeline::traverseTree(aiNode* node, glm::mat4 transMat, int counter, float t) {
     // find node has a mesh, and use nodename to find the animation of this node
     if (node != NULL){
         std::string name = node->mName.C_Str();

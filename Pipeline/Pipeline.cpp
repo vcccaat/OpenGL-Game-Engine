@@ -1,6 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "BunnyApp.hpp"
+#include "Pipeline.hpp"
 #include <nanogui/window.h>
 #include <nanogui/layout.h>
 #include <cpplocate/cpplocate.h>
@@ -13,7 +13,6 @@
 
 /**************************************** HELPER FUNCTIONS ****************************************/
 
-
 float getAspect(std::string path) {
     Assimp::Importer importer;
     // const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
@@ -23,6 +22,11 @@ float getAspect(std::string path) {
     aiProcess_SortByPType);
     if (obj->mNumCameras == 0) return 1.f;
     return obj->mCameras[0]->mAspect;
+}
+
+double getSecondsSinceEpoch() {
+    auto now = std::chrono::system_clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(now).count() / ((double) 1000);
 }
 
 glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
@@ -38,11 +42,6 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
         tempNode = tempNode->mParent;
     }
     return cmt;
-}
-
-double getSecondsSinceEpoch() {
-    auto now = std::chrono::system_clock::now().time_since_epoch();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(now).count() / ((double) 1000);
 }
 
 
@@ -64,10 +63,10 @@ Light::Light() {}
 
 
 
-/**************************************** BUNNYAPP STARTUP METHODS ****************************************/
+/**************************************** Pipeline STARTUP METHODS ****************************************/
 
 
-void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
+void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     // Mesh parsing
@@ -176,7 +175,7 @@ void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
     totalTime = (double) totalTicks / (double) ticksPerSec;
 }
 
-std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
+std::vector<Material> Pipeline::parseMats(const aiScene* scene) {
     std::vector<Material> mats = {};
     for (int i = 0; i < scene->mNumMaterials; ++i) {
         Material m = Material();
@@ -187,7 +186,7 @@ std::vector<Material> BunnyApp::parseMats(const aiScene* scene) {
     return mats;
 }
 
-std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene) {
+std::vector<Light> Pipeline::parseLights(aiNode* rootNode, const aiScene* scene) {
 
     // Initial empty list, then loop over all lights
     std::vector<Light> lights = {};
@@ -234,7 +233,7 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
     return lights;
 }
 
-void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
+void Pipeline::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
@@ -250,7 +249,7 @@ void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positi
 }
 }
 
-void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp){
+void Pipeline::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp){
 
     // store mesh vertices 
     int curMesh = translist.size();
@@ -279,7 +278,7 @@ void BunnyApp::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
     mp.push_back(msh->mMaterialIndex);
 }
 
-BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false), backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
+Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false), backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
         // PATHEDIT
@@ -409,50 +408,28 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
 }
 
 
-/**************************************** UPDATE METHODS FOR BUNNYAPP ****************************************/
+
+void Pipeline::draw_contents() {
+    // Update current time
+    curTime = getSecondsSinceEpoch();
+    float t = std::fmod(curTime - startTime, totalTime);
+    Assimp::Importer importer;
+    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+
+    traverseTree(obj->mRootNode, glm::mat4(1.f), 0, t);
 
 
-bool BunnyApp::keyboard_event(int key, int scancode, int action, int modifiers) {
-
-    if (Screen::keyboard_event(key, scancode, action, modifiers))
-       return true;
-
-    // If the user presses the escape key...
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        // ...exit the application.
-        set_visible(false);
-        return true;
-    }
-
-    if (key == GLFW_KEY_F && toggle) {
-        deferred = !deferred;
-        toggle = false;
-
-        if (deferred) {
-            std::cout << "deferred shading\n";
-        }else {
-            std::cout << "forward shading\n";
-        }
-    } else {
-        toggle = true;
-    }
-    
-
-    return cc->keyboard_event(key, scancode, action, modifiers);
-}
-
-bool BunnyApp::mouse_button_event(const nanogui::Vector2i &p, int button, bool down, int modifiers) {
-    return Screen::mouse_button_event(p, button, down, modifiers) ||
-           cc->mouse_button_event(p, button, down, modifiers);
-}
-
-bool BunnyApp::mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) {
-    return Screen::mouse_motion_event(p, rel, button, modifiers) ||
-           cc->mouse_motion_event(p, rel, button, modifiers);
-}
-
-bool BunnyApp::scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
-    return Screen::scroll_event(p, rel) ||
-           cc->scroll_event(p, rel);
+    forwardShade();
+    // if (!deferred) {
+    //     _CrtDumpMemoryLeaks();
+    //     deferred = true;
+    // }
+    return;
+    //if (!deferred) {
+    //    forwardShade();
+    //}
+    //else {
+    //    deferredShade();  //deferredShade   // TEMP: only use forward shading for animation
+    //}
 }
 

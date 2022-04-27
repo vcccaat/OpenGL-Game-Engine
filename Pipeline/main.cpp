@@ -3,7 +3,8 @@
 //#include <crtdbg.h>
 
 #include <iostream>
-#include "BunnyApp.hpp"
+#include "Pipeline.hpp"
+
 
 int main(int argc, char const* argv[]) {
     nanogui::init();
@@ -20,7 +21,7 @@ int main(int argc, char const* argv[]) {
 	
     float aspect = getAspect(path);
     int windowHeight = 500;
-    nanogui::ref<BunnyApp> app = new BunnyApp(path, aspect * windowHeight, windowHeight);
+    nanogui::ref<Pipeline> app = new Pipeline(path, aspect * windowHeight, windowHeight);
     nanogui::mainloop(16);
 	
     nanogui::shutdown();
