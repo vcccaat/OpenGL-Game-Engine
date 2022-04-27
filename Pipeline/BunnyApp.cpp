@@ -61,10 +61,9 @@ Light::Light() {}
 /**************************************** BUNNYAPP STARTUP METHODS ****************************************/
 
 
-void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
+void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-    // root = std::make_shared<Node>(obj->mRootNode);
+    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
     // Mesh parsing
     std::vector<std::vector<glm::vec3>> positions;
     std::vector<std::vector<uint32_t>> indices;
@@ -148,7 +147,7 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
         }
         for (int j = 0; j < curChannel->mNumRotationKeys; ++j) {
             KeyframeRot k;
-			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
+			k.time = (float) curChannel->mRotationKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
             k.rot = curChannel->mRotationKeys[j].mValue;
             std::cout << nodeName<< "rotation \n";
             printf("%f : %f, %f, %f, %f\n" ,k.time, k.rot.w,  k.rot.x , k.rot.y , k.rot.z) ;
@@ -156,7 +155,7 @@ void BunnyApp::initScene(std::string path, std::shared_ptr<RTUtil::PerspectiveCa
         }        
         for (int j = 0; j < curChannel->mNumScalingKeys; ++j) {
             KeyframeScale k;
-			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
+			k.time = (float) curChannel->mScalingKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
             k.scale = RTUtil::a2g(curChannel->mScalingKeys[j].mValue);
             na.keyframeScale.push_back(k);
         }
@@ -232,7 +231,6 @@ std::vector<Light> BunnyApp::parseLights(aiNode* rootNode, const aiScene* scene)
 void BunnyApp::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
-    
         if (cur->mNumMeshes > 0) {
             for (int i = 0; i < cur->mNumMeshes; ++i) {
                 aiMesh* temp = obj->mMeshes[cur->mMeshes[i]];
@@ -395,8 +393,8 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
             1 // fov
         );
 
-
-    initScene(path, cam, windowWidth, windowHeight);
+    GlobalPath = path;
+    initScene( cam, windowWidth, windowHeight);
     perform_layout();
     set_visible(true);
 
