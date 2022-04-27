@@ -54,6 +54,12 @@ Material::Material() {
     this->indexofref = 1.5;
 }
 
+Material::Material(glm::vec3 diffuse) {
+    this->diffuse = diffuse;
+    this->roughness = .2;
+    this->indexofref = 1.5;
+}
+
 Light::Light() {}
 
 
@@ -114,15 +120,15 @@ void BunnyApp::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
 
      // Add default light for animation
      Light defaultLight = Light();
-     defaultLight.pos = glm::vec3(0,5,0);
+     defaultLight.pos = glm::vec3(2,5,0);
      defaultLight.type = defaultLight.POINT;
      defaultLight.power = aiColor3D(300);
      defaultLight.transMat = glm::mat4(1.f);
      lights.push_back(defaultLight);
 
     //  // Add default material for animation
-     Material m1 = Material();
-     Material m2 = Material();
+     Material m1 = Material(glm::vec3(0.2,0.31,0.46) );
+     Material m2 = Material(glm::vec3(0.46,0.2,0.4));
      materials.push_back(m1);
      materials.push_back(m2);
 
@@ -379,7 +385,7 @@ BunnyApp::BunnyApp(std::string path, float windowWidth, float windowHeight) : na
         glm::vec3(0,1,0), // up
         windowWidth / (float) windowHeight, // aspect
         0.1, 50.0, // near, far
-        15.0 * M_PI/180 // fov
+        25.0 * M_PI/180 // fov  15.0 * M_PI/180
     );
 
     cc.reset(new RTUtil::DefaultCC(cam));

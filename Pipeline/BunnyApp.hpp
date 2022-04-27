@@ -23,6 +23,7 @@ public:
     float indexofref;
 
     Material();
+    Material(glm::vec3 diffuse);
 };
 
 class Light {
