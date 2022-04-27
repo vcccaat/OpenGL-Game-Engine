@@ -39,7 +39,7 @@ void BunnyApp::forwardShade() {
     }
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
-        prog->uniform("mM", transMatVec[i]);
+        prog->uniform("mM", transMatVec[idToName[i]]);
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
@@ -96,7 +96,7 @@ void BunnyApp::deferredShade() {
 
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
-        gProg->uniform("mM", transMatVec[i]);
+        gProg->uniform("mM", transMatVec[idToName[i]]);
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
@@ -194,7 +194,7 @@ void BunnyApp::deferredShade() {
 
         // each mesh has a different shadow map
         for (int i = 0; i < meshes.size(); ++i) {          
-            shadowProg->uniform("mM", transMatVec[i]);
+            shadowProg->uniform("mM", transMatVec[idToName[i]]);
             meshes[i]->drawElements();
         }
         shadowProg->unuse();
@@ -335,6 +335,7 @@ glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
     float tPortion;
     for (int i = 0; i < kfs.size(); ++i){
         if (t < kfs[i].time){
+            
             keyframe1 = kfs[i-1];
             keyframe2 = kfs[i];
             tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
@@ -347,7 +348,7 @@ glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
     m[3][0] = v[0];
     m[3][1] = v[1];
     m[3][2] = v[2];
-    // printm(m);
+    printm(m);
 	return m;
 }
 
@@ -388,39 +389,58 @@ glm::mat4 getInterpolateMat(NodeAnimate node, float t) {
 
 
     translation = interpolatePosition(node.keyframePos, t);
-    // if keyframe has no rotation, skip 
-    // if (keyframe2.rot.x == 0 && keyframe2.rot.y == 0 && keyframe2.rot.z == 0 && keyframe2.rot.w == 0) {
-    //     rotation = m1;
-    // } else {
-    //     glm::quat r1 = glm::quat( keyframe1.rot.w,  keyframe1.rot.x, keyframe1.rot.y, keyframe1.rot.z);
-    //     glm::quat r2 = glm::quat(keyframe2.rot.w, keyframe2.rot.x, keyframe2.rot.y, keyframe2.rot.z);
-        
-    rotation = interpolateRotation(node.keyframeRot, t);
-    // }
-    // glm::mat4 scale = interpolateScaling(m1, m2, t);
+    // rotation = interpolateRotation(node.keyframeRot, t);
+    // scale = interpolateScaling(m1, m2, t);
     
     return translation * rotation * scale;
 }
 
-void traverseTree(aiNode* node ) {
+void BunnyApp::traverseTree(aiNode* node, glm::mat4 transMat, int counter, float t) {
+    // find node has a mesh, and use nodename to find the animation of this node
+    
+    if (node != NULL){
+        std::string name = node->mName.C_Str();
+        if (animationOfName.find(name) != animationOfName.end()) { 
+            std::cout << name << "\n";          
+            NodeAnimate na = animationOfName.at(name);
+            glm::mat4 TRS = getInterpolateMat(na, t);
+                // printm(TRS);
+            // Update model matrix
+            transMat = transMat * TRS;  
+        }
+        if (node->mNumMeshes > 0 ) {
+             for (int i = 0; i < node->mNumMeshes; ++i) {
+                transMatVec[idToName[counter]] = transMat;
+                counter += 1;
+            }
+        }
+        
+        for (int i = 0; i < node->mNumChildren; ++i) {
+            traverseTree(node->mChildren[i],transMat, counter, t);
+        }
+        }
 
-}
+    }
+
 
 void BunnyApp::draw_contents() {
     // Update current time
     curTime = getSecondsSinceEpoch();
     float t = std::fmod(curTime - startTime, totalTime);
+    const std::string path = "../resources/scenes/BoxAnimated.glb";  //BoxAnimated.glb, CesiumMan.glb, RiggedFigure.glb, mosh_cmu_*.glb
+    Assimp::Importer importer;
+    const aiScene* obj = importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
-    traverseTree(obj->mRootNode);
-    for (int i = 0; i < idToName.size(); i++) {
-        std::string name = idToName[i];
-        // std::cout << name << "\n";
-        if ( name == "nodes[0]" ) { // TEMP  animationOfName.find(name) != animationOfName.end() 
-            glm::mat4 thisTrans = transMatVec[1]; 
-            NodeAnimate na = animationOfName.at(name);
-            transMatVec[1] = getInterpolateMat(na, t);
-        }
-    }
+    traverseTree(obj->mRootNode, glm::mat4(1.f), 0, t);
+    // for (int i = 0; i < idToName.size(); i++) {
+    //     std::string name = idToName[i];
+    //     // std::cout << name << "\n";
+    //     if ( name == "nodes[2]" ) { // TEMP  animationOfName.find(name) != animationOfName.end() 
+    //         glm::mat4 thisTrans = transMatVec[1]; 
+    //         NodeAnimate na = animationOfName.at(name);
+    //         transMatVec[1] = getInterpolateMat(na, t);
+    //     }
+    // }
 
     forwardShade();
     // if (!deferred) {
