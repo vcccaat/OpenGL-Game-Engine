@@ -163,6 +163,8 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
                 KeyframeScale k;
                 k.time = (float) curChannel->mScalingKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
                 k.scale = RTUtil::a2g(curChannel->mScalingKeys[j].mValue);
+                std::cout << nodeName<< "scale \n";
+                printf("%f: %f %f %f\n",k.time, k.scale.x,k.scale.y,k.scale.z);
                 na.keyframeScale.push_back(k);
             }
             animationOfName.insert({ nodeName, na });
@@ -217,13 +219,12 @@ std::vector<Light> Pipeline::parseLights(aiNode* rootNode, const aiScene* scene)
             printf("amb parsed\n");
         }
         else {
-            // continue; //TEMPORARY
             aiVector3D p = scene->mLights[i]->mPosition;
             l.pos = glm::vec3(p.x, p.y, p.z);
             l.power = scene->mLights[i]->mColorDiffuse;
             l.type = l.POINT;
             printf("Point parsed\n"); 
-              }
+        }
 
         // transform light
         l.transMat = getTransMatrix(rootNode, scene->mLights[i]->mName);
@@ -262,10 +263,9 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 
     for (int i = 0; i < msh->mNumVertices; ++i) {
         glm::vec3 t = reinterpret_cast<glm::vec3&>(msh->mVertices[i]);
-        glm::vec3 pos = glm::vec3(glm::vec4(t,1.0)); //transmat[i] * 
+        glm::vec3 pos = glm::vec3(glm::vec4(t,1.0)); 
         positions[curMesh].push_back(pos);
-        // std::cerr << t.x << "," << t.y << "," << t.z << std::endl;
-
+ 
         // access normal of each vertice
         glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
         normals[curMesh].push_back(n);
@@ -278,7 +278,6 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
         }
     }
     transMatVec.insert({ msh->mName.C_Str(), transmat });
-    // transMatVec.push_back(transmat);
     meshIndToMaterialInd.push_back(msh->mMaterialIndex);
 }
 
@@ -428,16 +427,13 @@ void Pipeline::draw_contents() {
 
 
     forwardShade();
-    // if (!deferred) {
-    //     _CrtDumpMemoryLeaks();
-    //     deferred = true;
-    // }
+
     return;
     //if (!deferred) {
     //    forwardShade();
     //}
     //else {
-    //    deferredShade();  //deferredShade   // TEMP: only use forward shading for animation
+    //    deferredShade(); 
     //}
 }
 
