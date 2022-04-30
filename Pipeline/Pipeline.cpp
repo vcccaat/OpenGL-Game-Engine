@@ -9,7 +9,7 @@
 #include <RTUtil/conversions.hpp>
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
-
+#include "Helper.hpp"
 
 /**************************************** HELPER FUNCTIONS ****************************************/
 
@@ -69,19 +69,14 @@ Light::Light() {}
 void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-    // Mesh parsing
-    std::vector<std::vector<glm::vec3>> positions;
-    std::vector<std::vector<uint32_t>> indices;
-    std::vector<std::vector<glm::vec3>> normals;
+
     transMatVec = {};
-    idToName = {};
     meshIndToMaterialInd = {};
 
-    // parse whole aiscene into a node class
+    // add mesh to scene and store meshes' model matrix
+    traverseNodeHierarchy( obj, obj->mRootNode, glm::mat4(1.f));
 
-    traverseNodeHierarchy(positions, indices, normals, obj, obj->mRootNode, transMatVec, glm::mat4(1.f), meshIndToMaterialInd, idToName);
-
-    // Mesh inserting
+    // number of positions equal to number of meshes in the scene
     for (int i = 0; i < positions.size(); ++i) {
         meshes.push_back(std::unique_ptr<GLWrap::Mesh>());
         meshes[i].reset(new GLWrap::Mesh());
@@ -108,71 +103,79 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
         glm::vec3 targetCamSpace = glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z) + projVec;
         glm::vec3 targetGlobal = glm::vec3(camTransMat * glm::vec4(targetCamSpace.x, targetCamSpace.y, targetCamSpace.z, 1));
         cam->setTarget(targetGlobal);
-        //cam->setTarget(glm::vec3(0.f, 0.f, 0.f));
-        //cam->setAspectRatio(windowWidth / windowHeight);
-        // no setUp??
     }
 
-     // Material and light parsing
-    //  materials = parseMats(obj);
-     lights = parseLights(obj->mRootNode, obj); // TEMPORARY: only the first pointlight is parsed
 
      // Add default light for animation
-     Light defaultLight = Light();
-     defaultLight.pos = glm::vec3(2,5,0);
-     defaultLight.type = defaultLight.POINT;
-     defaultLight.power = aiColor3D(300);
-     defaultLight.transMat = glm::mat4(1.f);
-     lights.push_back(defaultLight);
+     if (obj->mNumLights > 0){
+         lights = parseLights(obj->mRootNode, obj);
+     }
+     else {
+        Light defaultLight = Light();
+        defaultLight.pos = glm::vec3(2,5,0);
+        defaultLight.type = defaultLight.POINT;
+        defaultLight.power = aiColor3D(300);
+        defaultLight.transMat = glm::mat4(1.f);
+        lights.push_back(defaultLight);
+     }
 
-    //  // Add default material for animation
-     Material m1 = Material(glm::vec3(0.2,0.31,0.46) );
-     Material m2 = Material(glm::vec3(0.46,0.2,0.4));
-     materials.push_back(m1);
-     materials.push_back(m2);
-
-	// Animation
-    animationOfName = {};
-    for (int i = 0; i < obj->mAnimations[0]->mNumChannels; ++i) {
-		NodeAnimate na = NodeAnimate();
-        na.keyframePos = {};
-        na.keyframeRot = {};
-        na.keyframeScale = {};
-		aiNodeAnim* curChannel = obj->mAnimations[0]->mChannels[i];
-		std::string nodeName = curChannel->mNodeName.C_Str();
-        na.name = nodeName;
-  
-        for (int j = 0; j < curChannel->mNumPositionKeys; ++j) {
-            KeyframePos k;
-			k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
-            k.pos = RTUtil::a2g(curChannel->mPositionKeys[j].mValue);
-            std::cout << nodeName<< "translation \n";
-            printf("%f: %f %f %f\n",k.time, k.pos.x,k.pos.y,k.pos.z);
-            na.keyframePos.push_back(k);
-        }
-        for (int j = 0; j < curChannel->mNumRotationKeys; ++j) {
-            KeyframeRot k;
-			k.time = (float) curChannel->mRotationKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
-            k.rot = curChannel->mRotationKeys[j].mValue;
-            std::cout << nodeName<< "rotation \n";
-            printf("%f : %f, %f, %f, %f\n" ,k.time, k.rot.w,  k.rot.x , k.rot.y , k.rot.z) ;
-            na.keyframeRot.push_back(k);
-        }        
-        for (int j = 0; j < curChannel->mNumScalingKeys; ++j) {
-            KeyframeScale k;
-			k.time = (float) curChannel->mScalingKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
-            k.scale = RTUtil::a2g(curChannel->mScalingKeys[j].mValue);
-            na.keyframeScale.push_back(k);
-        }
-        animationOfName.insert({ nodeName, na });
+    // Add default material for animation
+    if (obj->mNumMaterials > 0){
+        materials = parseMats(obj);
+    }
+    else{
+        Material m1 = Material(glm::vec3(0.2,0.31,0.46));
+        Material m2 = Material(glm::vec3(0.46,0.2,0.4));
+        materials.push_back(m1);
+        materials.push_back(m2);
     }
 
-    // Animation metadata
-    startTime = getSecondsSinceEpoch();
-    curTime = startTime;
-    int ticksPerSec = obj->mAnimations[0]->mTicksPerSecond;
-    int totalTicks = obj->mAnimations[0]->mDuration;
-    totalTime = (double) totalTicks / (double) ticksPerSec;
+
+	// Animation
+    if (obj->mNumAnimations > 0){
+        animationOfName = {};
+        for (int i = 0; i < obj->mAnimations[0]->mNumChannels; ++i) {
+            NodeAnimate na = NodeAnimate();
+            na.keyframePos = {};
+            na.keyframeRot = {};
+            na.keyframeScale = {};
+            aiNodeAnim* curChannel = obj->mAnimations[0]->mChannels[i];
+            std::string nodeName = curChannel->mNodeName.C_Str();
+            na.name = nodeName;
+    
+            for (int j = 0; j < curChannel->mNumPositionKeys; ++j) {
+                KeyframePos k;
+                k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
+                k.pos = RTUtil::a2g(curChannel->mPositionKeys[j].mValue);
+                std::cout << nodeName<< "translation \n";
+                printf("%f: %f %f %f\n",k.time, k.pos.x,k.pos.y,k.pos.z);
+                na.keyframePos.push_back(k);
+            }
+            for (int j = 0; j < curChannel->mNumRotationKeys; ++j) {
+                KeyframeRot k;
+                k.time = (float) curChannel->mRotationKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
+                k.rot = curChannel->mRotationKeys[j].mValue;
+                std::cout << nodeName<< "rotation \n";
+                printf("%f : %f, %f, %f, %f\n" ,k.time, k.rot.w,  k.rot.x , k.rot.y , k.rot.z) ;
+                na.keyframeRot.push_back(k);
+            }        
+            for (int j = 0; j < curChannel->mNumScalingKeys; ++j) {
+                KeyframeScale k;
+                k.time = (float) curChannel->mScalingKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
+                k.scale = RTUtil::a2g(curChannel->mScalingKeys[j].mValue);
+                na.keyframeScale.push_back(k);
+            }
+            animationOfName.insert({ nodeName, na });
+        }
+
+        // Animation metadata
+        startTime = getSecondsSinceEpoch();
+        curTime = startTime;
+        int ticksPerSec = obj->mAnimations[0]->mTicksPerSecond;
+        int totalTicks = obj->mAnimations[0]->mDuration;
+        totalTime = (double) totalTicks / (double) ticksPerSec;
+    }
+
 }
 
 std::vector<Material> Pipeline::parseMats(const aiScene* scene) {
@@ -233,29 +236,30 @@ std::vector<Light> Pipeline::parseLights(aiNode* rootNode, const aiScene* scene)
     return lights;
 }
 
-void Pipeline::traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, const aiScene* obj, aiNode* cur, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn) {
+void Pipeline::traverseNodeHierarchy( const aiScene* obj, aiNode* cur, glm::mat4 transmat) {
     if (cur != NULL) {
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
             for (int i = 0; i < cur->mNumMeshes; ++i) {
-                aiMesh* temp = obj->mMeshes[cur->mMeshes[i]];
-                addMeshToScene(positions, indices, normals, temp, translist, transmat, mp);
-                itn.push_back(cur->mName.C_Str());
+                aiMesh* mesh = obj->mMeshes[cur->mMeshes[i]];
+                idToName.push_back(mesh->mName.C_Str());
+                addMeshToScene( mesh, transmat);
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy(positions, indices, normals, obj, cur->mChildren[i], translist, transmat, mp, itn);
+            traverseNodeHierarchy( obj, cur->mChildren[i], transmat);
         }
 }
 }
 
-void Pipeline::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp){
+void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 
     // store mesh vertices 
-    int curMesh = translist.size();
+    int curMesh = transMatVec.size();
     positions.push_back({});
     indices.push_back({});
     normals.push_back({});
+
     for (int i = 0; i < msh->mNumVertices; ++i) {
         glm::vec3 t = reinterpret_cast<glm::vec3&>(msh->mVertices[i]);
         glm::vec3 pos = glm::vec3(glm::vec4(t,1.0)); //transmat[i] * 
@@ -273,9 +277,9 @@ void Pipeline::addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, st
             indices[curMesh].push_back(reinterpret_cast<uint32_t&>(msh->mFaces[i].mIndices[j]));
         }
     }
-    translist.insert({ msh->mName.C_Str(), transmat });
-    // translist.push_back(transmat);
-    mp.push_back(msh->mMaterialIndex);
+    transMatVec.insert({ msh->mName.C_Str(), transmat });
+    // transMatVec.push_back(transmat);
+    meshIndToMaterialInd.push_back(msh->mMaterialIndex);
 }
 
 Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false), backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
@@ -416,7 +420,11 @@ void Pipeline::draw_contents() {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
-    traverseTree(obj->mRootNode, glm::mat4(1.f), 0, t);
+    // if the scene has animation, traverse the tree to update TRS
+    if (animationOfName.size() > 0){
+        traverseTree(obj->mRootNode, glm::mat4(1.f), t);
+    }
+    
 
 
     forwardShade();

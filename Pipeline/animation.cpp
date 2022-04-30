@@ -2,7 +2,7 @@
 #define _USE_MATH_DEFINES
 #include "Pipeline.hpp"
 #include <glm/gtx/quaternion.hpp>
-#include "Helper.hpp"
+#include <RTUtil/conversions.hpp>
 
 
 glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
@@ -109,27 +109,31 @@ glm::mat4 getInterpolateMat(NodeAnimate node, float t) {
     return translation * rotation * scale;
 }
 
-void Pipeline::traverseTree(aiNode* node, glm::mat4 transMat, int counter, float t) {
+void Pipeline::traverseTree(aiNode* node, glm::mat4 transMat, float t) {
     // find node has a mesh, and use nodename to find the animation of this node
     if (node != NULL){
         std::string name = node->mName.C_Str();
-        if (animationOfName.find(name) != animationOfName.end()) { 
-            // std::cout << name << "\n";          
+        // find animation TRS of a node
+        if (animationOfName.find(name) != animationOfName.end()) {        
             NodeAnimate na = animationOfName.at(name);
             glm::mat4 TRS = getInterpolateMat(na, t);
-            // printm(TRS);
-            // Update model matrix
-            transMat = transMat * TRS;  
-        }
-        if (node->mNumMeshes > 0 ) {
-             for (int i = 0; i < node->mNumMeshes; ++i) {
-                transMatVec[name] = transMat;
-                counter += 1;
+            transMat = transMat * TRS; 
+
+            // if this animation node has mesh, update mesh's model matrix
+            if (node->mNumMeshes > 0 ) {
+                // std::cout << name << " find \n";   
+                for (int i = 0; i < node->mNumMeshes; ++i) {
+                    std::string meshName = idToName[i];
+                    transMatVec[meshName] = transMat;    
+                    // transMatVec[i] = transMat;
+                }
             }
         }
+         
+
         
         for (int i = 0; i < node->mNumChildren; ++i) {
-            traverseTree(node->mChildren[i],transMat, counter, t);
+            traverseTree(node->mChildren[i],transMat, t);
         }
         }
 

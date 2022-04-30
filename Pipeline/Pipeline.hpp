@@ -14,6 +14,7 @@
 #include <cmath>   
 
 
+
 float getAspect(std::string path);
 double getSecondsSinceEpoch();
 
@@ -86,10 +87,10 @@ public:
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
     std::vector<Material> parseMats(const aiScene* scene);
     std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene);
-    void traverseNodeHierarchy(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals,const aiScene* obj, aiNode* cur, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp, std::vector<std::string>& itn);
-    void addMeshToScene(std::vector<std::vector<glm::vec3>>& positions, std::vector<std::vector<uint32_t>>& indices, std::vector<std::vector<glm::vec3>>& normals, aiMesh* msh, std::map<std::string, glm::mat4>& translist, glm::mat4 transmat, std::vector<int>& mp);
+    void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, glm::mat4 transmat);
+    void addMeshToScene( aiMesh* msh, glm::mat4 transmat);
 
-    void traverseTree(aiNode* node, glm::mat4 transMat, int counter, float t);
+    void traverseTree(aiNode* node, glm::mat4 transMat, float t);
 
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers) override;
     virtual bool mouse_button_event(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
@@ -120,16 +121,32 @@ private:
 
     nanogui::Color backgroundColor;
 
-    std::map<std::string, glm::mat4> transMatVec;
+    /* each mesh has list of vertices and each vertice has vec3 postion */
+    std::vector<std::vector<glm::vec3>> positions;
+    std::vector<std::vector<uint32_t>> indices;
+    std::vector<std::vector<glm::vec3>> normals;
 
-    glm::mat4 camTransMat;
+    /* map a mesh's model matrix to mesh's name, 
+    because when we read animation node, they might
+    appear as different order of mesh node  */
+    std::map<std::string, glm::mat4> transMatVec;
+    // std::vector<glm::mat4> transMatVec;
+
+    /* map a mesh's index to mesh's name */
+    std::vector<std::string> idToName;
+
+    /* map a mesh's index to mesh's material index */
     std::vector<int> meshIndToMaterialInd;
 
+    glm::mat4 camTransMat;
+    
+
+    /* map a node's name to node's animation */
     std::map<std::string, NodeAnimate> animationOfName;
     double curTime;
     double startTime;
     double totalTime;
-    std::vector<std::string> idToName;
+
     
 };
 

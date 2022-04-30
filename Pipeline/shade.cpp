@@ -40,6 +40,7 @@ void Pipeline::forwardShade() {
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
         prog->uniform("mM", transMatVec[idToName[i]]);
+        // prog->uniform("mM",transMatVec[i]);
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
@@ -97,6 +98,7 @@ void Pipeline::deferredShade() {
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
         gProg->uniform("mM", transMatVec[idToName[i]]);
+        // prog->uniform("mM",transMatVec[i]);
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
@@ -186,7 +188,7 @@ void Pipeline::deferredShade() {
         GLenum attachments[]{ GL_COLOR_ATTACHMENT0};
         glDrawBuffers(1,attachments);
 
-        shadowProg->use(); // TEMP
+        shadowProg->use(); 
         
         lightPers->setEye(glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
         shadowProg->uniform("mVlight", lightPers->getViewMatrix());
@@ -195,6 +197,7 @@ void Pipeline::deferredShade() {
         // each mesh has a different shadow map
         for (int i = 0; i < meshes.size(); ++i) {          
             shadowProg->uniform("mM", transMatVec[idToName[i]]);
+            // prog->uniform("mM",transMatVec[i]);
             meshes[i]->drawElements();
         }
         shadowProg->unuse();
