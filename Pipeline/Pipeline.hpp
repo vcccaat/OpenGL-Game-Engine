@@ -135,11 +135,12 @@ private:
     /* map a mesh's index to mesh's material index */
     std::vector<int> meshIndToMaterialInd;
 
+    /* transform camera pos to world space */
     glm::mat4 camTransMat;
     
-
     /* map a node's name to node's animation */
     std::map<std::string, NodeAnimate> animationOfName;
+
     double curTime;
     double startTime;
     double totalTime;
