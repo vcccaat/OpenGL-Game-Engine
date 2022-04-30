@@ -12,6 +12,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <assimp/scene.h>
 #include <assimp/anim.h>
 
@@ -36,9 +37,9 @@ namespace RTUtil {
         return glm::vec4(c.r, c.g, c.b, c.a);
     }
 
-    // inline glm::quat a2g(const aiQuaternion &q) {
-    //     return glm::quat(q.w, q.x, q.y, q.z);
-    // }
+    inline glm::quat a2g(const aiQuaternion &q) {
+        return glm::quat(q.w, q.x, q.y, q.z);
+    }
 
     inline glm::mat3 a2g(const aiMatrix3x3 &m) {
         return glm::mat3(

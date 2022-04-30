@@ -27,6 +27,17 @@ namespace glm {
     }
 
     /*
+     * An output operator for GLM quaternion types, suitable for debugging output.
+     */
+    template<class T>
+    std::ostream &operator <<(std::ostream &ost, const glm::tquat<T> &q) {
+        ost << "[ ";
+        for (int i = 0; i < 4; i++)
+            ost << +q[i] << " ";   // unary + hack to ensure numeric output even for char
+        return ost << "]";
+    }
+
+    /*
      * An output operator for GLM matrix types, suitable for debugging output.
      */
     template<int N, int M, class T, glm::qualifier Q>
