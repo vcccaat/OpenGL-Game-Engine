@@ -109,7 +109,7 @@ glm::mat4 getInterpolateMat(NodeAnimate node, float t) {
     return translation * rotation * scale;
 }
 
-void Pipeline::traverseTree(aiNode* node, glm::mat4 transMat, float t) {
+void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat, float t) {
     // find node has a mesh, and use nodename to find the animation of this node
     if (node != NULL){
         std::string name = node->mName.C_Str();
@@ -121,11 +121,9 @@ void Pipeline::traverseTree(aiNode* node, glm::mat4 transMat, float t) {
 
             // if this animation node has mesh, update mesh's model matrix
             if (node->mNumMeshes > 0 ) {
-                // std::cout << name << " find \n";   
                 for (int i = 0; i < node->mNumMeshes; ++i) {
-                    std::string meshName = idToName[i];
-                    transMatVec[meshName] = transMat;    
-                    // transMatVec[i] = transMat;
+                    aiMesh* mesh = obj->mMeshes[node->mMeshes[i]];
+                    transMatVec[mesh->mName.C_Str()] = transMat;    
                 }
             }
         }
@@ -133,7 +131,7 @@ void Pipeline::traverseTree(aiNode* node, glm::mat4 transMat, float t) {
 
         
         for (int i = 0; i < node->mNumChildren; ++i) {
-            traverseTree(node->mChildren[i],transMat, t);
+            traverseTree(obj, node->mChildren[i],transMat, t);
         }
         }
 

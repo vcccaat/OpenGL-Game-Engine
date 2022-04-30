@@ -70,32 +70,30 @@ public:
     std::vector<KeyframePos> keyframePos;
     std::vector<KeyframeRot> keyframeRot;
     std::vector<KeyframeScale> keyframeScale;
-    // std::map<float, Keyframe> keyframes;	
 };
-
-// class Node {
-// public:
-//     int mNumMeshes;
-//     std::String mName;
-// };
 
 class Pipeline : public nanogui::Screen {
 public:
     Pipeline(std::string path, float windowWidth, float windowHeight);
-
     std::string GlobalPath;
+
+    /* init scene, lights, materials, add mesh to scene */
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
-    std::vector<Material> parseMats(const aiScene* scene);
+    std::vector<Material> parseMaterials(const aiScene* scene);
     std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene);
     void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, glm::mat4 transmat);
     void addMeshToScene( aiMesh* msh, glm::mat4 transmat);
 
-    void traverseTree(aiNode* node, glm::mat4 transMat, float t);
+    /* traverse node to update model matrix in animation loop */
+    void traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat, float t);
 
+    /* camera controls */
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers) override;
     virtual bool mouse_button_event(const nanogui::Vector2i &p, int button, bool down, int modifiers) override;
     virtual bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel, int button, int modifiers) override;
     virtual bool scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override;
+    
+    /* shading */
     virtual void forwardShade();
     virtual void deferredShade();
     virtual void draw_contents() override;
@@ -130,7 +128,6 @@ private:
     because when we read animation node, they might
     appear as different order of mesh node  */
     std::map<std::string, glm::mat4> transMatVec;
-    // std::vector<glm::mat4> transMatVec;
 
     /* map a mesh's index to mesh's name */
     std::vector<std::string> idToName;

@@ -121,7 +121,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
 
     // Add default material for animation
     if (obj->mNumMaterials > 0){
-        materials = parseMats(obj);
+        materials = parseMaterials(obj);
     }
     else{
         Material m1 = Material(glm::vec3(0.2,0.31,0.46));
@@ -178,7 +178,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
 
 }
 
-std::vector<Material> Pipeline::parseMats(const aiScene* scene) {
+std::vector<Material> Pipeline::parseMaterials(const aiScene* scene) {
     std::vector<Material> mats = {};
     for (int i = 0; i < scene->mNumMaterials; ++i) {
         Material m = Material();
@@ -422,7 +422,7 @@ void Pipeline::draw_contents() {
 
     // if the scene has animation, traverse the tree to update TRS
     if (animationOfName.size() > 0){
-        traverseTree(obj->mRootNode, glm::mat4(1.f), t);
+        traverseTree(obj, obj->mRootNode, glm::mat4(1.f), t);
     }
     
 
