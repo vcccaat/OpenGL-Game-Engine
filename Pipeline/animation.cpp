@@ -46,7 +46,7 @@ glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
     KeyframeRot keyframe1;
     KeyframeRot keyframe2;
     // default not rotate
-    glm::quat r = glm::quat(kfs[0].rot.w,kfs[0].rot.x,kfs[0].rot.y,kfs[0].rot.z );
+    glm::quat r = RTUtil::a2g(kfs[0].rot);
     float tPortion;
     
     if (kfs.size() == 1) {
@@ -58,7 +58,7 @@ glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
         else {
             tPortion = t/kfs[0].time;
             glm::quat r1 = glm::quat(0.,0.,0.,0.);
-            glm::quat r2 = glm::quat(kfs[0].rot.w,kfs[0].rot.x,kfs[0].rot.y,kfs[0].rot.z );
+            glm::quat r2 = RTUtil::a2g(kfs[0].rot);
             r = glm::mix(r1,r2,tPortion);
         }    
     }
@@ -75,8 +75,8 @@ glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
                 keyframe1 = kfs[i-1];
                 keyframe2 = kfs[i];
                 tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
-                glm::quat r1 = glm::quat(keyframe1.rot.w,keyframe1.rot.x,keyframe1.rot.y,keyframe1.rot.z );
-                glm::quat r2 = glm::quat(keyframe2.rot.w,keyframe2.rot.x,keyframe2.rot.y,keyframe2.rot.z );
+                glm::quat r1 = RTUtil::a2g(keyframe1.rot);
+                glm::quat r2 = RTUtil::a2g(keyframe2.rot);
                 // printf(": %f, %f, %f, %f\n" , r1.x , r1.y , r1.z,r1.w ) ;
                 // printf(": %f, %f, %f, %f\n" , r2.x , r2.y , r2.z,r2.w ) ;
                 r = glm::mix(r1,r2,tPortion);
