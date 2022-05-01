@@ -295,11 +295,17 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
         if (msh->HasBones()){
             std::vector<int> boneIdsVec;
             std::vector<float> boneWeightsVec;
-            for (int numBone = 0; numBone < boneInfoMap[i].size(); numBone++){
+            int numBone = 0;
+            while(numBone < boneInfoMap[i].size()) {
                 boneIdsVec.push_back(boneInfoMap[i][numBone].boneId);
                 boneWeightsVec.push_back(boneInfoMap[i][numBone].weight);
+                numBone++;
             }
-            boneIds[curMesh].push_back(glm::ivec4(boneIdsVec[0],boneIdsVec[1],boneIdsVec[2],boneIdsVec[3]));
+            for (int numBone2 = numBone; numBone2 < 4; numBone2++) {
+                boneIdsVec.push_back(0);
+                boneWeightsVec.push_back(0.f);
+            }
+            boneIds[curMesh].push_back(glm::ivec4(boneIdsVec[0], boneIdsVec[1], boneIdsVec[2], boneIdsVec[3]));
             boneWts[curMesh].push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
         }
     }
