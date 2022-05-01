@@ -127,7 +127,7 @@ std::vector<Light> Pipeline::parseLights(aiNode* rootNode, const aiScene* scene)
 
 void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
     transMatVec = {};
     meshIndToMaterialInd = {};
@@ -143,6 +143,8 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
         meshes[i].reset(new GLWrap::Mesh());
         meshes[i]->setAttribute(0, positions[i]);
         meshes[i]->setAttribute(1, normals[i]);
+        meshes[i]->setAttribute(2, boneIds[i]);
+        meshes[i]->setAttribute(3, boneWts[i]);
         meshes[i]->setIndices(indices[i], GL_TRIANGLES);
         }
 
@@ -266,6 +268,8 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 
     int curMesh = transMatVec.size();
     boneInfoMap = {};
+    boneIds.push_back({});
+    boneWts.push_back({});
     positions.push_back({});
     indices.push_back({});
     normals.push_back({});
@@ -287,16 +291,16 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 
         // each vertex can be influenced by up to 4 bones
         // get bone's index and weight by vertex index
-        // boneInfoMap stores up to 4 bone indices for each vertex 
+        // boneInfoMap stores up to 4 bone indices for each vertex
         if (msh->HasBones()){
             std::vector<int> boneIdsVec;
             std::vector<float> boneWeightsVec;
-            for (int numBone = 0; numBone < MAX_BONE_INFLUENCE; numBone++){
+            for (int numBone = 0; numBone < boneInfoMap[i].size(); numBone++){
                 boneIdsVec.push_back(boneInfoMap[i][numBone].boneId);
                 boneWeightsVec.push_back(boneInfoMap[i][numBone].weight);
             }
-            boneIds.push_back(glm::ivec4(boneIdsVec[0],boneIdsVec[1],boneIdsVec[2],boneIdsVec[3]));
-            boneWts.push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
+            boneIds[curMesh].push_back(glm::ivec4(boneIdsVec[0],boneIdsVec[1],boneIdsVec[2],boneIdsVec[3]));
+            boneWts[curMesh].push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
         }
     }
     
@@ -352,7 +356,7 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
-        { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },
+        { GL_VERTEX_SHADER, resourcePath + "shaders/animation.vert" },  //min
         // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
         //  { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/microfacet.frag" }
@@ -482,7 +486,7 @@ void Pipeline::draw_contents() {
     curTime = getSecondsSinceEpoch();
     float t = std::fmod(curTime - startTime, totalTime);
     Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
     // if the scene has animation, traverse the tree to update TRS
     if (animationOfName.size() > 0){

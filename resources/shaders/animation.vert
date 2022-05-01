@@ -23,8 +23,8 @@ void main() {
         if(boneIds[i] == -1) 
             continue;
         vec4 localPosition = boneM[boneIds[i]] * vec4(position,1.0);
-        weightSumPos += localPosition * weights[i];
-        weightSumNorm += boneM[boneIds[i]]  * vec4(normal,1.0) * weights[i];
+        weightSumPos += localPosition * boneWts[i];
+        weightSumNorm += boneM[boneIds[i]]  * vec4(normal,0.0) * boneWts[i];
     }
 
 

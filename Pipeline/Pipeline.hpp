@@ -138,8 +138,8 @@ private:
     std::map<std::string, glm::mat4> transMatVec;
 
     /* each vertice in a mesh influenced by up to four bones under certain weights */  
-    std::vector<glm::ivec4> boneIds;
-    std::vector<glm::vec4> boneWts;
+    std::vector<std::vector<glm::ivec4>> boneIds;
+    std::vector<std::vector<glm::vec4>> boneWts;
 
     /* map a vertex index to a list of bones that influence the vertex */
     std::map<int, std::vector<BoneInfo>> boneInfoMap;
