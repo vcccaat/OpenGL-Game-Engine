@@ -44,6 +44,8 @@ glm::mat4 getTransMatrix(aiNode* rootNode, aiString nodeName) {
     return cmt;
 }
 
+int MAX_BONE_INFLUENCE = 4;
+
 
 /**************************************** MATERIAL AND LIGHT ****************************************/
 
@@ -129,6 +131,8 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
 
     transMatVec = {};
     meshIndToMaterialInd = {};
+    boneIds = {};
+    boneWts = {};
 
     // add mesh to scene and store meshes' model matrix
     traverseNodeHierarchy( obj, obj->mRootNode, glm::mat4(1.f));
@@ -205,24 +209,24 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
                 KeyframePos k;
                 k.time = (float) curChannel->mPositionKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
                 k.pos = RTUtil::a2g(curChannel->mPositionKeys[j].mValue);
-                std::cout << nodeName<< "translation \n";
-                printf("%f: %f %f %f\n",k.time, k.pos.x,k.pos.y,k.pos.z);
+                // std::cout << nodeName<< "translation \n";
+                // printf("%f: %f %f %f\n",k.time, k.pos.x,k.pos.y,k.pos.z);
                 na.keyframePos.push_back(k);
             }
             for (int j = 0; j < curChannel->mNumRotationKeys; ++j) {
                 KeyframeRot k;
                 k.time = (float) curChannel->mRotationKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
                 k.rot = curChannel->mRotationKeys[j].mValue;
-                std::cout << nodeName<< "rotation \n";
-                printf("%f : %f, %f, %f, %f\n" ,k.time, k.rot.w,  k.rot.x , k.rot.y , k.rot.z) ;
+                // std::cout << nodeName<< "rotation \n";
+                // printf("%f : %f, %f, %f, %f\n" ,k.time, k.rot.w,  k.rot.x , k.rot.y , k.rot.z) ;
                 na.keyframeRot.push_back(k);
             }        
             for (int j = 0; j < curChannel->mNumScalingKeys; ++j) {
                 KeyframeScale k;
                 k.time = (float) curChannel->mScalingKeys[j].mTime / (float) obj->mAnimations[0]->mTicksPerSecond;
                 k.scale = RTUtil::a2g(curChannel->mScalingKeys[j].mValue);
-                std::cout << nodeName<< "scale \n";
-                printf("%f: %f %f %f\n",k.time, k.scale.x,k.scale.y,k.scale.z);
+                // std::cout << nodeName<< "scale \n";
+                // printf("%f: %f %f %f\n",k.time, k.scale.x,k.scale.y,k.scale.z);
                 na.keyframeScale.push_back(k);
             }
             animationOfName.insert({ nodeName, na });
@@ -257,22 +261,43 @@ void Pipeline::traverseNodeHierarchy( const aiScene* obj, aiNode* cur, glm::mat4
 }
 }
 
+/* parse mesh to vector of positions, normals, bones */
 void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 
-    // store mesh vertices 
     int curMesh = transMatVec.size();
+    boneInfoMap = {};
     positions.push_back({});
     indices.push_back({});
     normals.push_back({});
 
+    // extract bones in mesh
+    // map [vertex index: vector of bone indices and weights]
+    if (msh->HasBones()){
+        // extractBonesforVertices(msh);
+    }
+
+    // store position and normal of all vertices in a mesh
     for (int i = 0; i < msh->mNumVertices; ++i) {
         glm::vec3 t = reinterpret_cast<glm::vec3&>(msh->mVertices[i]);
         glm::vec3 pos = glm::vec3(glm::vec4(t,1.0)); 
         positions[curMesh].push_back(pos);
  
-        // access normal of each vertice
         glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
         normals[curMesh].push_back(n);
+
+        // each vertex can be influenced by up to 4 bones
+        // get bone's index and weight by vertex index
+        // boneInfoMap stores up to 4 bone indices for each vertex 
+        if (msh->HasBones()){
+            // std::vector<int> boneIdsVec;
+            // std::vector<float> boneWeightsVec;
+            // for (int numBone = 0; numBone < MAX_BONE_INFLUENCE; numBone++){
+            //     boneIdsVec.push_back(boneInfoMap[i][numBone].boneId);
+            //     boneWeightsVec.push_back(boneInfoMap[i][numBone].weight);
+            // }
+            // boneIds.push_back(glm::ivec4(boneIdsVec[0],boneIdsVec[1],boneIdsVec[2],boneIdsVec[3]));
+            // boneWts.push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
+        }
     }
     
     // store mesh indices
@@ -281,11 +306,38 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
             indices[curMesh].push_back(reinterpret_cast<uint32_t&>(msh->mFaces[i].mIndices[j]));
         }
     }
+
+
     transMatVec.insert({ msh->mName.C_Str(), transmat });
     meshIndToMaterialInd.push_back(msh->mMaterialIndex);
 }
 
 
+void Pipeline::extractBonesforVertices(aiMesh* msh){
+    // parse every bones in a mesh
+    // haven't handled: a different mesh also has the same bone
+    for (int i = 0; i < msh->mNumBones; ++i) {
+        aiBone* bone = msh->mBones[i];
+        // get all vertices influenced by a bone
+        for (int vertexIndex = 0; i < bone->mNumWeights; i++){
+            int vertexId = bone->mWeights[vertexIndex].mVertexId;
+            float weight = bone->mWeights[vertexIndex].mWeight;
+            BoneInfo b;
+            b.boneId = i;
+            b.weight = weight;
+            // if this vertex is not visited before, create a new vector 
+            if (boneInfoMap.find(vertexId) == boneInfoMap.end()){
+                boneInfoMap.insert({vertexId,{}});
+            } 
+            // len of BoneInfo might more than 4
+            boneInfoMap[vertexId].push_back(b);
+            
+        } 
+
+         // TODO: compute bone transformation using each bone's mOffsetMatrix
+    }
+
+}
 
 /**************************************** PIPELINE CONSTRUCTOR  ****************************************/
 

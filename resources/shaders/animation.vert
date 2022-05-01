@@ -3,7 +3,7 @@
 uniform mat4 mM;  // Model matrix
 uniform mat4 mV;  // View matrix
 uniform mat4 mP;  // Projection matrix
-uniform mat4 bondM; // bond matrices
+uniform mat4 boneM; // bone matrices
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -22,9 +22,9 @@ void main() {
     for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++){
         if(boneIds[i] == -1) 
             continue;
-        vec4 localPosition = bondM[boneIds[i]] * vec4(position,1.0);
+        vec4 localPosition = boneM[boneIds[i]] * vec4(position,1.0);
         weightSumPos += localPosition * weights[i];
-        weightSumNorm += bondM[boneIds[i]]  * vec4(normal,1.0) * weights[i];
+        weightSumNorm += boneM[boneIds[i]]  * vec4(normal,1.0) * weights[i];
     }
 
 

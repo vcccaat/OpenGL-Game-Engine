@@ -47,6 +47,12 @@ public:
     Light();
 };
 
+struct BoneInfo {
+public:
+    int boneId;
+    float weight;
+};
+
 struct KeyframePos {
 public:
 	float time;
@@ -77,12 +83,14 @@ public:
     Pipeline(std::string path, float windowWidth, float windowHeight);
     std::string GlobalPath;
 
-    /* init scene, lights, materials, add mesh to scene */
+    /* init scene, lights, materials, bones, add mesh to scene */
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
     std::vector<Material> parseMaterials(const aiScene* scene);
     std::vector<Light> parseLights(aiNode* rootNode, const aiScene* scene);
     void traverseNodeHierarchy(const aiScene* obj, aiNode* cur, glm::mat4 transmat);
+    void extractBonesforVertices(aiMesh* msh);
     void addMeshToScene( aiMesh* msh, glm::mat4 transmat);
+    
 
     /* traverse node to update model matrix in animation loop */
     void traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat, float t);
@@ -128,6 +136,17 @@ private:
     because when we read animation node, they might
     appear as different order of mesh node  */
     std::map<std::string, glm::mat4> transMatVec;
+
+    /* each vertice in a mesh influenced by up to four bones under certain weights */  
+    std::vector<glm::ivec4> boneIds;
+    std::vector<glm::vec4> boneWts;
+
+    /* map a vertex index to a list of bones that influence the vertex */
+    std::map<int, std::vector<BoneInfo>> boneInfoMap;
+    // std::map<int, std::map<float, int>> boneInfoMap; map is sorted, can get the largest weight 
+
+    /* a list of bone transform matrix influenced by each mesh */    
+    std::vector<std::vector<glm::mat4>> boneTrans;
 
     /* map a mesh's index to mesh's name */
     std::vector<std::string> idToName;
