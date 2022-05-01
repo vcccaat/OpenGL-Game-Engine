@@ -273,7 +273,7 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
     // extract bones in mesh
     // map [vertex index: vector of bone indices and weights]
     if (msh->HasBones()){
-        // extractBonesforVertices(msh);
+        extractBonesforVertices(msh);
     }
 
     // store position and normal of all vertices in a mesh
@@ -289,14 +289,14 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
         // get bone's index and weight by vertex index
         // boneInfoMap stores up to 4 bone indices for each vertex 
         if (msh->HasBones()){
-            // std::vector<int> boneIdsVec;
-            // std::vector<float> boneWeightsVec;
-            // for (int numBone = 0; numBone < MAX_BONE_INFLUENCE; numBone++){
-            //     boneIdsVec.push_back(boneInfoMap[i][numBone].boneId);
-            //     boneWeightsVec.push_back(boneInfoMap[i][numBone].weight);
-            // }
-            // boneIds.push_back(glm::ivec4(boneIdsVec[0],boneIdsVec[1],boneIdsVec[2],boneIdsVec[3]));
-            // boneWts.push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
+            std::vector<int> boneIdsVec;
+            std::vector<float> boneWeightsVec;
+            for (int numBone = 0; numBone < MAX_BONE_INFLUENCE; numBone++){
+                boneIdsVec.push_back(boneInfoMap[i][numBone].boneId);
+                boneWeightsVec.push_back(boneInfoMap[i][numBone].weight);
+            }
+            boneIds.push_back(glm::ivec4(boneIdsVec[0],boneIdsVec[1],boneIdsVec[2],boneIdsVec[3]));
+            boneWts.push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
         }
     }
     
@@ -319,7 +319,7 @@ void Pipeline::extractBonesforVertices(aiMesh* msh){
     for (int i = 0; i < msh->mNumBones; ++i) {
         aiBone* bone = msh->mBones[i];
         // get all vertices influenced by a bone
-        for (int vertexIndex = 0; i < bone->mNumWeights; i++){
+        for (int vertexIndex = 0; vertexIndex < bone->mNumWeights; vertexIndex++){
             int vertexId = bone->mWeights[vertexIndex].mVertexId;
             float weight = bone->mWeights[vertexIndex].mWeight;
             BoneInfo b;
@@ -331,7 +331,6 @@ void Pipeline::extractBonesforVertices(aiMesh* msh){
             } 
             // len of BoneInfo might more than 4
             boneInfoMap[vertexId].push_back(b);
-            
         } 
 
          // TODO: compute bone transformation using each bone's mOffsetMatrix
