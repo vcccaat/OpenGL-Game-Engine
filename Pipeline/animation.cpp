@@ -23,8 +23,8 @@ glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
     }
     else{
         // case3: has more than one keyframes
-        for (int i = 0; i < kfs.size(); ++i){
-            if (t < kfs[i].time){
+        for (int i = 0; i < kfs.size(); ++i){ //TODO i should start at 1???
+            if (t < kfs[i].time && i != 0){ //TODO temp fix here
                 keyframe1 = kfs[i-1];
                 keyframe2 = kfs[i];
                 tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
