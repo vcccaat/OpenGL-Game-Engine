@@ -132,7 +132,7 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
                         glm::mat4 boneMat = RTUtil::a2g(bone->mOffsetMatrix);
                         glm::mat4 globalBoneMat = transMat * boneMat;
                         if (boneTrans.find(meshName) == boneTrans.end()) {
-                            boneTrans.insert(meshName, {});
+                            boneTrans.insert({ meshName, {} });
                         }
                         boneTrans[meshName].push_back(globalBoneMat);
                     }
