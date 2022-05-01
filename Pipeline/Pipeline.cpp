@@ -337,7 +337,6 @@ void Pipeline::extractBonesforVertices(aiMesh* msh){
             boneInfoMap[vertexId].push_back(b);
         } 
 
-         // TODO: compute bone transformation using each bone's mOffsetMatrix
     }
 
 }
@@ -490,8 +489,11 @@ void Pipeline::draw_contents() {
 
     // if the scene has animation, traverse the tree to update TRS
     if (animationOfName.size() > 0){
+        boneTrans.clear();
         traverseTree(obj, obj->mRootNode, glm::mat4(1.f), t);
     }
+
+    
 
     forwardShade();
     return;

@@ -40,7 +40,10 @@ void Pipeline::forwardShade() {
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
         prog->uniform("mM", transMatVec[idToName[i]]);
-        
+        for (int bone =0; bone < boneTrans[idToName[i]].size(); bone++){
+            prog->uniform("boneM"+std::to_string(i), boneTrans[idToName[i]][bone]);
+        }
+
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
@@ -98,7 +101,7 @@ void Pipeline::deferredShade() {
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
         gProg->uniform("mM", transMatVec[idToName[i]]);
-        
+
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);

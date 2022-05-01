@@ -146,7 +146,7 @@ private:
     // std::map<int, std::map<float, int>> boneInfoMap; map is sorted, can get the largest weight 
 
     /* a list of bone transform matrix influenced by each mesh */    
-    std::vector<std::vector<glm::mat4>> boneTrans;
+    std::map<std::string, std::vector<glm::mat4>> boneTrans;
 
     /* map a mesh's index to mesh's name */
     std::vector<std::string> idToName;

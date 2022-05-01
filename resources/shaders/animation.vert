@@ -3,7 +3,10 @@
 uniform mat4 mM;  // Model matrix
 uniform mat4 mV;  // View matrix
 uniform mat4 mP;  // Projection matrix
-uniform mat4 boneM; // bone matrices
+uniform mat4 boneM0; // bone matrices
+uniform mat4 boneM1; // bone matrices
+uniform mat4 boneM2; // bone matrices
+uniform mat4 boneM3; // bone matrices
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -14,6 +17,8 @@ out vec3 vPosition;  // vertex position in eye space
 out vec3 vNormal; // vertex normal in eye space
 
 const int MAX_BONE_INFLUENCE = 4;
+
+
 
 void main() {
     vec4 weightSumPos = vec4(0.);
