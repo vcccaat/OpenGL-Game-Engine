@@ -25,27 +25,24 @@ void main() {
     vec4 weightSumNorm = vec4(0.);
     mat4 boneM;
 
-    for(int i = 0 ; i < MAX_BONE_INFLUENCE; i++){
+    for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+    
         if(boneIds[i] == -1) {
             continue;
 		}
-		switch(i) {
-		    case 0:
-	            boneM = boneM0;
-                break;
-			case 1:
-	            boneM = boneM1;
-                break;
-			case 2:
-	            boneM = boneM2;
-                break;
-            case 3:
-	            boneM = boneM3;
-                break;
-        }		
+		if(i == 0) {
+		    boneM = boneM0;
+		} else if(i == 1) {
+		    boneM = boneM1;
+		} else if(i == 2) {
+			boneM = boneM2;
+		} else if(i == 3) {
+			boneM = boneM3;
+		}
+        
         vec4 localPosition = boneM[boneIds[i]] * vec4(position,1.0);
         weightSumPos += localPosition * boneWts[i];
-        weightSumNorm += boneM[boneIds[i]]  * vec4(normal,0.0) * boneWts[i];
+        weightSumNorm += boneM[boneIds[i]] * vec4(normal,0.0) * boneWts[i];
     }
 
     vPosition = (mV * mM * weightSumPos).xyz;

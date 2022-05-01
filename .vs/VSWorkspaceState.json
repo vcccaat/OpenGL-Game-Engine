@@ -3,10 +3,8 @@
     "",
     "\\Demo",
     "\\Pipeline",
-    "\\resources",
-    "\\resources\\scenes",
-    "\\resources\\shaders"
+    "\\resources"
   ],
-  "SelectedNode": "\\resources\\shaders\\animation.vert",
+  "SelectedNode": "\\CMakeLists.txt",
   "PreviewInSolutionExplorer": false
 }
