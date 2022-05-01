@@ -40,8 +40,13 @@ void Pipeline::forwardShade() {
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
         prog->uniform("mM", transMatVec[idToName[i]]);
-        for (int bone =0; bone < boneTrans[idToName[i]].size(); bone++){
+        int bone = 0;
+        while(bone < boneTrans[idToName[i]].size()) {
             prog->uniform("boneM"+std::to_string(i), boneTrans[idToName[i]][bone]);
+            bone++;
+        }
+        for (int bone2 = bone; bone2 < 4; bone2++) {
+            prog->uniform("boneM" + std::to_string(i), glm::mat4(1.f));
         }
 
         // Plug in materials

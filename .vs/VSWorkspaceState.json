@@ -4,8 +4,9 @@
     "\\Demo",
     "\\Pipeline",
     "\\resources",
+    "\\resources\\scenes",
     "\\resources\\shaders"
   ],
-  "SelectedNode": "\\CMakeLists.txt",
+  "SelectedNode": "\\resources\\shaders\\animation.vert",
   "PreviewInSolutionExplorer": false
 }

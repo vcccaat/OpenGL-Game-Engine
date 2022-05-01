@@ -124,29 +124,25 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
                 for (int i = 0; i < node->mNumMeshes; ++i) {
                     aiMesh* mesh = obj->mMeshes[node->mMeshes[i]];
                     std::string meshName = mesh->mName.C_Str();
-                    transMatVec[meshName] = transMat;  
+                    transMatVec[meshName] = transMat;
 
                     // compute bone matrix
-                     for (int j = 0; j < mesh->mNumBones; ++j) { 
+                    for (int j = 0; j < mesh->mNumBones; ++j) {
                         aiBone* bone = mesh->mBones[j];
                         glm::mat4 boneMat = RTUtil::a2g(bone->mOffsetMatrix);
                         glm::mat4 globalBoneMat = transMat * boneMat;
-                        if (boneTrans.find(meshName) == boneTrans.end()){
-                            boneTrans.insert(meshName,{});
+                        if (boneTrans.find(meshName) == boneTrans.end()) {
+                            boneTrans.insert(meshName, {});
                         }
                         boneTrans[meshName].push_back(globalBoneMat);
+                    }
                 }
             }
         }
 
-        
-
-        
-         
         for (int i = 0; i < node->mNumChildren; ++i) {
             traverseTree(obj, node->mChildren[i],transMat, t);
         }
-        }
-
     }
+}
 

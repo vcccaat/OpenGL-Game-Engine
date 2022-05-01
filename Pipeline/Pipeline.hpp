@@ -164,7 +164,8 @@ private:
     double startTime;
     double totalTime;
 
-    
+    /* Bone matrices */
+	std::vector<glm::mat4> boneMatrices;
 };
 
 
