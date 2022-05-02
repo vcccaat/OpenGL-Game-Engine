@@ -135,7 +135,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
     boneWts = {};
 
     // add mesh to scene and store meshes' model matrix
-    traverseNodeHierarchy( obj, obj->mRootNode, glm::mat4(1.f));
+    traverseNodeHierarchy(obj, obj->mRootNode, glm::mat4(1.f));
 
     // number of positions equal to number of meshes in the scene
     for (int i = 0; i < positions.size(); ++i) {
@@ -258,7 +258,7 @@ void Pipeline::traverseNodeHierarchy( const aiScene* obj, aiNode* cur, glm::mat4
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i) {
-            traverseNodeHierarchy( obj, cur->mChildren[i], transmat);
+            traverseNodeHierarchy(obj, cur->mChildren[i], transmat);
         }
 }
 }
@@ -302,11 +302,14 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
                 numBone++;
             }
             for (int numBone2 = numBone; numBone2 < 4; numBone2++) {
-                boneIdsVec.push_back(0);
-                boneWeightsVec.push_back(0.f);
+                boneIdsVec.push_back(-1);
+                boneWeightsVec.push_back(-1.f);
             }
             boneIds[curMesh].push_back(glm::ivec4(boneIdsVec[0], boneIdsVec[1], boneIdsVec[2], boneIdsVec[3]));
             boneWts[curMesh].push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
+        } else {
+			boneIds[curMesh].push_back(glm::ivec4(-1, -1, -1, -1));
+			boneWts[curMesh].push_back(glm::vec4(-1.f, -1.f, -1.f, -1.f));
         }
     }
     

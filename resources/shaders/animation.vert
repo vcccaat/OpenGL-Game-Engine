@@ -15,21 +15,18 @@ out vec3 vNormal; // vertex normal in eye space
 
 const int MAX_BONE_INFLUENCE = 4;
 
-
-
 void main() {
-    vec4 weightSumPos = vec4(0.);
-    vec4 weightSumNorm = vec4(0.);
+    vec4 weightSumPos = vec4(0.0);
+    vec4 weightSumNorm = vec4(0.0);
 
-    for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+    for(int i = 0; i < MAX_BONE_INFLUENCE; i++) {
     
         if(boneIds[i] == -1) {
             continue;
 		}
         
-        vec4 localPosition = boneM[i][boneIds[i]] * vec4(position,1.0);
-        weightSumPos += localPosition * boneWts[i];
-        weightSumNorm += boneM[i][boneIds[i]] * vec4(normal,0.0) * boneWts[i];
+        weightSumPos += boneM[i][boneIds[i]] * vec4(position, 1.0) * boneWts[i];
+        weightSumNorm += boneM[i][boneIds[i]] * vec4(normal, 0.0) * boneWts[i];
     }
 
     vPosition = (mV * mM * weightSumPos).xyz;
