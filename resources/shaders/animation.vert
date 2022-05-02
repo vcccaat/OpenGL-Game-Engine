@@ -22,6 +22,10 @@ void main() {
     for(int i = 0; i < MAX_BONE_INFLUENCE; i++) {
     
         if(boneIds[i] == -1) {
+		    if(i == 0) {
+			    //weightSumPos = vec4(position, 1.0);
+			    //weightSumNorm = vec4(normal, 0.0);
+			}
             continue;
 		}
         
