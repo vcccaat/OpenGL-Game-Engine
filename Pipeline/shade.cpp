@@ -35,7 +35,7 @@ void Pipeline::forwardShade() {
         if (lights[k].type == lights[k].POINT){
             prog->uniform("lightPos",glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
             prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power)); 
-        }       
+        }
     }
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
@@ -61,7 +61,7 @@ void Pipeline::forwardShade() {
             if(bone < boneTrans[idToName[i]].size()) {
                 boneMat = boneTrans[idToName[i]][bone];
 			}
-            prog->uniform("bones[" + std::to_string(bone) + "]", boneMat);
+            prog->uniform("boneM[" + std::to_string(bone) + "]", boneMat);
         }
 
         // Plug in materials
