@@ -316,8 +316,6 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 			boneWts[curMesh].push_back(glm::vec4(-1.f, -1.f, -1.f, -1.f));
         }
     }
-    printf("Length of lists: %i, %i, %i, %i\n", positions[curMesh].size(), normals[curMesh].size(), boneIds[curMesh].size(), boneWts[curMesh].size());
-    printf("-1 count: %i\n", negOneCt);
     
     // store mesh indices
     for (int i = 0; i < msh->mNumFaces; ++i) {

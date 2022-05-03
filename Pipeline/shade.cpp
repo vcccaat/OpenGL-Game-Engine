@@ -53,17 +53,29 @@ void Pipeline::forwardShade() {
     }
 
     // feed all bone's transMat into the shader
-    int MAX_BONES = 100;
-    int ind = 0;
+    int MAX_BONES = 4;
+    printf("\n\n\nNEW ANIMATION FRAME:\n");
     for (int boneIndex = 0; boneIndex < MAX_BONES; boneIndex++) {
-        glm::mat4 boneMat = glm::mat4(1.);
+        /*glm::mat4 boneMat = glm::mat4(1.);
         if (boneIndex < boneTrans.size()){
             boneMat = boneTrans[boneIndex];
             ind++;
-        }
-        prog->uniform("boneM[" + std::to_string(boneIndex) + "]", boneMat);
+            if (ind == 4) {
+                printf("BREAK\n");
+                break;
+            }
+        }*/
+		//Print all necessary information
+		printf("Bone %d:\n", boneIndex);
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				printf("%f ", boneTrans[boneIndex][i][j]);
+				}
+			printf("\n");
+			}
+		printf("\n");
+        prog->uniform("boneM[" + std::to_string(boneIndex) + "]", boneTrans[boneIndex]);
     }
-    printf("Total Matrices: %i\n", ind);
     
 
     prog->unuse();
