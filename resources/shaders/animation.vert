@@ -3,7 +3,8 @@
 uniform mat4 mM;  // Model matrix
 uniform mat4 mV;  // View matrix
 uniform mat4 mP;  // Projection matrix
-uniform mat4 boneM[4]; // Bone matrices
+const int MAX_BONES = 100;
+uniform mat4 boneM[MAX_BONES]; // Bone matrices
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -27,10 +28,10 @@ void main() {
         weightSumNorm += boneM[boneIds[i]] * vec4(normal, 0.0) * boneWts[i];
     }
 
-    vPosition = (mV * mM * vec4(position, 1.0)).xyz;
-    vNormal = normalize(mV * mM * vec4(normal, 0.0)).xyz;
-    // vPosition = (mV * mM * weightSumPos).xyz;
-    // vNormal = normalize(mV * mM * weightSumNorm).xyz;
+    // vPosition = (mV * mM * vec4(position, 1.0)).xyz;
+    // vNormal = normalize(mV * mM * vec4(normal, 0.0)).xyz;
+    vPosition = (mV * mM * weightSumPos).xyz;
+    vNormal = normalize(mV * mM * weightSumNorm).xyz;
     gl_Position = mP * vec4(vPosition, 1.0);
    
 }
