@@ -139,7 +139,6 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
         for (int i = 0; i < node->mNumChildren; ++i) {
             traverseTree(obj, node->mChildren[i],transMat, t);
         }
-    
     }
 }
 

@@ -4,8 +4,9 @@
     "\\Demo",
     "\\Pipeline",
     "\\resources",
+    "\\resources\\scenes",
     "\\resources\\shaders"
   ],
-  "SelectedNode": "\\CMakeLists.txt",
+  "SelectedNode": "\\resources\\scenes\\mosh_cmu_8806.glb",
   "PreviewInSolutionExplorer": false
 }
