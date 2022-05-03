@@ -3,7 +3,8 @@
     "",
     "\\Demo",
     "\\Pipeline",
-    "\\resources"
+    "\\resources",
+    "\\resources\\shaders"
   ],
   "SelectedNode": "\\CMakeLists.txt",
   "PreviewInSolutionExplorer": false
