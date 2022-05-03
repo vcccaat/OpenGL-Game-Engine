@@ -53,10 +53,15 @@ void Pipeline::forwardShade() {
     }
 
     // feed all bone's transMat into the shader
-    for (int boneIndex = 0; boneIndex < boneTrans.size(); boneIndex++) {
-        glm::mat4 boneMat = boneTrans[boneIndex];
+    int MAX_BONES = 100;
+    for (int boneIndex = 0; boneIndex < MAX_BONES; boneIndex++) {
+        glm::mat4 boneMat = glm::mat4(1.);
+        if (boneIndex < boneTrans.size()){
+            boneMat = boneTrans[boneIndex];
+        }
         prog->uniform("boneM[" + std::to_string(boneIndex) + "]", boneMat);
     }
+    
 
     prog->unuse();
     fbo->unbind();

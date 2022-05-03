@@ -370,8 +370,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -450,8 +450,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));
