@@ -3,8 +3,8 @@
 uniform mat4 mM;  // Model matrix
 uniform mat4 mV;  // View matrix
 uniform mat4 mP;  // Projection matrix
-//const int MAX_BONES = 100;
-uniform mat4 boneM[4]; // Bone matrices
+const int MAX_BONES = 100;
+uniform mat4 boneM[MAX_BONES]; // Bone matrices
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
