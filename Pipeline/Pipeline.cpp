@@ -131,6 +131,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
 
     transMatVec = {};
     meshIndToMaterialInd = {};
+    boneTransMap = {};
     boneIds = {};
     boneWts = {};
 
@@ -267,7 +268,6 @@ void Pipeline::traverseNodeHierarchy( const aiScene* obj, aiNode* cur, glm::mat4
 void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 
     int curMesh = transMatVec.size();
-    boneTransMap = {};
     boneIds.push_back({});
     boneWts.push_back({});
     positions.push_back({});
@@ -295,19 +295,19 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
             int numBone = 0;
             
             // vertexBoneMap stores up to 4 bone indices for each vertex
-            while(numBone < vertexBoneMap[i].size()) {
-                boneIdsVec.push_back(vertexBoneMap[i][numBone].boneId);
-                boneWeightsVec.push_back(vertexBoneMap[i][numBone].weight);
-                numBone++;
-            }
-            for (int numBone2 = numBone; numBone2 < 4; numBone2++) {
-                boneIdsVec.push_back(-1);
-                boneWeightsVec.push_back(-1.f);
+            for (int bone=0; bone < 4; bone++){
+                if (bone < vertexBoneMap[i].size()){
+                    boneIdsVec.push_back(vertexBoneMap[i][bone].boneId);
+                    boneWeightsVec.push_back(vertexBoneMap[i][bone].weight);
+                }else{
+                    boneIdsVec.push_back(-1);
+                    boneWeightsVec.push_back(-1.f);
+                }
             }
             boneIds[curMesh].push_back(glm::ivec4(boneIdsVec[0], boneIdsVec[1], boneIdsVec[2], boneIdsVec[3]));
             boneWts[curMesh].push_back(glm::vec4(boneWeightsVec[0],boneWeightsVec[1],boneWeightsVec[2],boneWeightsVec[3]));
-        } else {
-			boneIds[curMesh].push_back(glm::ivec4(-1, -1, -1, -1));
+        }else {
+            boneIds[curMesh].push_back(glm::ivec4(-1, -1, -1, -1));
 			boneWts[curMesh].push_back(glm::vec4(-1.f, -1.f, -1.f, -1.f));
         }
     }
@@ -344,7 +344,7 @@ void Pipeline::extractBonesforVertices(aiMesh* msh){
             m.boneId = i;
             m.mat = RTUtil::a2g(bone->mOffsetMatrix);
             boneTransMap.insert({boneName,m});
-            std::cout << "bone name " << boneName << std::endl;
+            // std::cout << "bone name " << boneName << std::endl;
 
             // if this vertex is not visited before, create a new vector 
             if (vertexBoneMap.find(vertexId) == vertexBoneMap.end()){

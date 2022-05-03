@@ -3,7 +3,7 @@
 #include "Pipeline.hpp"
 #include <glm/gtx/quaternion.hpp>
 #include <RTUtil/conversions.hpp>
-// #include "Helper.hpp"
+#include "Helper.hpp"
 
 glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
     KeyframePos keyframe1;
@@ -129,7 +129,6 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
             }
          }
         // if this node has bone, update boneTrans
-        std::cout << "nodeName " << nodeName << std::endl;
         if (boneTransMap.find(nodeName) != boneTransMap.end()){
             int boneIndex = boneTransMap[nodeName].boneId;
             glm::mat4 offsetMat = boneTransMap[nodeName].mat;

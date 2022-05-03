@@ -11,7 +11,7 @@
 #include "RTUtil/frame.hpp"
 #include "RTUtil/Sky.hpp"
 #include <glm/gtx/quaternion.hpp>
-#include "Helper.hpp"
+// #include "Helper.hpp"
 
 void Pipeline::forwardShade() {
     GLWrap::checkGLError("drawContents start");
