@@ -47,10 +47,16 @@ public:
     Light();
 };
 
-struct BoneInfo {
+struct BoneWeight {
 public:
     int boneId;
     float weight;
+};
+
+struct BoneMat {
+public:
+    int boneId;
+    glm::mat4 mat;
 };
 
 struct KeyframePos {
@@ -142,11 +148,14 @@ private:
     std::vector<std::vector<glm::vec4>> boneWts;
 
     /* map a vertex index to a list of bones that influence the vertex */
-    std::map<int, std::vector<BoneInfo>> boneInfoMap;
+    std::map<int, std::vector<BoneWeight>> vertexBoneMap;
+
+    /* map a bone name to bone trans matrix */
+    std::map<std::string, BoneMat> boneTransMap;
     // std::map<int, std::map<float, int>> boneInfoMap; map is sorted, can get the largest weight 
 
-    /* a list of bone transform matrix influenced by each mesh */    
-    std::map<std::string, std::vector<glm::mat4>> boneTrans;
+    /*  map a bone's index to its transformation matrix */
+    std::vector<glm::mat4> boneTrans;
 
     /* map a mesh's index to mesh's name */
     std::vector<std::string> idToName;

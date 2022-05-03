@@ -11,7 +11,7 @@
 #include "RTUtil/frame.hpp"
 #include "RTUtil/Sky.hpp"
 #include <glm/gtx/quaternion.hpp>
-
+#include "Helper.hpp"
 
 void Pipeline::forwardShade() {
     GLWrap::checkGLError("drawContents start");
@@ -40,29 +40,6 @@ void Pipeline::forwardShade() {
     for (int i = 0; i < meshes.size(); ++i) {
         // Plug in mesh
         prog->uniform("mM", transMatVec[idToName[i]]);
-        int bone = 0;
-		
-        // Set an array of mat4 uniforms
-		/*for (auto& b : bones[idToName[i]]) {
-			prog->uniform("bones[" + std::to_string(bone) + "]", b);
-			bone++;
-		}
-		
-        while(bone < boneTrans[idToName[i]].size()) {
-            prog->uniform("boneM"+std::to_string(i), boneTrans[idToName[i]][bone]);
-            bone++;
-        }
-        for (int bone2 = bone; bone2 < 4; bone2++) {
-            prog->uniform("boneM" + std::to_string(i), glm::mat4(1.f));
-        }*/
-
-        for (int bone = 0; bone < 4; bone++) {
-            auto& boneMat = glm::mat4(1.f);
-            if(bone < boneTrans[idToName[i]].size()) {
-                boneMat = boneTrans[idToName[i]][bone];
-			}
-            prog->uniform("boneM[" + std::to_string(bone) + "]", boneMat);
-        }
 
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
@@ -73,6 +50,12 @@ void Pipeline::forwardShade() {
         // Draw mesh
         meshes[i]->drawElements();
 
+    }
+
+    // feed all bone's transMat into the shader
+    for (int boneIndex = 0; boneIndex < boneTrans.size(); boneIndex++) {
+        glm::mat4 boneMat = boneTrans[boneIndex];
+        prog->uniform("boneM[" + std::to_string(boneIndex) + "]", boneMat);
     }
 
     prog->unuse();

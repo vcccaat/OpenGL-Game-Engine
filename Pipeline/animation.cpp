@@ -3,7 +3,7 @@
 #include "Pipeline.hpp"
 #include <glm/gtx/quaternion.hpp>
 #include <RTUtil/conversions.hpp>
-
+// #include "Helper.hpp"
 
 glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
     KeyframePos keyframe1;
@@ -112,37 +112,35 @@ glm::mat4 getInterpolateMat(NodeAnimate node, float t) {
 void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat, float t) {
     // find node has a mesh, and use nodename to find the animation of this node
     if (node != NULL){
-        std::string name = node->mName.C_Str();
-        // find animation TRS of a node
-        if (animationOfName.find(name) != animationOfName.end()) {        
-            NodeAnimate na = animationOfName.at(name);
+        std::string nodeName = node->mName.C_Str();
+        // find animation TRS of a node 
+        if (animationOfName.find(nodeName) != animationOfName.end()) {        
+            NodeAnimate na = animationOfName.at(nodeName);
             glm::mat4 TRS = getInterpolateMat(na, t);
             transMat = transMat * TRS; 
 
-            // if this animation node has mesh, update mesh's model matrix
-            if (node->mNumMeshes > 0 ) {
+            // if this node has mesh, update mesh's transMat
+            if (node->mNumMeshes > 0 ) {         
                 for (int i = 0; i < node->mNumMeshes; ++i) {
                     aiMesh* mesh = obj->mMeshes[node->mMeshes[i]];
                     std::string meshName = mesh->mName.C_Str();
                     transMatVec[meshName] = transMat;
-
-                    // compute bone matrix
-                    for (int j = 0; j < mesh->mNumBones; ++j) {
-                        aiBone* bone = mesh->mBones[j];
-                        glm::mat4 boneMat = RTUtil::a2g(bone->mOffsetMatrix);
-                        glm::mat4 globalBoneMat = transMat * boneMat;
-                        if (boneTrans.find(meshName) == boneTrans.end()) {
-                            boneTrans.insert({ meshName, {} });
-                        }
-                        boneTrans[meshName].push_back(globalBoneMat);
-                    }
                 }
             }
+         }
+        // if this node has bone, update boneTrans
+        std::cout << "nodeName " << nodeName << std::endl;
+        if (boneTransMap.find(nodeName) != boneTransMap.end()){
+            int boneIndex = boneTransMap[nodeName].boneId;
+            glm::mat4 offsetMat = boneTransMap[nodeName].mat;
+            glm::mat4 globalBoneMat = transMat * offsetMat;
+            boneTrans.push_back(globalBoneMat);
         }
-
+        
         for (int i = 0; i < node->mNumChildren; ++i) {
             traverseTree(obj, node->mChildren[i],transMat, t);
         }
+    
     }
 }
 

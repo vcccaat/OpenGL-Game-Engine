@@ -9,7 +9,7 @@
 #include <RTUtil/conversions.hpp>
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
-#include "Helper.hpp"
+
 
 /**************************************** HELPER FUNCTIONS ****************************************/
 
@@ -267,7 +267,7 @@ void Pipeline::traverseNodeHierarchy( const aiScene* obj, aiNode* cur, glm::mat4
 void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 
     int curMesh = transMatVec.size();
-    boneInfoMap = {};
+    boneTransMap = {};
     boneIds.push_back({});
     boneWts.push_back({});
     positions.push_back({});
@@ -275,7 +275,6 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
     normals.push_back({});
 
     // extract bones in mesh
-    // map [vertex index: vector of bone indices and weights]
     if (msh->HasBones()){
         extractBonesforVertices(msh);
     }
@@ -289,16 +288,16 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
         glm::vec3 n = reinterpret_cast<glm::vec3&>(msh->mNormals[i]) ;
         normals[curMesh].push_back(n);
 
-        // each vertex can be influenced by up to 4 bones
-        // get bone's index and weight by vertex index
-        // boneInfoMap stores up to 4 bone indices for each vertex
+        // parse bone to boneIdsVec and boneWeightsVec per vertex
         if (msh->HasBones()){
             std::vector<int> boneIdsVec;
             std::vector<float> boneWeightsVec;
             int numBone = 0;
-            while(numBone < boneInfoMap[i].size()) {
-                boneIdsVec.push_back(boneInfoMap[i][numBone].boneId);
-                boneWeightsVec.push_back(boneInfoMap[i][numBone].weight);
+            
+            // vertexBoneMap stores up to 4 bone indices for each vertex
+            while(numBone < vertexBoneMap[i].size()) {
+                boneIdsVec.push_back(vertexBoneMap[i][numBone].boneId);
+                boneWeightsVec.push_back(vertexBoneMap[i][numBone].weight);
                 numBone++;
             }
             for (int numBone2 = numBone; numBone2 < 4; numBone2++) {
@@ -335,15 +334,24 @@ void Pipeline::extractBonesforVertices(aiMesh* msh){
         for (int vertexIndex = 0; vertexIndex < bone->mNumWeights; vertexIndex++){
             int vertexId = bone->mWeights[vertexIndex].mVertexId;
             float weight = bone->mWeights[vertexIndex].mWeight;
-            BoneInfo b;
+            std::string boneName = bone->mName.C_Str();
+            BoneWeight b;
             b.boneId = i;
             b.weight = weight;
+
+            // map a bone name to bone matrix
+            BoneMat m;
+            m.boneId = i;
+            m.mat = RTUtil::a2g(bone->mOffsetMatrix);
+            boneTransMap.insert({boneName,m});
+            std::cout << "bone name " << boneName << std::endl;
+
             // if this vertex is not visited before, create a new vector 
-            if (boneInfoMap.find(vertexId) == boneInfoMap.end()){
-                boneInfoMap.insert({vertexId,{}});
+            if (vertexBoneMap.find(vertexId) == vertexBoneMap.end()){
+                vertexBoneMap.insert({vertexId,{}});
             } 
-            // len of BoneInfo might more than 4
-            boneInfoMap[vertexId].push_back(b);
+            // len of Bone is less than or equal to 4
+            vertexBoneMap[vertexId].push_back(b);
         } 
 
     }
@@ -360,8 +368,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -440,8 +448,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));
@@ -496,17 +504,16 @@ void Pipeline::draw_contents() {
     float t = std::fmod(curTime - startTime, totalTime);
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-
     // if the scene has animation, traverse the tree to update TRS
     if (animationOfName.size() > 0){
-        boneTrans.clear();
+        boneTrans = {};
         traverseTree(obj, obj->mRootNode, glm::mat4(1.f), t);
     }
 
     
 
     forwardShade();
-    return;
+    // return;
     //if (!deferred) {
     //    forwardShade();
     //}

@@ -19,18 +19,12 @@ void main() {
     vec4 weightSumPos = vec4(0.0);
     vec4 weightSumNorm = vec4(0.0);
 
-    for(int i = 0; i < MAX_BONE_INFLUENCE; i++) {
-    
+    for(int i = 0; i < MAX_BONE_INFLUENCE; i++) {  
         if(boneIds[i] == -1) {
-		    if(i == 0) {
-			    //weightSumPos = vec4(position, 1.0);
-			    //weightSumNorm = vec4(normal, 0.0);
-			}
             continue;
-		}
-        
-        weightSumPos += boneM[i][boneIds[i]] * vec4(position, 1.0) * boneWts[i];
-        weightSumNorm += boneM[i][boneIds[i]] * vec4(normal, 0.0) * boneWts[i];
+		}       
+        weightSumPos += boneM[boneIds[i]] * vec4(position, 1.0) * boneWts[i];
+        weightSumNorm += boneM[boneIds[i]] * vec4(normal, 0.0) * boneWts[i];
     }
 
     vPosition = (mV * mM * weightSumPos).xyz;
