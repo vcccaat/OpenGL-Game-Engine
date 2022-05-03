@@ -277,6 +277,8 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
     // extract bones in mesh
     if (msh->HasBones()){
         extractBonesforVertices(msh);
+    } else {
+        std::cout << "No bones in this mesh" << std::endl;
     }
 
     // store position and normal of all vertices in a mesh

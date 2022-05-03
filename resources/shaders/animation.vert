@@ -27,7 +27,10 @@ void main() {
         weightSumNorm += boneM[boneIds[i]] * vec4(normal, 0.0) * boneWts[i];
     }
 
-    vPosition = (mV * mM * weightSumPos).xyz;
+    vPosition = (mV * mM * vec4(position, 1.0)).xyz;
+    vNormal = normalize(mV * mM * vec4(normal, 0.0)).xyz;
+    // vPosition = (mV * mM * weightSumPos).xyz;
+    // vNormal = normalize(mV * mM * weightSumNorm).xyz;
     gl_Position = mP * vec4(vPosition, 1.0);
-    vNormal = normalize(mV * mM * weightSumNorm).xyz;
+   
 }
