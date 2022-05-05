@@ -3,6 +3,8 @@
 #include "Pipeline.hpp"
 #include <glm/gtx/quaternion.hpp>
 #include <RTUtil/conversions.hpp>
+#include <assimp/Importer.hpp> 
+#include <assimp/postprocess.h>  
 #include "Helper.hpp"
 
 glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
@@ -163,3 +165,15 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
     }
 }
 
+void Pipeline::playMeshAnimation(){
+        float currentFrame = glfwGetTime();
+        float t = std::fmod(currentFrame - startTime, totalTime);
+
+        Assimp::Importer importer;
+        const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+        // if the scene has animation, traverse the tree to update TRS
+        if (animationOfName.size() > 0){
+            boneTrans.clear();
+            traverseTree(obj, obj->mRootNode, glm::mat4(1.f), t);
+        }
+}

@@ -100,6 +100,7 @@ public:
     
 
     /* traverse node to update model matrix in animation loop */
+    void playMeshAnimation();
     void traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat, float t);
 
     /* camera controls */
@@ -171,13 +172,8 @@ private:
     /* map a node's name to node's animation */
     std::map<std::string, NodeAnimate> animationOfName;
 
-    // double curTime;
     double startTime;
     double totalTime;
-
-    float deltaTime;
-    float lastFrame;
-
     bool playAnimation;
 
     /* Bone matrices */
