@@ -237,8 +237,8 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
         }
 
         // total animation duration
-        startTime = getSecondsSinceEpoch();
-        curTime = startTime;
+        startTime = glfwGetTime(); //getSecondsSinceEpoch();
+        // curTime = startTime;
         int ticksPerSec = obj->mAnimations[0]->mTicksPerSecond;
         int totalTicks = obj->mAnimations[0]->mDuration;
         totalTime = (double) totalTicks / (double) ticksPerSec;
@@ -501,6 +501,7 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     deferred = true;
     toggle = true;
+    playAnimation = true;
 }
 
 
@@ -509,14 +510,18 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
 void Pipeline::draw_contents() {
     // Update current time
-    curTime = getSecondsSinceEpoch();
-    float t = std::fmod(curTime - startTime, totalTime);
-    Assimp::Importer importer;
-    const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
-    // if the scene has animation, traverse the tree to update TRS
-    if (animationOfName.size() > 0){
-        boneTrans.clear();
-        traverseTree(obj, obj->mRootNode, glm::mat4(1.f), t);
+    // curTime = getSecondsSinceEpoch();
+    if (playAnimation){
+        float currentFrame = glfwGetTime();
+        float t = std::fmod(currentFrame - startTime, totalTime);
+
+        Assimp::Importer importer;
+        const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+        // if the scene has animation, traverse the tree to update TRS
+        if (animationOfName.size() > 0){
+            boneTrans.clear();
+            traverseTree(obj, obj->mRootNode, glm::mat4(1.f), t);
+        }
     }
 
     

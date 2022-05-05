@@ -24,6 +24,14 @@ bool Pipeline::keyboard_event(int key, int scancode, int action, int modifiers) 
     } else {
         toggle = true;
     }
+
+    // toggle animation
+    // if (key == GLFW_KEY_SPACE && toggle) {
+    //     playAnimation = !playAnimation;
+    //     // toggle = false;
+    // } else {
+    //     // toggle = true;
+    // }
     
 
     return cc->keyboard_event(key, scancode, action, modifiers);

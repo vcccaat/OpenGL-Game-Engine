@@ -171,9 +171,14 @@ private:
     /* map a node's name to node's animation */
     std::map<std::string, NodeAnimate> animationOfName;
 
-    double curTime;
+    // double curTime;
     double startTime;
     double totalTime;
+
+    float deltaTime;
+    float lastFrame;
+
+    bool playAnimation;
 
     /* Bone matrices */
 	std::vector<glm::mat4> boneMatrices;
