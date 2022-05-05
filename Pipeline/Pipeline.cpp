@@ -500,7 +500,7 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     deferred = true;
     toggle = true;
-    playAnimation = true;
+    playAnimation = false;
 }
 
 
