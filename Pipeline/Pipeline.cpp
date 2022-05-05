@@ -128,6 +128,7 @@ std::vector<Light> Pipeline::parseLights(aiNode* rootNode, const aiScene* scene)
 void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight) {
     Assimp::Importer importer;
     const aiScene* obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+    
 
     transMatVec = {};
     meshIndToMaterialInd = {};
@@ -153,7 +154,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
     if (obj->mNumCameras > 0) {
         aiCamera* rawcam = obj->mCameras[0];
         aiNode* rootNode = obj->mRootNode;
-
+        
         // transform camera
         camTransMat = getTransMatrix(rootNode, rawcam->mName);
         cam->setAspectRatio(rawcam->mAspect);
@@ -250,6 +251,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
 
 void Pipeline::traverseNodeHierarchy( const aiScene* obj, aiNode* cur, glm::mat4 transmat) {
     if (cur != NULL) {
+        // new Node(,cur->mNumChildren,cur->mNumMeshes);
         transmat = transmat * RTUtil::a2g(cur->mTransformation);
         if (cur->mNumMeshes > 0) {
             for (int i = 0; i < cur->mNumMeshes; ++i) {
@@ -316,8 +318,8 @@ void Pipeline::addMeshToScene( aiMesh* msh,  glm::mat4 transmat){
 			boneWts[curMesh].push_back(glm::vec4(-1.f, -1.f, -1.f, -1.f));
         }
     }
-    printf("Length of lists: %i, %i, %i, %i\n", positions[curMesh].size(), normals[curMesh].size(), boneIds[curMesh].size(), boneWts[curMesh].size());
-    printf("-1 count: %i\n", negOneCt);
+    // printf("Length of lists: %i, %i, %i, %i\n", positions[curMesh].size(), normals[curMesh].size(), boneIds[curMesh].size(), boneWts[curMesh].size());
+    // printf("-1 count: %i\n", negOneCt);
     
     // store mesh indices
     for (int i = 0; i < msh->mNumFaces; ++i) {
@@ -375,8 +377,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
         // PATHEDIT
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
@@ -455,8 +457,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));

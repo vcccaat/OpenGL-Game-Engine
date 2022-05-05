@@ -18,29 +18,27 @@ glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
         } 
         // case2: has one keyframe, assume start pos at 0,0,0
         else {
-            v = glm::vec3(0) + (t / kfs[0].time) * kfs[0].pos;
+            v = glm::mix(glm::vec3(0),kfs[0].pos,t / kfs[0].time);
         }    
     }
     else{
         // case3: has more than one keyframes
-        for (int i = 0; i < kfs.size(); ++i){ //TODO i should start at 1???
-            if (t < kfs[i].time && i != 0){ //TODO temp fix here
+        for (int i = 0; i < kfs.size(); ++i){ 
+            if (t <= kfs[i].time && i != 0){ 
                 keyframe1 = kfs[i-1];
                 keyframe2 = kfs[i];
                 tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
                 break;
             }
         }
-        v = keyframe1.pos + tPortion * (keyframe2.pos - keyframe1.pos);
+        v = glm::mix(keyframe1.pos,keyframe2.pos,tPortion);
     }
 
-	glm::mat4 m( 1.0f );
-    m[3][0] = v[0];
-    m[3][1] = v[1];
-    m[3][2] = v[2];
-    // printm(m);
+    glm::mat4 m = glm::translate(glm::mat4(1.0f), v);
 	return m;
 }
+   
+
 
 glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
     KeyframeRot keyframe1;
@@ -65,13 +63,8 @@ glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
     else{
         // case3: has more than one keyframes
         for (int i = 0; i < kfs.size(); ++i){ 
-            // rotation keyframe time might start at non-zero
-            if (t < kfs[i].time && i == 0){ 
-                r = r;
-                break;
-            }
             // start interpolation from the first non-zero sec 
-            if (t < kfs[i].time && i != 0){ 
+            if (t <= kfs[i].time && i != 0){ 
                 keyframe1 = kfs[i-1];
                 keyframe2 = kfs[i];
                 tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
@@ -91,8 +84,38 @@ glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
 }
 
 glm::mat4 interpolateScaling(std::vector<KeyframeScale> kfs, float t) {
-  // TODO
-    glm::mat4 m = glm::mat4(1.0f);
+    KeyframeScale keyframe1;
+    KeyframeScale keyframe2;
+
+    glm::vec3 s = glm::vec3(1.);
+    float tPortion;
+    
+    if (kfs.size() == 1) {
+        // case1: only has one keyframe and time = 0
+        if (kfs[0].time == 0){
+            s = kfs[0].scale;
+        } 
+        // case2: has one keyframe, assume start changing scale from 0,0,0 
+        else {
+            s = (t / kfs[0].time) * kfs[0].scale;
+        }    
+    }
+    else{
+        // case3: has more than one keyframes
+        for (int i = 0; i < kfs.size(); ++i){ 
+            // start interpolation from the first non-zero sec 
+            if (t <= kfs[i].time && i != 0){ 
+                keyframe1 = kfs[i-1];
+                keyframe2 = kfs[i];
+                tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
+                s = glm::mix(keyframe1.scale,keyframe2.scale,tPortion);
+                break;
+            }
+        }
+    }
+    
+    glm::mat4 m = glm::scale(glm::mat4(1.0f), s);
+    // printm(m);
     return m;
 }
 
@@ -114,7 +137,7 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
     if (node != NULL){
         std::string nodeName = node->mName.C_Str();
         // find animation TRS of a node 
-        if (animationOfName.find(nodeName) != animationOfName.end()) {        
+        if (animationOfName.find(nodeName) != animationOfName.end()) {     
             NodeAnimate na = animationOfName.at(nodeName);
             glm::mat4 TRS = getInterpolateMat(na, t);
             transMat = transMat * TRS; 
@@ -122,9 +145,7 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
             // if this node has mesh, update mesh's transMat
             if (node->mNumMeshes > 0 ) {         
                 for (int i = 0; i < node->mNumMeshes; ++i) {
-                    aiMesh* mesh = obj->mMeshes[node->mMeshes[i]];
-                    std::string meshName = mesh->mName.C_Str();
-                    transMatVec[meshName] = transMat;
+                    transMatVec[idToName[i]] = transMat;
                 }
             }
          }

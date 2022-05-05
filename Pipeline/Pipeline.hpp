@@ -84,6 +84,7 @@ public:
     std::vector<KeyframeScale> keyframeScale;
 };
 
+
 class Pipeline : public nanogui::Screen {
 public:
     Pipeline(std::string path, float windowWidth, float windowHeight);
@@ -137,6 +138,7 @@ private:
     std::vector<std::vector<glm::vec3>> positions;
     std::vector<std::vector<uint32_t>> indices;
     std::vector<std::vector<glm::vec3>> normals;
+
 
     /* map a mesh's model matrix to mesh's name, 
     because when we read animation node, they might
