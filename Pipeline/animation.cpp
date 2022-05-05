@@ -65,8 +65,13 @@ glm::mat4 interpolateRotation(std::vector<KeyframeRot> kfs, float t) {
     else{
         // case3: has more than one keyframes
         for (int i = 0; i < kfs.size(); ++i){ 
+            // rotation keyframe time might start at non-zero
+            if (t < kfs[i].time && i == 0){ 
+                r = r;
+                break;
+            }
             // start interpolation from the first non-zero sec 
-            if (t <= kfs[i].time && i != 0){ 
+            if (t < kfs[i].time && i != 0){ 
                 keyframe1 = kfs[i-1];
                 keyframe2 = kfs[i];
                 tPortion= (t - kfs[i-1].time)/(kfs[i].time- kfs[i-1].time);
@@ -147,7 +152,10 @@ void Pipeline::traverseTree(const aiScene* obj, aiNode* node, glm::mat4 transMat
             // if this node has mesh, update mesh's transMat
             if (node->mNumMeshes > 0 ) {         
                 for (int i = 0; i < node->mNumMeshes; ++i) {
-                    transMatVec[idToName[i]] = transMat;
+                    // TOFIX: cannot use idToName[i] to reference meshname 
+                    aiMesh* mesh = obj->mMeshes[node->mMeshes[i]];
+                    std::string meshName = mesh->mName.C_Str();
+                    transMatVec[meshName] = transMat;
                 }
             }
          }
