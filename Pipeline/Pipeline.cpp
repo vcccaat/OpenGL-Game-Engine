@@ -135,6 +135,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
     boneTransMap = {};
     boneIds = {};
     boneWts = {};
+    idToName = {};
 
     // add mesh to scene and store meshes' model matrix
     traverseNodeHierarchy(obj, obj->mRootNode, glm::mat4(1.f));
@@ -145,8 +146,8 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
         meshes[i].reset(new GLWrap::Mesh());
         meshes[i]->setAttribute(0, positions[i]);
         meshes[i]->setAttribute(1, normals[i]);
-        meshes[i]->setAttribute(2, boneIds[i]);
-        meshes[i]->setAttribute(3, boneWts[i]);
+        //meshes[i]->setAttribute(2, boneIds[i]);
+        //meshes[i]->setAttribute(3, boneWts[i]);
         meshes[i]->setIndices(indices[i], GL_TRIANGLES);
     }
 
@@ -376,12 +377,12 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     const std::string resourcePath =
         // PATHEDIT
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
 
     // forward shading
     prog.reset(new GLWrap::Program("program", { 
-        { GL_VERTEX_SHADER, resourcePath + "shaders/animation.vert" },  //min
+        { GL_VERTEX_SHADER, resourcePath + "shaders/min.vert" },  //min
         // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
         //  { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
         { GL_FRAGMENT_SHADER, resourcePath + "shaders/microfacet.frag" }
@@ -456,8 +457,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));
