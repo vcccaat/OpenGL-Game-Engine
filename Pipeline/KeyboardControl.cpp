@@ -43,14 +43,14 @@ bool Pipeline::keyboard_event(int key, int scancode, int action, int modifiers) 
         float camSpeed = 0.08f;
         glm::vec3 v = glm::vec3(glm::inverse(cam->getViewMatrix()) * glm::vec4(1,0,0,0));
         // always keep the same eye direction for camera
-        cam->setEye(cam->getEye() + v * camSpeed);
+        cam->setEye(cam->getEye() - v * camSpeed);
         // therefore need to update target pos
         cam->setTarget(cam->getEye()- viewDir );
     }
     if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
         float camSpeed = 0.08f;
         glm::vec3 v = glm::vec3(glm::inverse(cam->getViewMatrix()) * glm::vec4(1,0,0,0));
-        cam->setEye(cam->getEye() - v * camSpeed);
+        cam->setEye(cam->getEye() + v * camSpeed);
         cam->setTarget(cam->getEye()-viewDir);
     }
     
