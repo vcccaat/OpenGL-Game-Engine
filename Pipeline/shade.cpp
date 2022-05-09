@@ -61,7 +61,7 @@ void Pipeline::forwardShade() {
             boneMat = boneTrans[boneIndex];
             ind++;
         }
-        prog->uniform("boneM[" + std::to_string(boneIndex) + "]", boneMat);
+        // prog->uniform("boneM[" + std::to_string(boneIndex) + "]", boneMat);
     }
     
 

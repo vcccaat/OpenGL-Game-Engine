@@ -5,7 +5,7 @@
 #include <RTUtil/conversions.hpp>
 #include <assimp/Importer.hpp> 
 #include <assimp/postprocess.h>  
-#include "Helper.hpp"
+// #include "Helper.hpp"
 
 glm::mat4 interpolatePosition(std::vector<KeyframePos> kfs, float t) {
     KeyframePos keyframe1;

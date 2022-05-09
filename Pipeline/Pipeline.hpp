@@ -178,6 +178,8 @@ private:
 
     /* Bone matrices */
 	std::vector<glm::mat4> boneMatrices;
+
 };
+
 
 

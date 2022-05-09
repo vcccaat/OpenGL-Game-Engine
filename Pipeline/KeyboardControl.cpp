@@ -12,26 +12,38 @@ bool Pipeline::keyboard_event(int key, int scancode, int action, int modifiers) 
         return true;
     }
 
-    if (key == GLFW_KEY_F && toggle) {
-        deferred = !deferred;
-        toggle = false;
+    // if (key == GLFW_KEY_F && toggle) {
+    //     deferred = !deferred;
+    //     toggle = false;
 
-        if (deferred) {
-            std::cout << "deferred shading\n";
-        }else {
-            std::cout << "forward shading\n";
-        }
-    } else {
-        toggle = true;
-    }
-
-    // toggle animation
-    // if (key == GLFW_KEY_SPACE && toggle) {
-    //     playAnimation = !playAnimation;
-    //     // toggle = false;
+    //     if (deferred) {
+    //         std::cout << "deferred shading\n";
+    //     }else {
+    //         std::cout << "forward shading\n";
+    //     }
     // } else {
-    //     // toggle = true;
+    //     toggle = true;
     // }
+
+
+    // player input system
+    glm::vec3 viewDir = cam->getEye() - cam->getTarget();
+    if (key == GLFW_KEY_W) {
+        cam->setEye(cam->getEye() - glm::vec3(0,0,1));
+    }
+    if (key == GLFW_KEY_S) {
+        cam->setEye(cam->getEye() + glm::vec3(0,0,1));
+    }
+    if (key == GLFW_KEY_A) {  
+        // always keep the same eye direction for camera
+        cam->setEye(cam->getEye() - glm::vec3(1,0,0));
+        // therefore need to update target pos
+        cam->setTarget(cam->getEye()-viewDir);
+    }
+    if (key == GLFW_KEY_D) {
+        cam->setEye(cam->getEye() + glm::vec3(1,0,0));
+        cam->setTarget(cam->getEye()-viewDir);
+    }
     
 
     return cc->keyboard_event(key, scancode, action, modifiers);

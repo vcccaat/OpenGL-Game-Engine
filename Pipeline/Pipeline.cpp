@@ -9,6 +9,7 @@
 #include <RTUtil/conversions.hpp>
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
+#include "Helper.hpp"
 
 
 /**************************************** HELPER FUNCTIONS ****************************************/
@@ -132,7 +133,6 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float 
 
     transMatVec = {};
     meshIndToMaterialInd = {};
-    boneTransMap = {};
     boneIds = {};
     boneWts = {};
     idToName = {};
@@ -456,8 +456,8 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = { m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i =0; i< 5; ++i){
         floatFormat.push_back(std::make_pair(GL_RGBA32F, GL_RGBA));
@@ -473,12 +473,12 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
-        glm::vec3(6,6,10), // eye  6,2,10
-        glm::vec3(-0.2,0.65,0), // target
-        glm::vec3(0,1,0), // up
+        glm::vec3(3.f,2.f,10.f), // eye  6,2,10
+        glm::vec3(3.f,1.f,-1.f), // target
+        glm::vec3(0.f,1.f,0.f), // up
         windowWidth / (float) windowHeight, // aspect
         0.1, 50.0, // near, far
-        25.0 * M_PI/180 // fov  15.0 * M_PI/180
+        45.0 * M_PI/180 // fov  15.0 * M_PI/180
     );
 
     cc.reset(new RTUtil::DefaultCC(cam));
@@ -508,6 +508,7 @@ backgroundColor(0.4f, 0.4f, 0.7f, 1.0f) {
 
 
 void Pipeline::draw_contents() {
+
     if (playAnimation){
         playMeshAnimation();
     }
