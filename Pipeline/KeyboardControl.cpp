@@ -29,19 +29,24 @@ bool Pipeline::keyboard_event(int key, int scancode, int action, int modifiers) 
     // player input system
     glm::vec3 viewDir = cam->getEye() - cam->getTarget();
     if (key == GLFW_KEY_W) {
-        cam->setEye(cam->getEye() - glm::vec3(0,0,1));
+        // if camera is rotated, shifting in z-axis in camera space is not the same as in world space
+        glm::vec3 v = glm::vec3(glm::inverse(cam->getViewMatrix()) * glm::vec4(0,0,1,0));
+        cam->setEye(cam->getEye() - v);
     }
     if (key == GLFW_KEY_S) {
-        cam->setEye(cam->getEye() + glm::vec3(0,0,1));
+        glm::vec3 v = glm::vec3(glm::inverse(cam->getViewMatrix()) * glm::vec4(0,0,1,0));
+        cam->setEye(cam->getEye() + v);
     }
     if (key == GLFW_KEY_A) {  
+        glm::vec3 v = glm::vec3(glm::inverse(cam->getViewMatrix()) * glm::vec4(1,0,0,0));
         // always keep the same eye direction for camera
-        cam->setEye(cam->getEye() - glm::vec3(1,0,0));
+        cam->setEye(cam->getEye() + v);
         // therefore need to update target pos
         cam->setTarget(cam->getEye()-viewDir);
     }
     if (key == GLFW_KEY_D) {
-        cam->setEye(cam->getEye() + glm::vec3(1,0,0));
+        glm::vec3 v = glm::vec3(glm::inverse(cam->getViewMatrix()) * glm::vec4(1,0,0,0));
+        cam->setEye(cam->getEye() - v);
         cam->setTarget(cam->getEye()-viewDir);
     }
     
