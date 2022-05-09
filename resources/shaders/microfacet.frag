@@ -72,7 +72,7 @@ float G1(vec3 v, vec3 m, vec3 n, float alpha) {
     float tanThetaV2 = sinThetaV2 / cosThetaV / cosThetaV;
     return 2.0 / (1.0 + sqrt(1.0 + alpha*alpha*tanThetaV2));
   } else {
-    return 0;
+    return 0.0;
   }
 }
 
@@ -108,7 +108,7 @@ float isotropicMicrofacet(vec3 i, vec3 o, vec3 n, float eta, float alpha) {
 
     float idotn = dot(i,n);
     if (idotn <= 0.0 || odotn <= 0.0)
-        return 0;
+        return 0.0;
 
     float idotm = dot(i,m);
     float F = (idotm > 0.0) ? fresnel(i,m,eta) : 0.0;

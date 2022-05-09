@@ -21,7 +21,7 @@ out vec4 fragColor;
 float sRGBSingle(float c) {
 	float a = 0.055;	
 	if (c <= 0) 
-		return 0;		
+		return 0.0;		
 	else if (c < 0.0031308) {
 		return 12.92*c;
 	} else {
