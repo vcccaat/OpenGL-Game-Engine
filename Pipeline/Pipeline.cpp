@@ -91,6 +91,16 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
             {
                 renderBuffers.emplace(renderTextureIndex,
                                       std::make_shared<GLWrap::Framebuffer>(glm::ivec2(512, 512)));
+
+                std::shared_ptr<RTUtil::PerspectiveCamera> renderCam = std::make_shared<RTUtil::PerspectiveCamera>(
+                    glm::vec3(6, 6, 10),               // eye  6,2,10
+                    glm::vec3(-0.2, 0.65, 0),          // target
+                    glm::vec3(0, 0, 1),                // up
+                    4.f/3.f, // aspect
+                    0.1, 50.0,                         // near, far
+                    25.0 * M_PI / 180                  // fov  15.0 * M_PI/180
+                );
+                renderCameras.emplace(renderTextureIndex, renderCam);
             }
             m.renderTextureIndex = renderTextureIndex;
         }
@@ -221,40 +231,6 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
     }
 
     // Camera initialize
-
-    for (size_t i = 0; i < obj->mNumCameras; i++)
-    {
-        aiCamera *rawcam = obj->mCameras[i];
-        aiNode *rootNode = obj->mRootNode;
-
-        std::string camName = std::string(obj->mCameras[i]->mName.C_Str());
-
-        int renderCameraIndex = i;
-        std::shared_ptr<RTUtil::PerspectiveCamera> renderCam = std::make_shared<RTUtil::PerspectiveCamera>(
-            glm::vec3(6, 6, 10),               // eye  6,2,10
-            glm::vec3(-0.2, 0.65, 0),          // target
-            glm::vec3(0, 0, 1),                // up
-            windowWidth / (float)windowHeight, // aspect
-            0.1, 50.0,                         // near, far
-            25.0 * M_PI / 180                  // fov  15.0 * M_PI/180
-        );
-        // transform camera
-
-        camTransMat = getTransMatrix(rootNode, rawcam->mName);
-        renderCam->setAspectRatio(rawcam->mAspect);
-        renderCam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z, 1)));
-        renderCam->setFOVY(rawcam->mHorizontalFOV / rawcam->mAspect);
-
-        // Find point closest to origin along target ray using projection in camera space
-        glm::vec3 originInCamSpace = glm::vec3(glm::inverse(camTransMat) * glm::vec4(0, 0, 0, 1));
-        glm::vec3 originVec = originInCamSpace - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
-        glm::vec3 targetVec = glm::vec3(rawcam->mLookAt.x, rawcam->mLookAt.y, rawcam->mLookAt.z) - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
-        glm::vec3 projVec = (float)(glm::dot(originVec, targetVec) / pow(glm::length(targetVec), 2)) * targetVec;
-        glm::vec3 targetCamSpace = glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z) + projVec;
-        glm::vec3 targetGlobal = glm::vec3(camTransMat * glm::vec4(targetCamSpace.x, targetCamSpace.y, targetCamSpace.z, 1));
-        renderCam->setTarget(targetGlobal);
-        renderCameras.emplace(renderCameraIndex, renderCam);
-    }
 
     // if (cam == nullptr)
     // {
@@ -602,12 +578,12 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
-        glm::vec3(3.f,2.f,10.f), // eye  6,2,10
-        glm::vec3(3.f,1.f,-1.f), // target
-        glm::vec3(0.f,1.f,0.f), // up
-        windowWidth / (float) windowHeight, // aspect
-        0.1, 50.0, // near, far
-        45.0 * M_PI/180 // fov  15.0 * M_PI/180
+        glm::vec3(3.f, 2.f, 10.f),         // eye  6,2,10
+        glm::vec3(3.f, 1.f, -1.f),         // target
+        glm::vec3(0.f, 1.f, 0.f),          // up
+        windowWidth / (float)windowHeight, // aspect
+        0.1, 50.0,                         // near, far
+        45.0 * M_PI / 180                  // fov  15.0 * M_PI/180
     );
 
     cc.reset(new RTUtil::DefaultCC(cam));
