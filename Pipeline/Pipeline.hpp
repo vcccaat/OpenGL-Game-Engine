@@ -20,10 +20,12 @@ double getSecondsSinceEpoch();
 
 class Material {
 public:
+    std::shared_ptr<GLWrap::Texture2D> diffuseTexture;
+    std::shared_ptr<GLWrap::Texture2D> normalTexture;
     glm::vec3 diffuse;
     float roughness;
     float indexofref;
-
+    int renderTextureIndex;
     Material();
     Material(glm::vec3 diffuse);
 };
@@ -89,6 +91,7 @@ class Pipeline : public nanogui::Screen {
 public:
     Pipeline(std::string path, float windowWidth, float windowHeight);
     std::string GlobalPath;
+    std::string ResourcesPath;
 
     /* init scene, lights, materials, bones, add mesh to scene */
     void initScene(std::shared_ptr<RTUtil::PerspectiveCamera>& cam, float windowWidth, float windowHeight);
@@ -126,11 +129,20 @@ private:
     std::vector<std::unique_ptr<GLWrap::Mesh>> meshes;
     std::unique_ptr<GLWrap::Mesh> fsqMesh;
     std::unique_ptr<GLWrap::Framebuffer> fbo, gfbo, lightfbo, shadowfbo, blurHorfbo, blurVerfbo, mergefbo;
+
+    std::map<int,std::shared_ptr<GLWrap::Framebuffer>> renderBuffers;
+
     std::shared_ptr<RTUtil::PerspectiveCamera> cam;
     std::shared_ptr<RTUtil::PerspectiveCamera> lightPers;
     std::unique_ptr<RTUtil::DefaultCC> cc;
 
     std::vector<Material> materials;
+
+    //These two members are not paired because that would require there to be an equal number of render materials and render cameras at all times 
+    //Pass these textures into the framebuffers
+    //These render to the render textures
+    std::map<int, std::shared_ptr<RTUtil::PerspectiveCamera>> renderCameras;
+
     std::vector<Light> lights;
 
     nanogui::Color backgroundColor;
@@ -139,7 +151,8 @@ private:
     std::vector<std::vector<glm::vec3>> positions;
     std::vector<std::vector<uint32_t>> indices;
     std::vector<std::vector<glm::vec3>> normals;
-
+    std::vector<std::vector<std::vector<glm::vec3>>> uvChannels;
+    std::map<std::string, std::shared_ptr<GLWrap::Texture2D>> textures;
 
     /* map a mesh's model matrix to mesh's name, 
     because when we read animation node, they might
