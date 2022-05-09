@@ -229,7 +229,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
 
         std::string camName = std::string(obj->mCameras[i]->mName.C_Str());
 
-        int renderCameraIndex = i - 1;
+        int renderCameraIndex = i;
         std::shared_ptr<RTUtil::PerspectiveCamera> renderCam = std::make_shared<RTUtil::PerspectiveCamera>(
             glm::vec3(6, 6, 10),               // eye  6,2,10
             glm::vec3(-0.2, 0.65, 0),          // target
