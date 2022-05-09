@@ -13,92 +13,8 @@
 #include <glm/gtx/quaternion.hpp>
 // #include "Helper.hpp"
 
-void Pipeline::forwardShade()
+void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera)
 {
-    GLWrap::checkGLError("drawContents start");
-
-    for (auto &&i : renderBuffers)
-    {
-        auto renderBuffer = i.second;
-        renderBuffer->bind();
-        glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderBuffer->unbind();
-    }
-
-    for (auto &&i : renderBuffers)
-    {
-        auto renderIndex = i.first;
-        auto renderBuffer = i.second;
-        auto renderCam = renderCameras[renderIndex];
-        renderBuffer->bind();
-        glEnable(GL_DEPTH_TEST);
-
-        glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        prog->use();
-
-        // Plug in camera stuff
-        prog->uniform("mV", renderCam->getViewMatrix());
-        prog->uniform("mP", renderCam->getProjectionMatrix());
-
-        for (int k = 0; k < lights.size(); ++k)
-        {
-            // Plug in point lights
-            // prog->uniform("lightPos"+std::to_string(k+1),  glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
-            // prog->uniform("power"+std::to_string(k+1), reinterpret_cast<glm::vec3&>(lights[k].power));
-            if (lights[k].type == lights[k].POINT)
-            {
-                // prog->uniform("lightPos",glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
-                // prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
-            }
-        }
-        for (int i = 0; i < meshes.size(); ++i)
-        {
-            // Plug in mesh
-            prog->uniform("mM", transMatVec[idToName[i]]);
-
-            // Plug in materials
-            Material material = materials[meshIndToMaterialInd[i]];
-            nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
-            if (material.renderTextureIndex >= 0)
-            {
-                renderBuffers[material.renderTextureIndex]->colorTexture().bindToTextureUnit(0);
-                prog->uniform("diffuseTexture", 0);
-            }
-            else
-            {
-                material.diffuseTexture->bindToTextureUnit(0);
-                prog->uniform("diffuseTexture", 0);
-            }
-
-            // prog->uniform("alpha", bsdf.alpha());
-            // prog->uniform("eta", bsdf.eta());
-            // prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
-            // Draw mesh
-            meshes[i]->drawElements();
-        }
-
-        // feed all bone's transMat into the shader
-        int MAX_BONES = 40;
-        int ind = 0;
-        for (int boneIndex = 0; boneIndex < MAX_BONES; boneIndex++)
-        {
-            glm::mat4 boneMat = glm::mat4(1.);
-            if (boneIndex < boneTrans.size())
-            {
-                boneMat = boneTrans[boneIndex];
-                ind++;
-            }
-            // prog->uniform("boneM[" + std::to_string(boneIndex) + "]", boneMat);
-        }
-
-        prog->unuse();
-        renderBuffer->unbind();
-    }
-
-    fbo->bind();
     glEnable(GL_DEPTH_TEST);
 
     glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
@@ -107,8 +23,8 @@ void Pipeline::forwardShade()
     prog->use();
 
     // Plug in camera stuff
-    prog->uniform("mV", cam->getViewMatrix());
-    prog->uniform("mP", cam->getProjectionMatrix());
+    prog->uniform("mV", camera->getViewMatrix());
+    prog->uniform("mP", camera->getProjectionMatrix());
 
     for (int k = 0; k < lights.size(); ++k)
     {
@@ -131,10 +47,7 @@ void Pipeline::forwardShade()
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
         if (material.renderTextureIndex >= 0)
         {
-            renderBuffers[material.renderTextureIndex]->colorTexture().setParameters(
-                GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
-                GL_LINEAR, GL_LINEAR);
-            renderBuffers[material.renderTextureIndex]->colorTexture().bindToTextureUnit(0);
+            portals[material.renderTextureIndex]->portalBuffer->colorTexture().bindToTextureUnit(0);
             prog->uniform("diffuseTexture", 0);
         }
         else
@@ -165,6 +78,35 @@ void Pipeline::forwardShade()
     }
 
     prog->unuse();
+}
+
+void Pipeline::forwardShade()
+{
+    GLWrap::checkGLError("drawContents start");
+
+    for (auto &&portalEntry : portals)
+    {
+        auto renderBuffer = portalEntry.second->portalBuffer;
+        renderBuffer->bind();
+        glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderBuffer->unbind();
+    }
+
+    for (auto &&portalEntry : portals)
+    {
+
+        auto renderIndex = portalEntry.first;
+        auto portalData = portalEntry.second;
+        auto renderBuffer = portalData->portalBuffer;
+        auto renderCam = portalData->portalCamera;
+        renderBuffer->bind();
+        drawGeometry(renderCam);
+        renderBuffer->unbind();
+    }
+
+    fbo->bind();
+    drawGeometry(cam);
     fbo->unbind();
 
     glDisable(GL_DEPTH_TEST);

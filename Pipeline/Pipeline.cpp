@@ -10,6 +10,7 @@
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
 #include "Helper.hpp"
+#include <glm/gtx/string_cast.hpp>
 
 /**************************************** HELPER FUNCTIONS ****************************************/
 
@@ -87,20 +88,23 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
             std::string renderNum = matName.substr(7);
             std::cout << renderNum << std::endl;
             int renderTextureIndex = std::stoi(renderNum);
-            if (renderBuffers.count(renderTextureIndex) == 0)
+            if (portals.count(renderTextureIndex) == 0)
             {
-                renderBuffers.emplace(renderTextureIndex,
-                                      std::make_shared<GLWrap::Framebuffer>(glm::ivec2(512, 512)));
-
-                std::shared_ptr<RTUtil::PerspectiveCamera> renderCam = std::make_shared<RTUtil::PerspectiveCamera>(
-                    glm::vec3(6, 6, 10),               // eye  6,2,10
-                    glm::vec3(-0.2, 0.65, 0),          // target
-                    glm::vec3(0, 0, 1),                // up
-                    4.f/3.f, // aspect
-                    0.1, 50.0,                         // near, far
-                    25.0 * M_PI / 180                  // fov  15.0 * M_PI/180
+                auto p = std::make_shared<PortalData>();
+                p->portalIndex = renderTextureIndex;
+                p->portalCamera = std::make_shared<RTUtil::PerspectiveCamera>(
+                    glm::vec3(6, 6, 10),      // eye  6,2,10
+                    glm::vec3(-0.2, 0.65, 0), // target
+                    glm::vec3(0, 0, 1),       // up
+                    4.f / 3.f,                // aspect
+                    0.1, 50.0,                // near, far
+                    25.0 * M_PI / 180         // fov  15.0 * M_PI/180
                 );
-                renderCameras.emplace(renderTextureIndex, renderCam);
+                p->portalBuffer = std::make_shared<GLWrap::Framebuffer>(glm::ivec2(512, 512));
+                p->meshIndex = -1; // The other will values will be assigned later
+                p->materialIndex = i;
+
+                portals.emplace(renderTextureIndex, p);
             }
             m.renderTextureIndex = renderTextureIndex;
         }
@@ -205,12 +209,24 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
     Assimp::Importer importer;
     const aiScene *obj = importer.ReadFile(GlobalPath, aiProcess_LimitBoneWeights | aiProcess_GenNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
-    renderBuffers = {};
+    portals = {};
     transMatVec = {};
     meshIndToMaterialInd = {};
     boneIds = {};
     boneWts = {};
     idToName = {};
+
+    if (obj->mNumMaterials > 0)
+    {
+        materials = parseMaterials(obj);
+    }
+    else
+    {
+        Material m1 = Material(glm::vec3(0.2, 0.31, 0.46));
+        Material m2 = Material(glm::vec3(0.46, 0.2, 0.4));
+        materials.push_back(m1);
+        materials.push_back(m2);
+    }
 
     // add mesh to scene and store meshes' model matrix
     traverseNodeHierarchy(obj, obj->mRootNode, glm::mat4(1.f));
@@ -268,17 +284,6 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
     }
 
     // Add default material for animation
-    if (obj->mNumMaterials > 0)
-    {
-        materials = parseMaterials(obj);
-    }
-    else
-    {
-        Material m1 = Material(glm::vec3(0.2, 0.31, 0.46));
-        Material m2 = Material(glm::vec3(0.46, 0.2, 0.4));
-        materials.push_back(m1);
-        materials.push_back(m2);
-    }
 
     // parse animation TRS in each node
     if (obj->mNumAnimations > 0)
@@ -330,6 +335,26 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
         int totalTicks = obj->mAnimations[0]->mDuration;
         totalTime = (double)totalTicks / (double)ticksPerSec;
     }
+
+    for (auto &&i : portals)
+    {
+        auto portalIndex = i.first;
+        auto portalData = i.second;
+
+        std::cout << "Portal Index : " << portalData->portalIndex << std::endl;
+        std::cout << "Portal Mesh Index : " << portalData->meshIndex << std::endl;
+        std::cout << "Portal Material Index : " << portalData->materialIndex << std::endl;
+        std::cout << "Portal Node Name : " << portalData->portalNodeName << std::endl;
+        std::cout << "Portal Center : " << glm::to_string(portalData->portalCenter) << std::endl;
+        std::cout << "-- Portal Verts Start -- " << std::endl;
+        for (size_t i = 0; i < 4; i++)
+        {
+            std::cout << "Portal Vert " << i << " : " << glm::to_string(portalData->portalVertices.at(i)) << std::endl;
+        }
+        std::cout << "-- Portal Verts End -- " << std::endl;
+
+        std::cout << std::endl;
+    }
 }
 
 /**************************************** TRAVERSE NODE TREE TO ADD MESH ****************************************/
@@ -346,7 +371,8 @@ void Pipeline::traverseNodeHierarchy(const aiScene *obj, aiNode *cur, glm::mat4 
             {
                 aiMesh *mesh = obj->mMeshes[cur->mMeshes[i]];
                 idToName.push_back(mesh->mName.C_Str());
-                addMeshToScene(mesh, transmat);
+                std::string nodeName = std::string(cur->mName.C_Str());
+                addMeshToScene(mesh, transmat, nodeName);
             }
         }
         for (int i = 0; i < cur->mNumChildren; ++i)
@@ -357,10 +383,33 @@ void Pipeline::traverseNodeHierarchy(const aiScene *obj, aiNode *cur, glm::mat4 
 }
 
 /* parse mesh to vector of positions, normals, bones */
-void Pipeline::addMeshToScene(aiMesh *msh, glm::mat4 transmat)
+void Pipeline::addMeshToScene(aiMesh *msh, glm::mat4 transmat, std::string nodeName)
 {
-
     int curMesh = transMatVec.size();
+
+    for (auto &&portal : portals)
+    {
+        auto portalData = portal.second;
+
+        // Checks if material is a render material
+        if (msh->mMaterialIndex != portalData->materialIndex)
+            continue;
+        portalData->meshIndex = curMesh;
+        portalData->portalTransformationMatrix = transmat;
+        portalData->portalVertices.clear();
+        portalData->portalNodeName = nodeName;
+        portalData->portalVertices.reserve(4);
+        glm::vec3 center = glm::vec3(0);
+        for (size_t i = 0; i < 4; i++)
+        {
+            glm::vec3 vert = RTUtil::a2g(msh->mVertices[i]);
+            portalData->portalVertices.push_back(glm::vec3((transmat * glm::vec4(vert, 1.0))));
+            center += vert;
+        }
+        center /= 4.0;
+        portalData->portalCenter = glm::vec3((transmat * glm::vec4(center, 1.0)));
+    }
+
     boneIds.push_back({});
     boneWts.push_back({});
     positions.push_back({});
@@ -422,20 +471,20 @@ void Pipeline::addMeshToScene(aiMesh *msh, glm::mat4 transmat)
     }
     // printf("Length of lists: %i, %i, %i, %i\n", positions[curMesh].size(), normals[curMesh].size(), boneIds[curMesh].size(), boneWts[curMesh].size());
     // printf("-1 count: %i\n", negOneCt);
-    std::cout << "Mesh " << curMesh << " has " << msh->GetNumUVChannels() << " UV Channels" << std::endl;
+    // std::cout << "Mesh " << curMesh << " has " << msh->GetNumUVChannels() << " UV Channels" << std::endl;
     for (size_t j = 0; j < msh->GetNumUVChannels(); j++)
     {
         auto uvChannel = std::vector<glm::vec3>();
         uvChannel.reserve(msh->mNumVertices);
         uvChannel.clear();
-        std::cout << "Mesh " << curMesh << " : UV Channel of size" << msh->mNumVertices << std::endl;
+        // std::cout << "Mesh " << curMesh << " : UV Channel of size" << msh->mNumVertices << std::endl;
 
         if (msh->HasTextureCoords(j))
         {
             for (int k = 0; k < msh->mNumVertices; k++)
             {
                 glm::vec3 uv = reinterpret_cast<glm::vec3 &>(msh->mTextureCoords[j][k]);
-                std::cout << "Mesh " << curMesh << " : UV Coord " << k << " (" << uv.x << ", " << uv.y << ", " << uv.z << ")" << std::endl;
+                // std::cout << "Mesh " << curMesh << " : UV Coord " << k << " (" << uv.x << ", " << uv.y << ", " << uv.z << ")" << std::endl;
 
                 uvChannel.push_back(uv);
             }
