@@ -109,6 +109,8 @@ public:
     int materialIndex;
     int portalIndex;
     std::string portalNodeName;
+    // The paired portal to this one
+    int pairedPortal;
 };
 
 class Pipeline : public nanogui::Screen
@@ -126,7 +128,7 @@ public:
     void extractBonesforVertices(aiMesh *msh);
     void addMeshToScene(aiMesh *msh, glm::mat4 transmat, std::string nodeName);
 
-    void drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera);
+    void drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalId);
     /* traverse node to update model matrix in animation loop */
     void playMeshAnimation();
     void traverseTree(const aiScene *obj, aiNode *node, glm::mat4 transMat, float t);

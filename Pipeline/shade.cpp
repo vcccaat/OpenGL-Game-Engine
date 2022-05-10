@@ -13,7 +13,7 @@
 #include <glm/gtx/quaternion.hpp>
 // #include "Helper.hpp"
 
-void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera)
+void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalId)
 {
     glEnable(GL_DEPTH_TEST);
 
@@ -39,13 +39,17 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera)
     }
     for (int i = 0; i < meshes.size(); ++i)
     {
+		// Ignore this mesh if it is the portal mesh
+        if (portalId != -1 && materials[meshIndToMaterialInd[i]].renderTextureIndex == portalId) {
+            continue;
+        }
         // Plug in mesh
         prog->uniform("mM", transMatVec[idToName[i]]);
 
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
-        if (material.renderTextureIndex >= 0)
+        if (material.renderTextureIndex != -1)
         {
             portals[material.renderTextureIndex]->portalBuffer->colorTexture().bindToTextureUnit(0);
             prog->uniform("diffuseTexture", 0);
@@ -98,15 +102,20 @@ void Pipeline::forwardShade()
 
         auto renderIndex = portalEntry.first;
         auto portalData = portalEntry.second;
+        // Transform each portal camera to match its paired portal
+        glm::vec4 eyepos = glm::vec4(cam->getEye().x, cam->getEye().y, cam->getEye().z, 1.f);
+        glm::vec4 portalCamPos4 = eyepos * glm::inverse(portals.at(portalData->pairedPortal)->portalTransformationMatrix);
+        glm::vec3 portalCamPos = glm::vec3(portalCamPos4.x, portalCamPos4.y, portalCamPos4.z);
+        portalData->portalCamera->setEye(portalCamPos);
         auto renderBuffer = portalData->portalBuffer;
         auto renderCam = portalData->portalCamera;
         renderBuffer->bind();
-        drawGeometry(renderCam);
+        drawGeometry(renderCam, portals.at(portalData->pairedPortal)->portalIndex);
         renderBuffer->unbind();
     }
 
     fbo->bind();
-    drawGeometry(cam);
+    drawGeometry(cam, -1);
     fbo->unbind();
 
     glDisable(GL_DEPTH_TEST);

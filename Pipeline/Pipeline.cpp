@@ -103,6 +103,12 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
                 p->portalBuffer = std::make_shared<GLWrap::Framebuffer>(glm::ivec2(512, 512));
                 p->meshIndex = -1; // The other will values will be assigned later
                 p->materialIndex = i;
+                if (renderTextureIndex == 0) {
+                    p->pairedPortal = 1;
+                }
+                else {
+                    p->pairedPortal = 0;
+                }
 
                 portals.emplace(renderTextureIndex, p);
             }
@@ -408,6 +414,8 @@ void Pipeline::addMeshToScene(aiMesh *msh, glm::mat4 transmat, std::string nodeN
         }
         center /= 4.0;
         portalData->portalCenter = glm::vec3((transmat * glm::vec4(center, 1.0)));
+        // Set target of camera to the center of the portal.
+        portalData->portalCamera->setTarget(portalData->portalCenter);
     }
 
     boneIds.push_back({});
