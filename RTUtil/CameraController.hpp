@@ -148,7 +148,7 @@ public:
     }
 
     if (GLFW_CURSOR_DISABLED == glfwGetInputMode(glfwGetCurrentContext(), GLFW_CURSOR)){
-      orbit(glm::vec2(-rel.x(), -rel.y()) * 0.01f);
+      orbit(glm::vec2(-rel.x(), -rel.y()) * 0.00015f);
     }
 
     return false;
@@ -157,21 +157,21 @@ public:
   virtual bool keyboard_event(int key, int scancode, int action,
                              int modifiers) override{
     if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
-      dolly(0.1f);
+      dolly(0.01f);
       return true;
     }
     if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
-      dolly(-0.1f);
+      dolly(-0.01f);
       return true;
     }
     if (key == GLFW_KEY_A && action != GLFW_RELEASE) {  
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(-1.f * scale, 0));
+      pan(glm::vec2(-0.1f * scale, 0));
       return true;
     }
     if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(1.f * scale, 0));
+      pan(glm::vec2(0.1f * scale, 0));
       return true;
     }
     return false;

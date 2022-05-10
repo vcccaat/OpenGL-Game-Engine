@@ -282,9 +282,9 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
     else
     {
         Light defaultLight = Light();
-        defaultLight.pos = glm::vec3(2, 5, 0);
+        defaultLight.pos = glm::vec3(0, 0, -3);
         defaultLight.type = defaultLight.POINT;
-        defaultLight.power = aiColor3D(300);
+        defaultLight.power = aiColor3D(1000);
         defaultLight.transMat = glm::mat4(1.f);
         lights.push_back(defaultLight);
     }
@@ -549,7 +549,7 @@ void Pipeline::extractBonesforVertices(aiMesh *msh)
 
 /**************************************** PIPELINE CONSTRUCTOR  ****************************************/
 
-Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Bunny Demo", false),
+Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Portal Game", false),
                                                                               backgroundColor(0.4f, 0.4f, 0.7f, 1.0f)
 {
 
