@@ -146,6 +146,34 @@ public:
       pan(glm::vec2(-rel.x() * scale, rel.y() * scale));
       return true;
     }
+
+    if (GLFW_CURSOR_DISABLED == glfwGetInputMode(glfwGetCurrentContext(), GLFW_CURSOR)){
+      orbit(glm::vec2(-rel.x(), -rel.y()) * 0.01f);
+    }
+
+    return false;
+  }
+
+  virtual bool keyboard_event(int key, int scancode, int action,
+                             int modifiers) override{
+    if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
+      dolly(0.1f);
+      return true;
+    }
+    if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
+      dolly(-0.1f);
+      return true;
+    }
+    if (key == GLFW_KEY_A && action != GLFW_RELEASE) {  
+      float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
+      pan(glm::vec2(-1.f * scale, 0));
+      return true;
+    }
+    if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
+      float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
+      pan(glm::vec2(1.f * scale, 0));
+      return true;
+    }
     return false;
   }
 
