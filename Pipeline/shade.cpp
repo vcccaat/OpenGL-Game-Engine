@@ -29,18 +29,19 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
     for (int k = 0; k < lights.size(); ++k)
     {
         // Plug in point lights
-        // prog->uniform("lightPos"+std::to_string(k+1),  glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
-        // prog->uniform("power"+std::to_string(k+1), reinterpret_cast<glm::vec3&>(lights[k].power));
+        prog->uniform("lightPos"+std::to_string(k+1),  glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
+        prog->uniform("power"+std::to_string(k+1), reinterpret_cast<glm::vec3&>(lights[k].power));
         if (lights[k].type == lights[k].POINT)
         {
-            // prog->uniform("lightPos",glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
-            // prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
+            prog->uniform("lightPos",glm::vec3(lights[k].transMat * glm::vec4(lights[k].pos,1.0)));
+            prog->uniform("power", reinterpret_cast<glm::vec3&>(lights[k].power));
         }
     }
     for (int i = 0; i < meshes.size(); ++i)
     {
-		// Ignore this mesh if it is the portal mesh
-        if (portalId != -1 && materials[meshIndToMaterialInd[i]].renderTextureIndex == portalId) {
+        // Ignore this mesh if it is the portal mesh
+        if (portalId != -1 && materials[meshIndToMaterialInd[i]].renderTextureIndex == portalId)
+        {
             continue;
         }
         // Plug in mesh
@@ -56,14 +57,22 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
         }
         else
         {
-            material.diffuseTexture->bindToTextureUnit(0);
-            prog->uniform("diffuseTexture", 0);
+            
+            if (material.diffuseTexture == nullptr)
+            {
+                prog->uniform("textureMapped",0);
+                prog->uniform("alpha", bsdf.alpha());
+                prog->uniform("eta", bsdf.eta());
+                prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
+            }
+            else
+            {
+                prog->uniform("textureMapped",1);
+                material.diffuseTexture->bindToTextureUnit(0);
+                prog->uniform("diffuseTexture", 0);
+            }
         }
 
-        // prog->uniform("alpha", bsdf.alpha());
-        // prog->uniform("eta", bsdf.eta());
-        // prog->uniform("diffuseReflectance", bsdf.diffuseReflectance());
-        // Draw mesh
         meshes[i]->drawElements();
     }
 
