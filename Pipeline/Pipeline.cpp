@@ -390,6 +390,8 @@ void Pipeline::traverseNodeHierarchy(const aiScene *obj, aiNode *cur, glm::mat4 
     }
 }
 
+int w, h;
+
 /* parse mesh to vector of positions, normals, bones */
 void Pipeline::addMeshToScene(aiMesh *msh, glm::mat4 transmat, std::string nodeName)
 {
@@ -554,12 +556,14 @@ void Pipeline::extractBonesforVertices(aiMesh *msh)
 Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Portal Game", false),
                                                                               backgroundColor(0.0f, 0.5f, 1.0f, 1.0f)
 {
-
+    std::cout << windowWidth << ", " << windowHeight <<std::endl;
+    w = windowWidth;
+    h = windowHeight;
     const std::string resourcePath =
         // PATHEDIT
 
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("resoC:/Users/Ponol/Documents/GitHub/Starter22/resourcesurces", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        //cpplocate::locatePath("resoC:/Users/Ponol/Documents/GitHub/Starter22/resourcesurces", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
@@ -676,7 +680,10 @@ void Pipeline::draw_contents()
     {
         playMeshAnimation();
     }
-
+   glViewport(0, 0, w, h);
+    GLint viewportData[4];
+    glGetIntegerv(GL_VIEWPORT,viewportData);
+ 
     forwardShade();
     // return;
     // if (!deferred) {
