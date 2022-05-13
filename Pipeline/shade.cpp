@@ -96,8 +96,8 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
 void Pipeline::forwardShade()
 {
     GLWrap::checkGLError("drawContents start");
-    glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
-glViewport(0,0,myFBOSize.x,myFBOSize.y);
+    //glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    //glViewport(0,0,myFBOSize.x,myFBOSize.y);
     for (auto &&portalEntry : portals)
     {
         auto renderBuffer = portalEntry.second->portalBuffer;
@@ -151,7 +151,7 @@ void Pipeline::deferredShade()
 
     GLWrap::checkGLError("deferred shading start");
     gfbo->bind();
-    //glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
+    glViewport(0, 0, m_fbsize[0], m_fbsize[1]);
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

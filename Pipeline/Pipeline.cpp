@@ -562,8 +562,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     const std::string resourcePath =
         // PATHEDIT
 
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        //cpplocate::locatePath("resoC:/Users/Ponol/Documents/GitHub/Starter22/resourcesurces", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
@@ -643,7 +643,7 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
         glm::vec3(-50.f, .75f, 18.f),      // eye  6,2,10
-        glm::vec3(-50.f, .75f, 0.f),      // target
+        glm::vec3(-50.f, .75f, 0.f),       // target
         glm::vec3(0.f, 1.f, 0.f),          // up
         windowWidth / (float)windowHeight, // aspect
         0.1, 50.0,                         // near, far
@@ -680,9 +680,9 @@ void Pipeline::draw_contents()
     {
         playMeshAnimation();
     }
-   glViewport(0, 0, w, h);
-    GLint viewportData[4];
-    glGetIntegerv(GL_VIEWPORT,viewportData);
+    //glViewport(0, 0, w, h);
+    //GLint viewportData[4];
+    //glGetIntegerv(GL_VIEWPORT,viewportData);
  
     forwardShade();
     // return;
