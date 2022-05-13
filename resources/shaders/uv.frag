@@ -17,6 +17,7 @@ uniform mat4 mC;// Camera matrix
 uniform vec3 power;
 uniform int textureMapped;
 
+const float amb = .75;
 
 out vec4 fragColor;
 
@@ -125,6 +126,7 @@ void main(){
     acc=acc+shade(lightPos,power);
     //break; //TEMP//
   }
+  acc = acc + vec4(diffuseReflectance * vec3(amb, amb, amb), 0);
   if(textureMapped==1.0){
     fragColor=texture(diffuseTexture,uv0);
   }

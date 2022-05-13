@@ -282,11 +282,13 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
     else
     {
         Light defaultLight = Light();
-        defaultLight.pos = glm::vec3(0, 0, -3);
-        defaultLight.type = defaultLight.POINT;
-        defaultLight.power = aiColor3D(1000);
         defaultLight.transMat = glm::mat4(1.f);
-        lights.push_back(defaultLight);
+        defaultLight.name = "defaultLight";
+        defaultLight.pos = glm::vec3(-50, 50, 0);
+        defaultLight.type = defaultLight.POINT;
+        defaultLight.power = aiColor3D(10000);
+        //lights.push_back(defaultLight);
+        std::cout << "hi";
     }
 
     // Add default material for animation
@@ -550,13 +552,14 @@ void Pipeline::extractBonesforVertices(aiMesh *msh)
 /**************************************** PIPELINE CONSTRUCTOR  ****************************************/
 
 Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Portal Game", false),
-                                                                              backgroundColor(0.4f, 0.4f, 0.7f, 1.0f)
+                                                                              backgroundColor(0.0f, 0.5f, 1.0f, 1.0f)
 {
 
     const std::string resourcePath =
         // PATHEDIT
 
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        cpplocate::locatePath("resoC:/Users/Ponol/Documents/GitHub/Starter22/resourcesurces", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
@@ -635,8 +638,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
-        glm::vec3(3.f, 2.f, 10.f),         // eye  6,2,10
-        glm::vec3(3.f, 1.f, -1.f),         // target
+        glm::vec3(-50.f, .75f, 12.f),      // eye  6,2,10
+        glm::vec3(-50.f, .75f, 0.f),      // target
         glm::vec3(0.f, 1.f, 0.f),          // up
         windowWidth / (float)windowHeight, // aspect
         0.1, 50.0,                         // near, far
