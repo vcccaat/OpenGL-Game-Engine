@@ -7,9 +7,11 @@
 #include <glm/glm.hpp>
 #include <nanogui/vector.h>
 #include "Camera.hpp"
+#include "output.hpp"
+// #include "../Pipeline/Helper.hpp"
+
 
 namespace RTUtil {
-
 
 /// Translates user input into camera movement around a virtual scene.
 /// This class is designed to be compatible with the GLFW interface, but
@@ -121,6 +123,8 @@ public:
   virtual bool scroll_event(const nanogui::Vector2i& p, const nanogui::Vector2f& rel,
                            int modifiers = 0) override {
     zoom(rel.y() * 0.01);
+    // std::cout << "cam pos:" << camera->getEye().x << "," << camera->getEye().y << "," << camera->getEye().z << std::endl;
+
     return true;
   }
 
@@ -147,8 +151,29 @@ public:
       return true;
     }
 
+    // first person view look around (not rotate camera around an anchor point)
     if (GLFW_CURSOR_DISABLED == glfwGetInputMode(glfwGetCurrentContext(), GLFW_CURSOR)){
-      orbit(glm::vec2(-rel.x(), -rel.y()) * 0.00015f);
+      // orbit(glm::vec2(-rel.x(), -rel.y()) * 0.0015f);
+
+      const glm::vec3& v = camera->getVertical();
+      const glm::vec3& r = camera->getRight();
+      glm::mat4 T = glm::mat4(1.f);
+      glm::vec2 delta = glm::vec2(-rel.x(), -rel.y())* 0.0015f;
+      T = glm::rotate(T, delta.x, glm::vec3(0,1,0));
+      T = glm::rotate(T, delta.y, glm::vec3(1,0,0));
+
+      // std::cerr << T << "\n";
+      // std::cerr << camera->getTarget() << "\n";
+      // std::cout << delta.x << "," <<delta.y << std::endl;
+      camera->setTarget(T * glm::vec4(camera->getTarget(), 1.0));
+      // std::cout << "cam pos:" << camera->getEye().x << "," << camera->getEye().y << "," << camera->getEye().z << std::endl;
+      // std::cout << "target pos:" << camera->getTarget().x << "," << camera->getTarget().y << "," << camera->getTarget().z << std::endl;
+      
+      // glm::mat4 T = glm::rotate(glm::mat4(1.f), 3.14f/(4.0f*45.0f)* (-rel.x()), glm::vec3(0.f,1.f,0.f));
+      // camera->setTarget(T * glm::vec4(camera->getTarget(), 1.0));
+
+
+      return true;
     }
 
     return false;
@@ -156,24 +181,24 @@ public:
 
   virtual bool keyboard_event(int key, int scancode, int action,
                              int modifiers) override{
+    glm::vec3 v = glm::vec3(0.f);
     if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
       dolly(0.01f);
-      return true;
     }
     if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
       dolly(-0.01f);
-      return true;
     }
     if (key == GLFW_KEY_A && action != GLFW_RELEASE) {  
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
       pan(glm::vec2(-0.1f * scale, 0));
-      return true;
     }
     if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
       pan(glm::vec2(0.1f * scale, 0));
-      return true;
     }
+    // std::cout << "cam pos:" << camera->getEye().x << "," << camera->getEye().y << "," << camera->getEye().z << std::endl;
+    // std::cout << "target pos:" << camera->getTarget().x << "," << camera->getTarget().y << "," << camera->getTarget().z << std::endl;
+
     return false;
   }
 
@@ -210,6 +235,7 @@ protected:
     glm::vec3 t = delta.x * r + delta.y * v;
     translate(t);
   }
+
 
   /// Orbit the Camera around its target.
   /// @param delta The amount (in radians) to rotate the camera around the

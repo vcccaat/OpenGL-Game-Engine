@@ -9,7 +9,7 @@
 #include <RTUtil/conversions.hpp>
 #include "RTUtil/microfacet.hpp"
 #include "RTUtil/frame.hpp"
-#include "Helper.hpp"
+// #include "Helper.hpp"
 #include <glm/gtx/string_cast.hpp>
 
 /**************************************** HELPER FUNCTIONS ****************************************/
@@ -363,6 +363,10 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
 
         std::cout << std::endl;
     }
+
+    // enable free camera rotation based on mouse location (exit by esc key)
+    glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 }
 
 /**************************************** TRAVERSE NODE TREE TO ADD MESH ****************************************/
@@ -562,8 +566,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     const std::string resourcePath =
         // PATHEDIT
 
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
@@ -624,8 +628,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    // glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
-    glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    // glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i = 0; i < 5; ++i)
     {
@@ -646,7 +650,7 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
         glm::vec3(-50.f, .75f, 0.f),       // target
         glm::vec3(0.f, 1.f, 0.f),          // up
         windowWidth / (float)windowHeight, // aspect
-        0.1, 50.0,                         // near, far
+        0.1, 500.0,                         // near, far
         45.0 * M_PI / 180                  // fov  15.0 * M_PI/180
     );
 
