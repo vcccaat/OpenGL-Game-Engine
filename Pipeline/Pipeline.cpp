@@ -638,7 +638,7 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
 
     // Default camera, will be overwritten if camera is given in .glb
     cam = std::make_shared<RTUtil::PerspectiveCamera>(
-        glm::vec3(-50.f, .75f, 12.f),      // eye  6,2,10
+        glm::vec3(-50.f, .75f, 18.f),      // eye  6,2,10
         glm::vec3(-50.f, .75f, 0.f),      // target
         glm::vec3(0.f, 1.f, 0.f),          // up
         windowWidth / (float)windowHeight, // aspect
