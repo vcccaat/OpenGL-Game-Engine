@@ -6,6 +6,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include <nanogui/vector.h>
+#include <glm/gtc/type_ptr.hpp>
 #include "Camera.hpp"
 #include "output.hpp"
 // #include "../Pipeline/Helper.hpp"
@@ -102,6 +103,8 @@ public:
   };
 
 
+  float startTime;
+
 protected:
   std::shared_ptr<Camera> camera;
 };
@@ -153,25 +156,15 @@ public:
 
     // first person view look around (not rotate camera around an anchor point)
     if (GLFW_CURSOR_DISABLED == glfwGetInputMode(glfwGetCurrentContext(), GLFW_CURSOR)){
-      // orbit(glm::vec2(-rel.x(), -rel.y()) * 0.0015f);
-
+   
       const glm::vec3& v = camera->getVertical();
       const glm::vec3& r = camera->getRight();
+      glm::vec2 delta = glm::vec2(-rel.x(), -rel.y())* 0.003f;
+      glm::vec3 viewDir = camera->getEye() - camera->getTarget();
       glm::mat4 T = glm::mat4(1.f);
-      glm::vec2 delta = glm::vec2(-rel.x(), -rel.y())* 0.0015f;
       T = glm::rotate(T, delta.x, glm::vec3(0,1,0));
-      T = glm::rotate(T, delta.y, glm::vec3(1,0,0));
-
-      // std::cerr << T << "\n";
-      // std::cerr << camera->getTarget() << "\n";
-      // std::cout << delta.x << "," <<delta.y << std::endl;
-      camera->setTarget(T * glm::vec4(camera->getTarget(), 1.0));
-      // std::cout << "cam pos:" << camera->getEye().x << "," << camera->getEye().y << "," << camera->getEye().z << std::endl;
-      // std::cout << "target pos:" << camera->getTarget().x << "," << camera->getTarget().y << "," << camera->getTarget().z << std::endl;
-      
-      // glm::mat4 T = glm::rotate(glm::mat4(1.f), 3.14f/(4.0f*45.0f)* (-rel.x()), glm::vec3(0.f,1.f,0.f));
-      // camera->setTarget(T * glm::vec4(camera->getTarget(), 1.0));
-
+      T = glm::rotate(T, delta.y,  glm::vec3(1,0,0));
+      camera->setTarget(camera->getEye() - glm::vec3(T * glm::vec4(viewDir,1.0)));
 
       return true;
     }
@@ -182,19 +175,40 @@ public:
   virtual bool keyboard_event(int key, int scancode, int action,
                              int modifiers) override{
     glm::vec3 v = glm::vec3(0.f);
+    
     if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
-      dolly(0.01f);
+      if (action == GLFW_PRESS){
+        startTime = glfwGetTime();
+      } 
+      float deltaTime = glfwGetTime() - startTime;
+      dolly(0.01f,deltaTime);
+      return true;
     }
     if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
-      dolly(-0.01f);
+      if (action == GLFW_PRESS){
+        startTime = glfwGetTime();
+      } 
+      float deltaTime = glfwGetTime() - startTime;
+      dolly(-0.01f,deltaTime);
+      return true;
     }
     if (key == GLFW_KEY_A && action != GLFW_RELEASE) {  
+      if (action == GLFW_PRESS){
+        startTime = glfwGetTime();
+      } 
+      float deltaTime = glfwGetTime() - startTime;
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(-0.1f * scale, 0));
+      pan(glm::vec2(-0.1f * scale, 0),deltaTime);
+      return true;
     }
     if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
+      if (action == GLFW_PRESS){
+        startTime = glfwGetTime();
+      } 
+      float deltaTime = glfwGetTime() - startTime;
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(0.1f * scale, 0));
+      pan(glm::vec2(0.1f * scale, 0),deltaTime);
+      return true;
     }
     // std::cout << "cam pos:" << camera->getEye().x << "," << camera->getEye().y << "," << camera->getEye().z << std::endl;
     // std::cout << "target pos:" << camera->getTarget().x << "," << camera->getTarget().y << "," << camera->getTarget().z << std::endl;
@@ -215,8 +229,13 @@ protected:
 
   /// Moves the Camera and its target in the direction of the Camera's gaze.
   /// @param d The distance to move the Camera and its target.
-  virtual void dolly(float d) {
+  virtual void dolly(float d, float deltaTime = 0) {
+    float t = 0;
+    if (deltaTime > 0){
+      t = std::sin(deltaTime * 10 * 2 * 3.14);
+    }
     glm::vec3 gaze = camera->getTarget() - camera->getEye();
+    gaze.y += t * 2; 
     translate(gaze * d);
   }
 
@@ -229,11 +248,15 @@ protected:
 
   /// Move the Camera and its target within the view plane.
   /// @param delta The distance to move the camera within the view plane.
-  virtual void pan(const glm::vec2& delta) {
+  virtual void pan(const glm::vec2& delta, float deltaTime = 0) {
+    float t = 0;
+    if (deltaTime > 0){
+      t = std::sin(deltaTime * 10 * 2 * 3.14);
+    }
     const glm::vec3& r = camera->getRight();
     const glm::vec3& v = camera->getVertical();
-    glm::vec3 t = delta.x * r + delta.y * v;
-    translate(t);
+    glm::vec3 d = delta.x * r + (delta.y + t * 0.02f) * v;
+    translate(d);
   }
 
 
