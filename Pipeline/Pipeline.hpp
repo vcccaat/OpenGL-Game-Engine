@@ -107,11 +107,16 @@ public:
     glm::vec3 portalCenter;
     int meshIndex;
     int materialIndex;
-    int portalIndex;
+    int portalEntranceIndex;
+    int portalPairIndex;
     std::string portalNodeName;
-    
 };
-
+struct PortalPair 
+{
+    public:
+    int entryA;
+    int entryB;
+};
 class Pipeline : public nanogui::Screen
 {
 public:
@@ -127,7 +132,7 @@ public:
     void extractBonesforVertices(aiMesh *msh);
     void addMeshToScene(aiMesh *msh, glm::mat4 transmat, std::string nodeName);
 
-    void drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalIndex);
+    void drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalEntranceIndex);
     /* traverse node to update model matrix in animation loop */
     void playMeshAnimation();
     void traverseTree(const aiScene *obj, aiNode *node, glm::mat4 transMat, float t);
@@ -162,6 +167,7 @@ private:
 
     
     std::map<int, std::shared_ptr<PortalData>> portals;
+    std::map<int, std::shared_ptr<PortalPair>> portalPairs;
 
     std::vector<Light> lights;
 

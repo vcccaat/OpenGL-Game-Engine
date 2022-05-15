@@ -13,7 +13,7 @@
 #include <glm/gtx/quaternion.hpp>
 // #include "Helper.hpp"
 
-void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalIndex)
+void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalEntranceIndex)
 {
     glEnable(GL_DEPTH_TEST);
 
@@ -46,9 +46,10 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
         // Plug in materials
         Material material = materials[meshIndToMaterialInd[i]];
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
-        if (material.renderTextureIndex != -1 )
+        if (material.renderTextureIndex != -1)
         {
-            if(material.renderTextureIndex == portalIndex) continue;
+            if (material.renderTextureIndex == portalEntranceIndex)
+                continue;
             prog->uniform("textureMapped", 1);
             portals[material.renderTextureIndex]->portalBuffer->colorTexture().bindToTextureUnit(0);
             prog->uniform("diffuseTexture", 0);
@@ -104,12 +105,28 @@ void Pipeline::forwardShade()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderBuffer->unbind();
 
-        auto portalData =portalEntry.second;
+        auto portalData = portalEntry.second;
 
-        glm::vec3 localCamPosition = glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getEye(),1.0f);
+        auto portalPair = portalPairs.at(portalData->portalPairIndex);
+        std::shared_ptr<PortalData> linkedPortal;
 
-        portalData->portalCamera->setEye(cam->getEye());
-        portalData->portalCamera->setTarget(cam->getTarget());
+        if (portalData->portalEntranceIndex == portalPair->entryA)
+        {
+            linkedPortal = portals.at(portalPair->entryB);
+        }
+        else
+        {
+            linkedPortal = portals.at(portalPair->entryA);
+        }
+
+        glm::vec3 localPos = glm::vec3(glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getEye(), 1.0));
+        glm::vec3 localTarget = glm::vec3(glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getTarget(), 0.0));
+        
+        glm::vec3 analogousEye = glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(localPos, 1.0));
+        glm::vec3 analogousTarget = glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(localTarget, 0.0));
+       
+        portalData->portalCamera->setEye(analogousEye);
+        portalData->portalCamera->setTarget(analogousTarget);
         portalData->portalCamera->setAspectRatio(cam->getAspectRatio());
         portalData->portalCamera->setFOVY(cam->getFOVY());
     }
@@ -121,6 +138,8 @@ void Pipeline::forwardShade()
         auto portalData = portalEntry.second;
         // Transform each portal camera to match its paired portal
         auto renderBuffer = portalData->portalBuffer;
+
+        
         auto renderCam = portalData->portalCamera;
         renderBuffer->bind();
         drawGeometry(renderCam, renderIndex);
@@ -128,7 +147,7 @@ void Pipeline::forwardShade()
     }
 
     fbo->bind();
-    drawGeometry(cam,-1);
+    drawGeometry(cam, -1);
     fbo->unbind();
 
     glDisable(GL_DEPTH_TEST);

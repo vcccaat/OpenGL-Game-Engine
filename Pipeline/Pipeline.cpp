@@ -91,11 +91,11 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
             if (portals.count(renderTextureIndex) == 0)
             {
                 auto p = std::make_shared<PortalData>();
-                p->portalIndex = renderTextureIndex;
+                p->portalEntranceIndex = renderTextureIndex;
                 p->portalCamera = std::make_shared<RTUtil::PerspectiveCamera>(
                     glm::vec3(6, 6, 10),      // eye  6,2,10
                     glm::vec3(-0.2, 0.65, 0), // target
-                    glm::vec3(0, 1.0, 0),       // up
+                    glm::vec3(0, 1.0, 0),     // up
                     4.f / 3.f,                // aspect
                     0.1, 50.0,                // near, far
                     25.0 * M_PI / 180         // fov  15.0 * M_PI/180
@@ -103,8 +103,6 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
                 p->portalBuffer = std::make_shared<GLWrap::Framebuffer>(glm::ivec2(512, 512));
                 p->meshIndex = -1; // The other will values will be assigned later
                 p->materialIndex = i;
-               
-               
 
                 portals.emplace(renderTextureIndex, p);
             }
@@ -283,7 +281,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
         defaultLight.pos = glm::vec3(-50, 50, 0);
         defaultLight.type = defaultLight.POINT;
         defaultLight.power = aiColor3D(10000);
-        //lights.push_back(defaultLight);
+        // lights.push_back(defaultLight);
         std::cout << "hi";
     }
 
@@ -342,10 +340,10 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
 
     for (auto &&i : portals)
     {
-        auto portalIndex = i.first;
+        auto portalEntranceIndex = i.first;
         auto portalData = i.second;
 
-        std::cout << "Portal Index : " << portalData->portalIndex << std::endl;
+        std::cout << "Portal Index : " << portalData->portalEntranceIndex << std::endl;
         std::cout << "Portal Mesh Index : " << portalData->meshIndex << std::endl;
         std::cout << "Portal Material Index : " << portalData->materialIndex << std::endl;
         std::cout << "Portal Node Name : " << portalData->portalNodeName << std::endl;
@@ -362,7 +360,6 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
 
     // enable free camera rotation based on mouse location (exit by esc key)
     glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
 }
 
 /**************************************** TRAVERSE NODE TREE TO ADD MESH ****************************************/
@@ -418,8 +415,29 @@ void Pipeline::addMeshToScene(aiMesh *msh, glm::mat4 transmat, std::string nodeN
         }
         center /= 4.0;
         portalData->portalCenter = glm::vec3((transmat * glm::vec4(center, 1.0)));
+
+        std::string portalNum = nodeName.substr(7);
+        int portalSepIndex = portalNum.rfind('_');
+        std::string portalID = portalNum.substr(0, portalSepIndex);
+        int portalIDNum = std::atoi(portalID.c_str());
+
+        if (portalPairs.count(portalIDNum) == 0)
+        {
+            portalPairs.emplace(portalIDNum, std::make_shared<PortalPair>());
+        }
+        auto portalPair = portalPairs.at(portalIDNum);
+
+        portalData->portalPairIndex = portalIDNum;
+        if (portalNum.at(portalNum.size() - 1) == 'a')
+        {
+            portalPair->entryA = portalData->portalEntranceIndex;
+        }
+        else
+        {
+            portalPair->entryB = portalData->portalEntranceIndex;
+        }
         // Set target of camera to the center of the portal.
-        //portalData->portalCamera->setTarget(portalData->portalCenter);
+        // portalData->portalCamera->setTarget(portalData->portalCenter);
     }
 
     boneIds.push_back({});
@@ -556,14 +574,14 @@ void Pipeline::extractBonesforVertices(aiMesh *msh)
 Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : nanogui::Screen(nanogui::Vector2i(windowWidth, windowHeight), "Portal Game", false),
                                                                               backgroundColor(0.0f, 0.5f, 1.0f, 1.0f)
 {
-    std::cout << windowWidth << ", " << windowHeight <<std::endl;
+    std::cout << windowWidth << ", " << windowHeight << std::endl;
     w = windowWidth;
     h = windowHeight;
     const std::string resourcePath =
         // PATHEDIT
 
         cpplocate::locatePath("resources", "", nullptr) + "resources/";
-        // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+    // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
@@ -624,7 +642,7 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    glm::ivec2 myFBOSize = { m_fbsize[0], m_fbsize[1] };
+    glm::ivec2 myFBOSize = {m_fbsize[0], m_fbsize[1]};
     // glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i = 0; i < 5; ++i)
@@ -646,7 +664,7 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
         glm::vec3(-50.f, .75f, 0.f),       // target
         glm::vec3(0.f, 1.f, 0.f),          // up
         windowWidth / (float)windowHeight, // aspect
-        0.1, 500.0,                         // near, far
+        0.1, 500.0,                        // near, far
         45.0 * M_PI / 180                  // fov  15.0 * M_PI/180
     );
 
@@ -664,6 +682,7 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
 
     GlobalPath = path;
     initScene(cam, windowWidth, windowHeight);
+
     perform_layout();
     set_visible(true);
 
@@ -680,10 +699,10 @@ void Pipeline::draw_contents()
     {
         playMeshAnimation();
     }
-    //glViewport(0, 0, w, h);
-    //GLint viewportData[4];
-    //glGetIntegerv(GL_VIEWPORT,viewportData);
- 
+    // glViewport(0, 0, w, h);
+    // GLint viewportData[4];
+    // glGetIntegerv(GL_VIEWPORT,viewportData);
+
     forwardShade();
     // return;
     // if (!deferred) {
