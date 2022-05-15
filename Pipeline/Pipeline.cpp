@@ -95,7 +95,7 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
                 p->portalCamera = std::make_shared<RTUtil::PerspectiveCamera>(
                     glm::vec3(6, 6, 10),      // eye  6,2,10
                     glm::vec3(-0.2, 0.65, 0), // target
-                    glm::vec3(0, 0, 1),       // up
+                    glm::vec3(0, 1.0, 0),       // up
                     4.f / 3.f,                // aspect
                     0.1, 50.0,                // near, far
                     25.0 * M_PI / 180         // fov  15.0 * M_PI/180
@@ -103,12 +103,8 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
                 p->portalBuffer = std::make_shared<GLWrap::Framebuffer>(glm::ivec2(512, 512));
                 p->meshIndex = -1; // The other will values will be assigned later
                 p->materialIndex = i;
-                if (renderTextureIndex == 0) {
-                    p->pairedPortal = 1;
-                }
-                else {
-                    p->pairedPortal = 0;
-                }
+               
+               
 
                 portals.emplace(renderTextureIndex, p);
             }
@@ -423,7 +419,7 @@ void Pipeline::addMeshToScene(aiMesh *msh, glm::mat4 transmat, std::string nodeN
         center /= 4.0;
         portalData->portalCenter = glm::vec3((transmat * glm::vec4(center, 1.0)));
         // Set target of camera to the center of the portal.
-        portalData->portalCamera->setTarget(portalData->portalCenter);
+        //portalData->portalCamera->setTarget(portalData->portalCenter);
     }
 
     boneIds.push_back({});
