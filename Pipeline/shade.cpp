@@ -11,7 +11,56 @@
 #include "RTUtil/frame.hpp"
 #include "RTUtil/Sky.hpp"
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/type_ptr.hpp>
 // #include "Helper.hpp"
+
+// http://www.terathon.com/code/oblique.html
+//Oblique Projection
+inline float sgn(float a)
+{
+    if (a > 0.0F)
+        return (1.0F);
+    if (a < 0.0F)
+        return (-1.0F);
+    return (0.0F);
+}
+
+glm::mat4 modifyProjectionMatrix(glm::mat4 perspective, glm::vec4 clipPlane)
+{
+    float matrix[16];
+
+    for (size_t i = 0; i < 16; i++)
+    {
+        matrix[i] = perspective[i / 4][i % 4];
+    }
+
+    glm::vec4 q;
+
+    // Grab the current projection matrix from OpenGL
+    glGetFloatv(GL_PROJECTION_MATRIX, matrix);
+
+    // Calculate the clip-space corner point opposite the clipping plane
+    // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
+    // transform it into camera space by multiplying it
+    // by the inverse of the projection matrix
+
+    q.x = (sgn(clipPlane.x) + matrix[8]) / matrix[0];
+    q.y = (sgn(clipPlane.y) + matrix[9]) / matrix[5];
+    q.z = -1.0F;
+    q.w = (1.0F + matrix[10]) / matrix[14];
+
+    // Calculate the scaled plane vector
+    glm::vec4 c = clipPlane * (2.0F / glm::dot(clipPlane, q));
+
+    // Replace the third row of the projection matrix
+    matrix[2] = c.x;
+    matrix[6] = c.y;
+    matrix[10] = c.z + 1.0F;
+    matrix[14] = c.w;
+
+    return glm::make_mat4(matrix);
+}
+//Oblique Projection End
 
 void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalEntranceIndex)
 {
@@ -22,8 +71,19 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
 
     prog->use();
 
-    // Plug in camera stuff
     prog->uniform("mV", camera->getViewMatrix());
+
+    if (portalEntranceIndex == -1)
+    {
+    }
+    else
+    {
+        auto normal = glm::vec3(portals.at(portalEntranceIndex)->portalTransformationMatrix * glm::vec4(0.0, 1.0, 0.0, 0.0));
+        normal = glm::vec3(camera->getViewMatrix() * glm::vec4(normal, 0.0));
+
+        auto plane = glm::vec4(0.0, 0.0, 1.0, -1.0f);
+        prog->uniform("mP", modifyProjectionMatrix(camera->getProjectionMatrix(), plane));
+    }
     prog->uniform("mP", camera->getProjectionMatrix());
 
     for (int k = 0; k < lights.size(); ++k)
@@ -48,9 +108,10 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
         nori::Microfacet bsdf = nori::Microfacet(material.roughness, material.indexofref, 1.f, material.diffuse);
         if (material.renderTextureIndex != -1)
         {
-            if (material.renderTextureIndex == portalEntranceIndex)
+
+            if (portalEntranceIndex != -1)
                 continue;
-            prog->uniform("textureMapped", 1);
+            prog->uniform("textureMapped", 2);
             portals[material.renderTextureIndex]->portalBuffer->colorTexture().bindToTextureUnit(0);
             prog->uniform("diffuseTexture", 0);
         }
@@ -120,13 +181,15 @@ void Pipeline::forwardShade()
         }
 
         glm::vec3 localPos = glm::vec3(glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getEye(), 1.0));
-        glm::vec3 localTarget = glm::vec3(glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getTarget(), 0.0));
-        
+        glm::vec3 localTarget = glm::vec3(glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(portalData->portalCenter, 1.0));
+
         glm::vec3 analogousEye = glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(localPos, 1.0));
-        glm::vec3 analogousTarget = glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(localTarget, 0.0));
-       
+        glm::vec3 analogousTarget = glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(localTarget, 1.0));
+
         portalData->portalCamera->setEye(analogousEye);
         portalData->portalCamera->setTarget(analogousTarget);
+        // portalData->portalCamera->setEye(linkedPortal->portalCenter);
+        // portalData->portalCamera->setTarget(analogousTarget);
         portalData->portalCamera->setAspectRatio(cam->getAspectRatio());
         portalData->portalCamera->setFOVY(cam->getFOVY());
     }
@@ -139,7 +202,6 @@ void Pipeline::forwardShade()
         // Transform each portal camera to match its paired portal
         auto renderBuffer = portalData->portalBuffer;
 
-        
         auto renderCam = portalData->portalCamera;
         renderBuffer->bind();
         drawGeometry(renderCam, renderIndex);
@@ -154,7 +216,7 @@ void Pipeline::forwardShade()
 
     fsqProg->use();
     fbo->colorTexture().setParameters(
-        GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
+        GL_REPEAT, GL_REPEAT,
         GL_LINEAR, GL_LINEAR);
     fbo->colorTexture().bindToTextureUnit(0);
     fsqProg->uniform("image", 0);

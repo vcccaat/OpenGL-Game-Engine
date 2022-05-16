@@ -100,7 +100,7 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
                     0.1, 50.0,                // near, far
                     25.0 * M_PI / 180         // fov  15.0 * M_PI/180
                 );
-                p->portalBuffer = std::make_shared<GLWrap::Framebuffer>(glm::ivec2(512, 512));
+                p->portalBuffer = std::make_shared<GLWrap::Framebuffer>(glm::ivec2((int)(500 * cam->getAspectRatio()), 500));
                 p->meshIndex = -1; // The other will values will be assigned later
                 p->materialIndex = i;
 
@@ -248,25 +248,17 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
 
     // Camera initialize
 
-    // if (cam == nullptr)
-    // {
-    //     aiCamera *rawcam = obj->mCameras[0];
-    //     aiNode *rootNode = obj->mRootNode;
-    //     // transform camera
-    //     camTransMat = getTransMatrix(rootNode, rawcam->mName);
-    //     cam->setAspectRatio(rawcam->mAspect);
-    //     cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z, 1)));
-    //     cam->setFOVY(rawcam->mHorizontalFOV / rawcam->mAspect);
+    aiCamera *rawcam = obj->mCameras[0];
+    aiNode *rootNode = obj->mRootNode;
+    // transform camera
+    camTransMat = getTransMatrix(rootNode, rawcam->mName);
+    cam->setAspectRatio(rawcam->mAspect);
+    cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z, 1)));
+    cam->setFOVY(rawcam->mHorizontalFOV / rawcam->mAspect);
 
-    //     // Find point closest to origin along target ray using projection in camera space
-    //     glm::vec3 originInCamSpace = glm::vec3(glm::inverse(camTransMat) * glm::vec4(0, 0, 0, 1));
-    //     glm::vec3 originVec = originInCamSpace - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
-    //     glm::vec3 targetVec = glm::vec3(rawcam->mLookAt.x, rawcam->mLookAt.y, rawcam->mLookAt.z) - glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z);
-    //     glm::vec3 projVec = (float)(glm::dot(originVec, targetVec) / pow(glm::length(targetVec), 2)) * targetVec;
-    //     glm::vec3 targetCamSpace = glm::vec3(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z) + projVec;
-    //     glm::vec3 targetGlobal = glm::vec3(camTransMat * glm::vec4(targetCamSpace.x, targetCamSpace.y, targetCamSpace.z, 1));
-    //     cam->setTarget(targetGlobal);
-    // }
+    // Find point closest to origin along target ray using projection in camera space
+     
+    std::cout << "Set Camera Postion" << std::endl;
 
     // Add default light for animation
     if (obj->mNumLights > 0)
