@@ -249,14 +249,16 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
 
     // Camera initialize
 
-    aiCamera *rawcam = obj->mCameras[0];
-    aiNode *rootNode = obj->mRootNode;
-    // transform camera
-    camTransMat = getTransMatrix(rootNode, rawcam->mName);
-    cam->setAspectRatio(rawcam->mAspect);
-    cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z, 1)));
-    cam->setFOVY(rawcam->mHorizontalFOV / rawcam->mAspect);
-
+    if (obj->mNumCameras > 0) {
+        aiCamera* rawcam = obj->mCameras[0];
+        aiNode* rootNode = obj->mRootNode;
+        // transform camera
+        camTransMat = getTransMatrix(rootNode, rawcam->mName);
+        cam->setAspectRatio(rawcam->mAspect);
+        cam->setEye(glm::vec3(camTransMat * glm::vec4(rawcam->mPosition.x, rawcam->mPosition.y, rawcam->mPosition.z, 1)));
+        cam->setFOVY(rawcam->mHorizontalFOV / rawcam->mAspect);
+    }
+ 
     // Find point closest to origin along target ray using projection in camera space
 
     std::cout << "Set Camera Postion" << std::endl;
@@ -573,8 +575,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     const std::string resourcePath =
         // PATHEDIT
 
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-    // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+    cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
@@ -713,7 +715,7 @@ void Pipeline::draw_contents()
                 linkedPortal = portals.at(portalPair->entryA);
             }
 
-            cam->setEye(linkedPortal->portalCenter + glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(0,5,0,0)));
+            cam->setEye(linkedPortal->portalCenter + glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(0,3,0,0)));
             cam->setTarget(linkedPortal->portalCenter + glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(0,6.0,0,0)));
             break;
         }

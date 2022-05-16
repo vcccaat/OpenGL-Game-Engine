@@ -37,7 +37,7 @@ glm::mat4 modifyProjectionMatrix(glm::mat4 perspective, glm::vec4 clipPlane)
     glm::vec4 q;
 
     // Grab the current projection matrix from OpenGL
-    glGetFloatv(GL_PROJECTION_MATRIX, matrix);
+    //glGetFloatv(GL_PROJECTION_MATRIX, matrix);
 
     // Calculate the clip-space corner point opposite the clipping plane
     // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
@@ -73,7 +73,7 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
 
     prog->uniform("mV", camera->getViewMatrix());
 
-    if (portalEntranceIndex == -1)
+    /*if (portalEntranceIndex == -1)
     {
     }
     else
@@ -83,7 +83,7 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
 
         auto plane = glm::vec4(0.0, 0.0, 1.0, -1.0f);
         prog->uniform("mP", modifyProjectionMatrix(camera->getProjectionMatrix(), plane));
-    }
+    }*/
     prog->uniform("mP", camera->getProjectionMatrix());
 
     for (int k = 0; k < lights.size(); ++k)
@@ -127,6 +127,9 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
             }
             else
             {
+                material.diffuseTexture->setParameters(
+                    GL_REPEAT, GL_REPEAT,
+                    GL_LINEAR, GL_LINEAR);
                 prog->uniform("textureMapped", 1);
                 material.diffuseTexture->bindToTextureUnit(0);
                 prog->uniform("diffuseTexture", 0);
