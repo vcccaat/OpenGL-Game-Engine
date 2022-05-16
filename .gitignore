@@ -9,3 +9,4 @@ cmake-build-debug/
 .idea/.name
 CMakeSettings.json
 Demo/TetraFBO.cpp
+/resources/meshes/ourscene.glb

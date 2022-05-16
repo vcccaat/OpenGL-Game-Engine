@@ -181,7 +181,7 @@ public:
         startTime = glfwGetTime();
       } 
       float deltaTime = glfwGetTime() - startTime;
-      dolly(0.1f,0);
+      dolly(0.2f,deltaTime);
       return true;
     }
     if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
@@ -189,7 +189,7 @@ public:
         startTime = glfwGetTime();
       } 
       float deltaTime = glfwGetTime() - startTime;
-      dolly(-0.1f,0);
+      dolly(-0.2f,deltaTime);
       return true;
     }
     if (key == GLFW_KEY_A && action != GLFW_RELEASE) {  
@@ -198,7 +198,7 @@ public:
       } 
       float deltaTime = glfwGetTime() - startTime;
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(-0.1f , 0),0);
+      pan(glm::vec2(-0.1f , 0),deltaTime);
       return true;
     }
     if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
@@ -207,7 +207,7 @@ public:
       } 
       float deltaTime = glfwGetTime() - startTime;
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(0.1f , 0),0);
+      pan(glm::vec2(0.1f , 0),deltaTime);
       return true;
     }
     // std::cout << "cam pos:" << camera->getEye().x << "," << camera->getEye().y << "," << camera->getEye().z << std::endl;
@@ -232,10 +232,12 @@ protected:
   virtual void dolly(float d, float deltaTime = 0) {
     float t = 0;
     if (deltaTime > 0){
-      t = std::sin(deltaTime * 10 * 2 * 3.14);
+      t = std::sin(deltaTime * 2 * 2 * 3.14);
     }
-    glm::vec3 gaze = camera->getTarget() - camera->getEye();
-    gaze.y += t * 2; 
+    glm::vec3 gaze = glm::normalize(camera->getTarget() - camera->getEye());   
+    // always move in a fixed y level
+    gaze.y = 0;
+    gaze.y += t / 4; 
     translate(gaze * d);
   }
 
