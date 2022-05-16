@@ -17,8 +17,8 @@ int main(int argc, char const *argv[])
 
     // const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/bunnyscene2.glb";
     // const std::string path = "C:/Users/Ponol/Documents/GitHub/Starter22/resources/scenes/smoothbunny.glb";
-    const std::string resourcePath = cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
-    //const std::string resourcePath =  cpplocate::locatePath("resources", "", nullptr) + "resources/";
+    //const std::string resourcePath = cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+    const std::string resourcePath =  cpplocate::locatePath("resources", "", nullptr) + "resources/";
     const std::string path = resourcePath+"meshes/ourscene.glb";
 
     float aspect = getAspect(path);
