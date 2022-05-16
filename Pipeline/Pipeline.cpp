@@ -572,8 +572,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     const std::string resourcePath =
         // PATHEDIT
 
-        cpplocate::locatePath("resources", "", nullptr) + "resources/";
-    // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
+    cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
@@ -634,8 +634,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    glm::ivec2 myFBOSize = {m_fbsize[0], m_fbsize[1]};
-    // glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
+    //glm::ivec2 myFBOSize = {m_fbsize[0], m_fbsize[1]};
+    glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i = 0; i < 5; ++i)
     {
