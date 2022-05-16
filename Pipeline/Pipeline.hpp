@@ -103,6 +103,9 @@ public:
     std::shared_ptr<RTUtil::PerspectiveCamera> portalCamera;
     //In world space
     std::vector<glm::vec3> portalVertices;
+        
+        glm::mat4 portalMat;
+
     glm::mat4 portalTransformationMatrix;
     glm::vec3 portalCenter;
     int meshIndex;

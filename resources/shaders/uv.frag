@@ -17,7 +17,9 @@ uniform mat4 mC;// Camera matrix
 uniform vec3 power;
 uniform int textureMapped;
 
-const float amb = .75;
+in vec4 screenPos;
+
+const float amb=.75;
 
 out vec4 fragColor;
 
@@ -38,7 +40,7 @@ float fresnel(vec3 i,vec3 m,float eta){
   float gpc=g+c;
   float nom=c*(g+c)-1.;
   float denom=c*(g-c)+1.;
-  return .5*gmc*gmc/gpc/gpc*(1.+nom*nom/denom/denom);
+  return.5*gmc*gmc/gpc/gpc*(1.+nom*nom/denom/denom);
 }
 
 // The one-sided Smith shadowing/masking function
@@ -126,12 +128,17 @@ void main(){
     acc=acc+shade(lightPos,power);
     //break; //TEMP//
   }
-  acc = acc + vec4(diffuseReflectance * vec3(amb, amb, amb), 0);
-  if(textureMapped==1.0){
+  acc=acc+vec4(diffuseReflectance*vec3(amb,amb,amb),0);
+  if(textureMapped==0.){
+    fragColor=acc;
+  }
+  else if(textureMapped==2){
+    //PORTALS
+    vec2 screenSpace = uv0; // Fix Pls
     fragColor=texture(diffuseTexture,uv0);
   }
   else{
-    fragColor=acc;
+    fragColor=texture(diffuseTexture,uv0);
   }
   
 }
