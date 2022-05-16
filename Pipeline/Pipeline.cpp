@@ -696,6 +696,29 @@ void Pipeline::draw_contents()
     // GLint viewportData[4];
     // glGetIntegerv(GL_VIEWPORT,viewportData);
 
+    for (auto &&i : portals)
+    {
+        auto portalData = i.second;
+        if (glm::distance(cam->getEye(), portalData->portalCenter) < 2.0f)
+        {
+            auto portalPair = portalPairs.at(portalData->portalPairIndex);
+            std::shared_ptr<PortalData> linkedPortal;
+
+            if (portalData->portalEntranceIndex == portalPair->entryA)
+            {
+                linkedPortal = portals.at(portalPair->entryB);
+            }
+            else
+            {
+                linkedPortal = portals.at(portalPair->entryA);
+            }
+
+            cam->setEye(linkedPortal->portalCenter + glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(0,5,0,0)));
+            cam->setTarget(linkedPortal->portalCenter + glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(0,6.0,0,0)));
+            break;
+        }
+    }
+
     forwardShade();
     // return;
     // if (!deferred) {

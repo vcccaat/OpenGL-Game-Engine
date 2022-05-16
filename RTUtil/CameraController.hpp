@@ -181,7 +181,7 @@ public:
         startTime = glfwGetTime();
       } 
       float deltaTime = glfwGetTime() - startTime;
-      dolly(0.01f,deltaTime);
+      dolly(0.1f,0);
       return true;
     }
     if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
@@ -189,7 +189,7 @@ public:
         startTime = glfwGetTime();
       } 
       float deltaTime = glfwGetTime() - startTime;
-      dolly(-0.01f,deltaTime);
+      dolly(-0.1f,0);
       return true;
     }
     if (key == GLFW_KEY_A && action != GLFW_RELEASE) {  
@@ -198,7 +198,7 @@ public:
       } 
       float deltaTime = glfwGetTime() - startTime;
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(-0.1f * scale, 0),deltaTime);
+      pan(glm::vec2(-0.1f , 0),0);
       return true;
     }
     if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
@@ -207,7 +207,7 @@ public:
       } 
       float deltaTime = glfwGetTime() - startTime;
       float scale = glm::length(camera->getEye() - camera->getTarget()) * 0.03f;
-      pan(glm::vec2(0.1f * scale, 0),deltaTime);
+      pan(glm::vec2(0.1f , 0),0);
       return true;
     }
     // std::cout << "cam pos:" << camera->getEye().x << "," << camera->getEye().y << "," << camera->getEye().z << std::endl;
