@@ -575,8 +575,8 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     const std::string resourcePath =
         // PATHEDIT
 
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-    cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+    //cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
