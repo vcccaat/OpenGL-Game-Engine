@@ -101,6 +101,7 @@ std::vector<Material> Pipeline::parseMaterials(const aiScene *scene)
                     25.0 * M_PI / 180         // fov  15.0 * M_PI/180
                 );
                 p->portalBuffer = std::make_shared<GLWrap::Framebuffer>(glm::ivec2((int)(500 * cam->getAspectRatio()), 500));
+                p->portalBuffer2 = std::make_shared<GLWrap::Framebuffer>(glm::ivec2((int)(500 * cam->getAspectRatio()), 500));
                 p->meshIndex = -1; // The other will values will be assigned later
                 p->materialIndex = i;
 
@@ -257,7 +258,7 @@ void Pipeline::initScene(std::shared_ptr<RTUtil::PerspectiveCamera> &cam, float 
     cam->setFOVY(rawcam->mHorizontalFOV / rawcam->mAspect);
 
     // Find point closest to origin along target ray using projection in camera space
-     
+
     std::cout << "Set Camera Postion" << std::endl;
 
     // Add default light for animation
@@ -572,16 +573,16 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     const std::string resourcePath =
         // PATHEDIT
 
-        //cpplocate::locatePath("resources", "", nullptr) + "resources/";
-    cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
+        cpplocate::locatePath("resources", "", nullptr) + "resources/";
+    // cpplocate::locatePath("C:/Users/Ponol/Documents/GitHub/Starter22/resources", "", nullptr) + "C:/Users/Ponol/Documents/GitHub/Starter22/resources/";
     ResourcesPath = resourcePath;
     // forward shading
     prog.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/min.vert"}, // min
                                                                                                       // { GL_GEOMETRY_SHADER, resourcePath + "shaders/flat.geom" },
                                                                                                       //  { GL_FRAGMENT_SHADER, resourcePath + "shaders/lambert.frag" }
                                                {GL_FRAGMENT_SHADER, resourcePath + "shaders/uv.frag"}}));
-
-    // deferred shading: g-buffer
+    portalProg.reset(new GLWrap::Program("portal program", {{GL_VERTEX_SHADER, resourcePath + "shaders/fsq.vert"},
+                                                            {GL_FRAGMENT_SHADER, resourcePath + "shaders/portal.frag"}})); // deferred shading: g-buffer
     gProg.reset(new GLWrap::Program("program", {{GL_VERTEX_SHADER, resourcePath + "shaders/gbuff.vert"},
                                                 {GL_FRAGMENT_SHADER, resourcePath + "shaders/gbuff.frag"}}));
 
@@ -634,7 +635,7 @@ Pipeline::Pipeline(std::string path, float windowWidth, float windowHeight) : na
     fsqMesh->setAttribute(1, fsqTex);
 
     // Make framebuffer PATHEDIT
-    //glm::ivec2 myFBOSize = {m_fbsize[0], m_fbsize[1]};
+    // glm::ivec2 myFBOSize = {m_fbsize[0], m_fbsize[1]};
     glm::ivec2 myFBOSize = {m_fbsize[0] * 1.5, m_fbsize[1] * 1.5};
     std::vector<std::pair<GLenum, GLenum>> floatFormat;
     for (int i = 0; i < 5; ++i)

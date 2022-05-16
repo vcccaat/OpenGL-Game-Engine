@@ -17,7 +17,7 @@ uniform mat4 mC;// Camera matrix
 uniform vec3 power;
 uniform int textureMapped;
 
-in vec4 screenPos;
+in vec4 screenSpace;
 
 const float amb=.75;
 
@@ -134,8 +134,10 @@ void main(){
   }
   else if(textureMapped==2){
     //PORTALS
-    vec2 screenSpace = uv0; // Fix Pls
+    // vec2 screenSpace = uv0; // Fix Pls
+    vec2 s=screenSpace.xy/screenSpace.w;
     fragColor=texture(diffuseTexture,uv0);
+    
   }
   else{
     fragColor=texture(diffuseTexture,uv0);

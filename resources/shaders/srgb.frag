@@ -45,6 +45,5 @@ void main() {
         fragColor = color * exposure;
     }
 
-	//  fragColor = vec4(gl_FragCoord.x/900.0,gl_FragCoord.y/500.0,0.0,1.0);
-
+	// fragColor = vec4(geom_texCoord,0.0,1.0);
  }

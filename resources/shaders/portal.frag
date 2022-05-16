@@ -7,17 +7,17 @@
  * Pramook Khungurn (pk395), Sean Ryan (ser99), and Eston Schweickart (ers273)
  */
 
-// Simple full screen quad
-#version 330
+#version 140
 
-layout (location = 0) in vec3 vert_position;
-layout (location = 1) in vec2 vert_texCoord;
+uniform sampler2D image;
 
-out vec2 geom_texCoord;
-out vec4 screenSpace;
+in vec2 geom_texCoord;
+in vec4 screenSpace;
 
-void main() {
-	gl_Position = vec4(vert_position, 1.0);
-	geom_texCoord = vert_texCoord;
-	screenSpace = gl_Position;
-}
+out vec4 fragColor;
+
+void main() {		
+	vec4 color = texture(image, geom_texCoord);
+
+	fragColor = color;
+ }

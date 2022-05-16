@@ -15,6 +15,8 @@ out vec3 vNormal;// vertex normal in eye space
 out vec2 uv0;
 out vec2 uv1;
 
+out vec4 screenSpace;
+
 
 void main(){
     uv0=tex_coord0.xy;
@@ -22,4 +24,6 @@ void main(){
     vPosition=(mV*mM*vec4(position,1.)).xyz;
     vNormal=normalize(mV*mM*vec4(normal,.0)).xyz;
     gl_Position=mP*vec4(vPosition,1.);
+
+    screenSpace = gl_Position;
 }

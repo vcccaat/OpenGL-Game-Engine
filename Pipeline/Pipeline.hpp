@@ -100,11 +100,13 @@ struct PortalData
 {
 public:
     std::shared_ptr<GLWrap::Framebuffer> portalBuffer;
+    std::shared_ptr<GLWrap::Framebuffer> portalBuffer2;
+
     std::shared_ptr<RTUtil::PerspectiveCamera> portalCamera;
-    //In world space
+    // In world space
     std::vector<glm::vec3> portalVertices;
-        
-        glm::mat4 portalMat;
+
+    glm::mat4 portalMat;
 
     glm::mat4 portalTransformationMatrix;
     glm::vec3 portalCenter;
@@ -114,9 +116,9 @@ public:
     int portalPairIndex;
     std::string portalNodeName;
 };
-struct PortalPair 
+struct PortalPair
 {
-    public:
+public:
     int entryA;
     int entryB;
 };
@@ -157,7 +159,7 @@ private:
     bool deferred;
     bool toggle;
 
-    std::unique_ptr<GLWrap::Program> prog, fsqProg, gProg, lightProg, shadowProg, ambProg, sunskyProg, accProg, mergeProg;
+    std::unique_ptr<GLWrap::Program> prog,portalProg, fsqProg, gProg, lightProg, shadowProg, ambProg, sunskyProg, accProg, mergeProg;
     std::vector<std::unique_ptr<GLWrap::Mesh>> meshes;
     std::unique_ptr<GLWrap::Mesh> fsqMesh;
     std::unique_ptr<GLWrap::Framebuffer> fbo, gfbo, lightfbo, shadowfbo, blurHorfbo, blurVerfbo, mergefbo;
@@ -168,7 +170,6 @@ private:
 
     std::vector<Material> materials;
 
-    
     std::map<int, std::shared_ptr<PortalData>> portals;
     std::map<int, std::shared_ptr<PortalPair>> portalPairs;
 

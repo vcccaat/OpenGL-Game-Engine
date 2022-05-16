@@ -15,7 +15,7 @@
 // #include "Helper.hpp"
 
 // http://www.terathon.com/code/oblique.html
-//Oblique Projection
+// Oblique Projection
 inline float sgn(float a)
 {
     if (a > 0.0F)
@@ -60,7 +60,7 @@ glm::mat4 modifyProjectionMatrix(glm::mat4 perspective, glm::vec4 clipPlane)
 
     return glm::make_mat4(matrix);
 }
-//Oblique Projection End
+// Oblique Projection End
 
 void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, int portalEntranceIndex)
 {
@@ -160,13 +160,19 @@ void Pipeline::forwardShade()
     // glViewport(0,0,myFBOSize.x,myFBOSize.y);
     for (auto &&portalEntry : portals)
     {
-        auto renderBuffer = portalEntry.second->portalBuffer;
+        auto portalData = portalEntry.second;
+
+        auto renderBuffer = portalData->portalBuffer;
         renderBuffer->bind();
         glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderBuffer->unbind();
 
-        auto portalData = portalEntry.second;
+        renderBuffer = portalData->portalBuffer2;
+        renderBuffer->bind();
+        glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.w());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderBuffer->unbind();
 
         auto portalPair = portalPairs.at(portalData->portalPairIndex);
         std::shared_ptr<PortalData> linkedPortal;
@@ -200,12 +206,29 @@ void Pipeline::forwardShade()
         auto renderIndex = portalEntry.first;
         auto portalData = portalEntry.second;
         // Transform each portal camera to match its paired portal
-        auto renderBuffer = portalData->portalBuffer;
+        auto renderBuffer = portalData->portalBuffer2;
 
         auto renderCam = portalData->portalCamera;
         renderBuffer->bind();
         drawGeometry(renderCam, renderIndex);
         renderBuffer->unbind();
+
+        renderBuffer = portalData->portalBuffer;
+
+        renderBuffer->bind();
+        glDisable(GL_DEPTH_TEST);
+
+        portalProg->use();
+        portalData->portalBuffer2->colorTexture().setParameters(
+            GL_REPEAT, GL_REPEAT,
+            GL_LINEAR, GL_LINEAR);
+        portalData->portalBuffer2->colorTexture().bindToTextureUnit(0);
+  
+        // Draw the full screen quad
+        fsqMesh->drawArrays(GL_TRIANGLE_FAN, 0, 4);
+        portalProg->unuse();
+        renderBuffer->unbind();
+        glEnable(GL_DEPTH_TEST);
     }
 
     fbo->bind();
