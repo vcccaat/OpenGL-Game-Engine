@@ -84,6 +84,7 @@ void Pipeline::drawGeometry(std::shared_ptr<RTUtil::PerspectiveCamera> camera, i
         auto plane = glm::vec4(0.0, 0.0, 1.0, -1.0f);
         prog->uniform("mP", modifyProjectionMatrix(camera->getProjectionMatrix(), plane));
     }*/
+
     prog->uniform("mP", camera->getProjectionMatrix());
 
     for (int k = 0; k < lights.size(); ++k)
@@ -189,11 +190,16 @@ void Pipeline::forwardShade()
             linkedPortal = portals.at(portalPair->entryA);
         }
 
-        glm::vec3 localPos = glm::vec3(glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getEye(), 1.0));
-        glm::vec3 localTarget = glm::vec3(glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getTarget(), 1.0));  //portalData->portalCenter
+        glm::vec4 localPos = glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getEye(), 1.0);
+        glm::vec4 localTarget = glm::inverse(portalData->portalTransformationMatrix) * glm::vec4(cam->getTarget(), 1.0);  //portalData->portalCenter
 
-        glm::vec3 analogousEye = glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(localPos, 1.0));
-        glm::vec3 analogousTarget = glm::vec3(linkedPortal->portalTransformationMatrix * glm::vec4(localTarget, 1.0));
+        // rotate the camera behind the portal in the linked scene
+        // glm::mat4 m = glm::mat4(1.f);
+        // localPos = glm::rotate(m,3.14f,glm::vec3(0,1,0)) * localPos;
+        // localTarget = glm::rotate(m,3.14f,glm::vec3(0,1,0)) * localTarget;
+        
+        glm::vec3 analogousEye = glm::vec3(linkedPortal->portalTransformationMatrix * localPos);
+        glm::vec3 analogousTarget = glm::vec3(linkedPortal->portalTransformationMatrix * localTarget);
 
         portalData->portalCamera->setEye(analogousEye);
         portalData->portalCamera->setTarget(analogousTarget);
